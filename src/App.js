@@ -1,17 +1,8 @@
-import logo from "./logo.svg";
 import "./App.css";
+import SignIn from "./features/authentication/signin/sign_in";
 
 function App() {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-      </header>
-    </div>
-  );
+  return <SignIn />;
 }
 
 export default App;
