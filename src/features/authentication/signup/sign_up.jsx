@@ -1,12 +1,13 @@
 import React from "react";
 import {Typography, Form, Input, Divider } from 'antd';
-import PrimaryButton from "../../../components/primary_button";
+import PrimaryButton from "../../../components/primary_button"; // Reuse button component
  
 
 const {Title, Text} = Typography;
 
 const SignUp = () => {
 
+    //Internal style
     const styles = {
         container:{
             width: "320px",
@@ -18,7 +19,6 @@ const SignUp = () => {
         },
         subtitle:{
             fontSize: "16px",
-            // fontWeight: "bold",
         },
 
         link:{
@@ -71,6 +71,7 @@ const SignUp = () => {
             <Input placeholder="Confirm your password" size="large" />
         </Form.Item>
 
+        {/*Render the PrimaryButton component with the appropriate props. */ }
         <PrimaryButton text="Sign Up" type="primary" block />
     </Form>
 
