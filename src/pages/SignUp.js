@@ -130,7 +130,7 @@ export default class SignUp extends Component {
             <div className="header-col header-brand">
               <h5>Muse Dashboard</h5>
             </div>
-            <div className="header-col header-nav">
+            {/* <div className="header-col header-nav">
               <Menu mode="horizontal" defaultSelectedKeys={["1"]}>
                 <Menu.Item key="1">
                   <Link to="/dashboard">
@@ -160,7 +160,7 @@ export default class SignUp extends Component {
             </div>
             <div className="header-col header-btn">
               <Button type="false">FREE DOWNLOAD</Button>
-            </div>
+            </div> */}
           </Header>
 
           <Content className="p-0">
@@ -251,16 +251,16 @@ export default class SignUp extends Component {
             </Card>
           </Content>
           <Footer>
-            <Menu mode="horizontal">
+            {/* <Menu mode="horizontal">
               <Menu.Item>Company</Menu.Item>
               <Menu.Item>About Us</Menu.Item>
               <Menu.Item>Teams</Menu.Item>
               <Menu.Item>Products</Menu.Item>
               <Menu.Item>Blogs</Menu.Item>
               <Menu.Item>Pricing</Menu.Item>
-            </Menu>
+            </Menu> */}
             <Menu mode="horizontal" className="menu-nav-social">
-              <Menu.Item>
+              {/* <Menu.Item>
                 <Link to="#">{<DribbbleOutlined />}</Link>
               </Menu.Item>
               <Menu.Item>
@@ -283,7 +283,7 @@ export default class SignUp extends Component {
               </Menu.Item>
               <Menu.Item>
                 <Link to="#">{<GithubOutlined />}</Link>
-              </Menu.Item>
+              </Menu.Item> */}
             </Menu>
             <p className="copyright">
               {" "}
