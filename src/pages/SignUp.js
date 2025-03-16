@@ -176,10 +176,12 @@ export default class SignUp extends Component {
 
             <Card
               className="card-signup header-solid h-full ant-card pt-0"
-              title={<h5>Register With</h5>}
+              title={
+                ""
+              }
               bordered="false"
             >
-              <div className="sign-up-gateways">
+              {/* <div className="sign-up-gateways">
                 <Button type="false">
                   <img src={logo1} alt="logo 1" />
                 </Button>
@@ -189,8 +191,8 @@ export default class SignUp extends Component {
                 <Button type="false">
                   <img src={logo3} alt="logo 3" />
                 </Button>
-              </div>
-              <p className="text-center my-25 font-semibold text-muted">Or</p>
+              </div> */}
+              {/* <p className="text-center my-25 font-semibold text-muted">Or</p> */}
               <Form
                 name="basic"
                 initialValues={{ remember: true }}
