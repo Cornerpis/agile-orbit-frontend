@@ -245,15 +245,15 @@ export default class SignIn extends Component {
             </Row>
           </Content>
           <Footer>
-            <Menu mode="horizontal">
+            {/* <Menu mode="horizontal">
               <Menu.Item>Company</Menu.Item>
               <Menu.Item>About Us</Menu.Item>
               <Menu.Item>Teams</Menu.Item>
               <Menu.Item>Products</Menu.Item>
               <Menu.Item>Blogs</Menu.Item>
               <Menu.Item>Pricing</Menu.Item>
-            </Menu>
-            <Menu mode="horizontal" className="menu-nav-social">
+            </Menu> */}
+            {/* <Menu mode="horizontal" className="menu-nav-social">
               <Menu.Item>
                 <Link to="#">{<DribbbleOutlined />}</Link>
               </Menu.Item>
@@ -278,7 +278,7 @@ export default class SignIn extends Component {
               <Menu.Item>
                 <Link to="#">{<GithubOutlined />}</Link>
               </Menu.Item>
-            </Menu>
+            </Menu> */}
             <p className="copyright">
               {" "}
               Copyright © 2021 Muse by <a href="#pablo">Creative Tim</a>.{" "}
