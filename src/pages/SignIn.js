@@ -130,7 +130,7 @@ export default class SignIn extends Component {
             <div className="header-col header-brand">
               <h5>Muse Dashboard</h5>
             </div>
-            <div className="header-col header-nav">
+            {/* <div className="header-col header-nav">
               <Menu mode="horizontal" defaultSelectedKeys={["1"]}>
                 <Menu.Item key="1">
                   <Link to="/dashboard">
@@ -157,10 +157,10 @@ export default class SignIn extends Component {
                   </Link>
                 </Menu.Item>
               </Menu>
-            </div>
-            <div className="header-col header-btn">
+            </div> */}
+            {/* <div className="header-col header-btn">
               <Button type="primary">FREE DOWNLOAD</Button>
-            </div>
+            </div> */}
           </Header>
           <Content className="signin">
             <Row gutter={[24, 0]} justify="space-around">
