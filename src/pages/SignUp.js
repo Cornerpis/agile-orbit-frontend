@@ -128,7 +128,7 @@ export default class SignUp extends Component {
         <div className="layout-default ant-layout layout-sign-up">
           <Header>
             <div className="header-col header-brand">
-              <h5>Muse Dashboard</h5>
+              <h5>Agile Orbit Dashboard</h5>
             </div>
             {/* <div className="header-col header-nav">
               <Menu mode="horizontal" defaultSelectedKeys={["1"]}>
@@ -168,8 +168,7 @@ export default class SignUp extends Component {
               <div className="content">
                 <Title>Sign Up</Title>
                 <p className="text-lg">
-                  Use these awesome forms to login or create new account in your
-                  project for free.
+                Please provide the necessary details below to create your account. Ensure all information is accurate for a seamless experience.
                 </p>
               </div>
             </div>
@@ -198,31 +197,71 @@ export default class SignUp extends Component {
                 initialValues={{ remember: true }}
                 onFinish={onFinish}
                 onFinishFailed={onFinishFailed}
-                className="row-col"
+                className="row-col" style={{marginTop:20}}
               >
                 <Form.Item
-                  name="Name"
+                  name="Firstname"
                   rules={[
-                    { required: true, message: "Please input your username!" },
+                    { required: true, message: "Please enter your first name" },
                   ]}
                 >
-                  <Input placeholder="Name" />
+                  <Input placeholder="First name" />
+                </Form.Item>
+                <Form.Item
+                  name="Lastname"
+                  rules={[
+                    { required: true, message: "Please enter your last name" },
+                  ]}
+                >
+                  <Input placeholder="Last name" />
                 </Form.Item>
                 <Form.Item
                   name="email"
                   rules={[
-                    { required: true, message: "Please input your email!" },
+                    { required: true, message: "Please enter your email" },
                   ]}
                 >
                   <Input placeholder="email" />
                 </Form.Item>
                 <Form.Item
-                  name="password"
+                  name="Phonenumber"
                   rules={[
-                    { required: true, message: "Please input your password!" },
+                    { required: true, message: "Please enter your phone number" },
                   ]}
                 >
-                  <Input placeholder="Passwoed" />
+                  <Input placeholder="Phone number" />
+                </Form.Item>
+                <Form.Item
+                  name="Role"
+                  rules={[
+                    { required: true, message: "Please enter your role" },
+                  ]}
+                >
+                  <Input placeholder="Role" />
+                </Form.Item>
+                <Form.Item
+                  name="department"
+                  rules={[
+                    { required: true, message: "Please enter your department" },
+                  ]}
+                >
+                  <Input placeholder="Department" />
+                </Form.Item>
+                <Form.Item
+                  name="password"
+                  rules={[
+                    { required: true, message: "Please enter your password" },
+                  ]}
+                >
+                  <Input placeholder="Password" />
+                </Form.Item>
+                <Form.Item
+                  name="confirmpassword"
+                  rules={[
+                    { required: true, message: "Please enter your confirm password" },
+                  ]}
+                >
+                  <Input placeholder="Confirm password" />
                 </Form.Item>
 
                 <Form.Item name="remember" valuePropName="checked">
@@ -289,7 +328,7 @@ export default class SignUp extends Component {
             </Menu>
             <p className="copyright">
               {" "}
-              Copyright © 2021 Muse by <a href="#pablo">Creative Tim</a>.{" "}
+              Copyright © 2025 by <a href="#pablo">Cornerpis Technology</a>.{" "}
             </p>
           </Footer>
         </div>
