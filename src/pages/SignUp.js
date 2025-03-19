@@ -168,8 +168,7 @@ export default class SignUp extends Component {
               <div className="content">
                 <Title>Sign Up</Title>
                 <p className="text-lg">
-                  Use these awesome forms to login or create new account in your
-                  project for free.
+                  Fill the form with the correct details to create account.
                 </p>
               </div>
             </div>
@@ -198,32 +197,73 @@ export default class SignUp extends Component {
                 initialValues={{ remember: true }}
                 onFinish={onFinish}
                 onFinishFailed={onFinishFailed}
-                className="row-col"
+                className="row-col" style={{marginTop:25}}
               >
                 <Form.Item
                   name="Name"
                   rules={[
-                    { required: true, message: "Please input your username!" },
+                    { required: true, message: "Please enter your first name" },
                   ]}
                 >
-                  <Input placeholder="Name" />
+                  <Input placeholder="First name" />
+                </Form.Item>
+                <Form.Item
+                  name="lname"
+                  rules={[
+                    { required: true, message: "Please enter your last name" },
+                  ]}
+                >
+                  <Input placeholder="Last name" />
                 </Form.Item>
                 <Form.Item
                   name="email"
                   rules={[
-                    { required: true, message: "Please input your email!" },
+                    { required: true, message: "Please enter your email!" },
                   ]}
                 >
-                  <Input placeholder="email" />
+                  <Input placeholder="Email" />
+                </Form.Item>
+                <Form.Item
+                  name="phonenumber"
+                  rules={[
+                    { required: true, message: "Please enter your phone number" },
+                  ]}
+                >
+                  <Input placeholder="Phone number" />
+                </Form.Item>
+                <Form.Item
+                  name="role"
+                  rules={[
+                    { required: true, message: "Please enter your role" },
+                  ]}
+                >
+                  <Input placeholder="Role" />
+                </Form.Item>
+                <Form.Item
+                  name="department"
+                  rules={[
+                    { required: true, message: "Please enter your department" },
+                  ]}
+                >
+                  <Input placeholder="Department" />
                 </Form.Item>
                 <Form.Item
                   name="password"
                   rules={[
-                    { required: true, message: "Please input your password!" },
+                    { required: true, message: "Please enter your password!" },
                   ]}
                 >
                   <Input placeholder="Passwoed" />
                 </Form.Item>
+                <Form.Item
+                  name="confirmpassword"
+                  rules={[
+                    { required: true, message: "Please enter your confirm password!" },
+                  ]}
+                >
+                  <Input placeholder="Confirm Passwoed" />
+                </Form.Item>
+
 
                 <Form.Item name="remember" valuePropName="checked">
                   <Checkbox>
@@ -289,7 +329,7 @@ export default class SignUp extends Component {
             </Menu>
             <p className="copyright">
               {" "}
-              Copyright © 2021 Muse by <a href="#pablo">Creative Tim</a>.{" "}
+              Copyright © 2025 by <a href="www.cornerpistech.com">Cornerpis Technology</a>.{" "}
             </p>
           </Footer>
         </div>
