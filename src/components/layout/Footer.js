@@ -21,18 +21,18 @@ function Footer() {
       <Row className="just">
         <Col xs={24} md={12} lg={12}>
           <div className="copyright">
-            © 2021, made with
-            {<HeartFilled />} by
+            © 2025, 
+             by
             <a href="#pablo" className="font-weight-bold" target="_blank">
-              Creative Tim
+              Cornerpis Technology
             </a>
-            for a better web.
+           
           </div>
         </Col>
         <Col xs={24} md={12} lg={12}>
           <div className="footer-menu">
             <ul>
-              <li className="nav-item">
+              {/* <li className="nav-item">
                 <a
                   href="#pablo"
                   className="nav-link text-muted"
@@ -40,8 +40,8 @@ function Footer() {
                 >
                   Creative Tim
                 </a>
-              </li>
-              <li className="nav-item">
+              </li> */}
+              {/* <li className="nav-item">
                 <a
                   href="#pablo"
                   className="nav-link text-muted"
@@ -49,8 +49,8 @@ function Footer() {
                 >
                   About Us
                 </a>
-              </li>
-              <li className="nav-item">
+              </li> */}
+              {/* <li className="nav-item">
                 <a
                   href="#pablo"
                   className="nav-link text-muted"
@@ -58,8 +58,8 @@ function Footer() {
                 >
                   Blog
                 </a>
-              </li>
-              <li className="nav-item">
+              </li> */}
+              {/* <li className="nav-item">
                 <a
                   href="#pablo"
                   className="nav-link pe-0 text-muted"
@@ -67,7 +67,7 @@ function Footer() {
                 >
                   License
                 </a>
-              </li>
+              </li> */}
             </ul>
           </div>
         </Col>
