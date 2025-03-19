@@ -486,7 +486,7 @@ function Home() {
                    <span className="bnb2"></span>
                 </Paragraph>
                 <Text>Current Score: 80%</Text>
-                progress: <Progress percent={80} size="small" />,
+                <Progress percent={80} size="small" />
                 {/* <Progress percent={80} status="active" /> */}
 
                 {/* <Timeline
@@ -501,13 +501,13 @@ function Home() {
                     </Timeline.Item>
                   ))}
                 </Timeline> */}
-                <Button
+                {/* <Button
                   type="primary"
                   className="width-100"
                   onClick={() => setReverse(!reverse)}
                 >
                   {<MenuUnfoldOutlined />} REVERSE
-                </Button>
+                </Button> */}
               </div>
             </Card>
             <Card style={{ marginTop: 16 }}>
