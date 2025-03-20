@@ -410,10 +410,10 @@ function Home() {
                 <table className="width-100">
                   <thead>
                     <tr>
-                      <th>COMPANIES</th>
-                      <th>MEMBERS</th>
-                      <th>BUDGET</th>
-                      <th>COMPLETION</th>
+                      <th>PROJECT</th>
+                      <th>SPRINT VELOCITY</th>
+                      <th>COST</th>
+                      <th>PROGRESS</th>
                     </tr>
                   </thead>
                   <tbody>
