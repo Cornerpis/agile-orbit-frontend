@@ -31,6 +31,8 @@ import {
   RightOutlined,
 } from "@ant-design/icons";
 import Paragraph from "antd/lib/typography/Paragraph";
+import MyModal from '../pages/create-project';
+import { Pagination } from "antd";
 
 import Echart from "../components/chart/EChart";
 import LineChart from "../components/chart/LineChart";
@@ -53,6 +55,14 @@ function Home() {
   const onChange = (e) => console.log(`radio checked:${e.target.value}`);
 
   const [reverse, setReverse] = useState(false);
+
+  const [isModalVisible, setIsModalVisible] = useState(false);
+  
+  const handleCreate = (values) => {
+    console.log("Project Created:", values);
+    // If you want to keep the modal open after submission, remove this line:
+    setIsModalVisible(false);
+  };
 
   const dollor = [
     <svg
@@ -142,30 +152,30 @@ function Home() {
   ];
   const count = [
     {
-      today: "Today’s Sales",
-      title: "$53,000",
-      persent: "+30%",
+      today: "Total Projects",
+      title: "53,000",
+      // persent: "+30%",
       icon: dollor,
       bnb: "bnb2",
     },
     {
-      today: "Today’s Users",
+      today: "Total Users",
       title: "3,200",
-      persent: "+20%",
+      // persent: "+20%",
       icon: profile,
       bnb: "bnb2",
     },
     {
-      today: "New Clients",
-      title: "+1,200",
-      persent: "-20%",
+      today: "Team Members",
+      title: "15",
+      // persent: "-20%",
       icon: heart,
       bnb: "redtext",
     },
     {
-      today: "New Orders",
-      title: "$13,200",
-      persent: "10%",
+      today: "Projects Inprogress",
+      title: "13,200",
+      // persent: "10%",
       icon: cart,
       bnb: "bnb2",
     },
@@ -175,9 +185,10 @@ function Home() {
     {
       // img: ava1,
       Title: "Soft UI Shopify Version",
-      bud: "$14,000",
-      member:"Timothy",
-      progress: <Progress percent={60} size="small" />,
+      bud: "23/03/2025",
+      desscription: "presentatation of accur..",
+      member:"15",
+      progress: "High",
       
       // member: (
       //   <div className="avatar-group mt-2">
@@ -199,9 +210,11 @@ function Home() {
     {
       // img: ava2,
       Title: "Progress Track",
-      bud: "$3,000",
-      member:"Timothy",
-      progress: <Progress percent={10} size="small" />,
+      bud: "12/04/2025",
+      desscription: "Change date of..",
+      member:"10",
+      progress: "Medium",
+      // progress: <Progress percent={10} size="small" />,
       // member: (
       //   <div className="avatar-group mt-2">
       //     <Tooltip placement="bottom" title="Ryan Tompson">
@@ -216,9 +229,10 @@ function Home() {
     {
       // img: ava3,
       Title: "Fix Platform Errors",
-      bud: "Not Set",
-      member:"Timothy",
-      progress: <Progress percent={100} size="small" status="active" />,
+      bud: "04/04/2025",
+      desscription: "presentatation of accur..",
+      member:"5",
+      progress: "Low",
       // member: (
       //   <div className="avatar-group mt-2">
       //     <Tooltip placement="bottom" title="Ryan Tompson">
@@ -236,9 +250,10 @@ function Home() {
     {
       // img: ava4,
       Title: "Launch new Mobile App",
-      bud: "$20,600",
-      member:"Timothy",
-      progress: <Progress percent={100} size="small" status="active" />,
+      bud: "15/05/2025",
+      desscription: "presentatation of accur..",
+      member:"7",
+      progress: "High",
       // member: (
       //   <div className="avatar-group mt-2">
       //     <Tooltip placement="bottom" title="Ryan Tompson">
@@ -253,9 +268,10 @@ function Home() {
     {
       // img: ava5,
       Title: "Add the New Landing Page",
-      bud: "$4,000",
-      member:"Timothy",
-      progress: <Progress percent={80} size="small" />,
+      bud: "02/04/2025",
+      desscription: "Change date of..",
+      member:"4",
+      progress: "Medium",
       // member: (
       //   <div className="avatar-group mt-2">
       //     <Tooltip placement="bottom" title="Ryan Tompson">
@@ -277,16 +293,10 @@ function Home() {
     {
       // img: ava6,
       Title: "Redesign Online Store",
-      bud: "$2,000",
-      member:"Timothy",
-      progress: (
-        <Progress
-          percent={100}
-          size="small"
-          status="exception"
-          format={() => "Cancel"}
-        />
-      ),
+      bud: "31/03/2025",
+      desscription: "Change date of..",
+      member:"3",
+      progress: "Medium",
       // member: (
       //   <div className="avatar-group mt-2">
       //     <Tooltip placement="bottom" title="Ryan Tompson">
@@ -394,6 +404,11 @@ function Home() {
             </Card>
           </Col>
         </Row> */}
+        <MyModal
+            visible={isModalVisible}
+            onCreate={handleCreate}
+            onCancel={() => setIsModalVisible(false)}
+          />
 
         <Row gutter={[24, 0]}>
           <Col xs={24} sm={24} md={12} lg={12} xl={16} className="mb-24">
@@ -409,9 +424,9 @@ function Home() {
                 <Button
                   type="primary"
                   className="width-100"
-                  onClick={() => setReverse(!reverse)}
+                  onClick = {() => setIsModalVisible(true)}
                 >
-                  {<PlusOutlined />} New Project
+                  {<PlusOutlined />} Create New Project
                 </Button>
                   {/* <div className="antd-pro-pages-dashboard-analysis-style-salesExtra">
                     <Radio.Group onChange={onChange} defaultValue="a">
@@ -423,13 +438,14 @@ function Home() {
                 </div>
               </div>
               <div className="ant-list-box table-responsive">
-                <table className="width-100">
+                <table className="width-100" >
                   <thead>
                     <tr>
-                      <th>PROJECT</th>
-                      <th>SPRINT VELOCITY</th>
-                      <th>COST</th>
-                      <th>PROGRESS</th>
+                      <th>PROJECT NAME</th>
+                      <th>TEAM MEMBERS</th>
+                      <th>DESCRIPTION</th>
+                      <th>DEADLINE</th>
+                      <th>PRIORITY</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -437,28 +453,26 @@ function Home() {
                       <tr key={index}>
                         <td>
                           <h6>
-                            <img
+                            {/* <img
                               src={d.img}
                               alt=""
                               className="avatar-sm mr-10"
-                            />{" "}
-                            {d.Title}
+                            />{" "} */}
                           </h6>
+                          {d.Title}
                         </td>
                         <td>
-                          <span className="text-xs font-weight-bold">
                             {d.member}
 
-                          </span>
-                          {/* {d.member} */}
+                          </td>
+                          <td>
+                          {d.desscription}
                           </td>
                         <td>
-                          <span className="text-xs font-weight-bold">
-                            {d.bud}{" "}
-                          </span>
+                            {d.bud}
                         </td>
                         <td>
-                          <div className="percent-progress">{d.progress}</div>
+                          {d.progress}
                         </td>
                       </tr>
                     ))}
@@ -481,7 +495,7 @@ function Home() {
           <Col xs={24} sm={24} md={12} lg={12} xl={8} className="mb-24">
             <Card bordered={false} className="criclebox">
               <div className="timeline-box">
-                <Title level={5}>Agile Maturity Score</Title>
+                <Title level={5}>Project Completed</Title>
                 <Paragraph className="lastweek" style={{ marginBottom: 24 }}>
                    <span className="bnb2"></span>
                 </Paragraph>
@@ -523,11 +537,10 @@ function Home() {
               </Card>
           </Col>
         </Row>
-
-        
       </div>
     </>
   );
 }
 
 export default Home;
+
