@@ -1,14 +1,4 @@
-/*!
-=========================================================
-* Muse Ant Design Dashboard - v1.0.0
-=========================================================
-* Product Page: https://www.creative-tim.com/product/muse-ant-design-dashboard
-* Copyright 2021 Creative Tim (https://www.creative-tim.com)
-* Licensed under MIT (https://github.com/creativetimofficial/muse-ant-design-dashboard/blob/main/LICENSE.md)
-* Coded by Creative Tim
-=========================================================
-* The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
-*/
+
 import React, { Component } from "react";
 import {
   Layout,
@@ -223,22 +213,7 @@ name="Lastname"
                 >
                   <Input placeholder="Email" />
                 </Form.Item>
-                <Form.Item
-                  name="phonenumber"
-                  rules={[
-                    { required: true, message: "Please enter your phone number" },
-                  ]}
-                >
-                  <Input placeholder="Phone number" />
-                </Form.Item>
-                <Form.Item
-                  name="role"
-                  rules={[
-                    { required: true, message: "Please enter your role" },
-                  ]}
-                >
-                  <Input placeholder="Role" />
-                </Form.Item>
+               
                 <Form.Item
                   name="department"
                   rules={[
@@ -247,14 +222,7 @@ name="Lastname"
                 >
                   <Input placeholder="Department" />
                 </Form.Item>
-                <Form.Item
-                  name="Phonenumber"
-                  rules={[
-                    { required: true, message: "Please enter your phone number" },
-                  ]}
-                >
-                  <Input placeholder="Phone number" />
-                </Form.Item>
+                
                 <Form.Item
                   name="Role"
                   rules={[
@@ -263,14 +231,7 @@ name="Lastname"
                 >
                   <Input placeholder="Role" />
                 </Form.Item>
-                <Form.Item
-                  name="department"
-                  rules={[
-                    { required: true, message: "Please enter your department" },
-                  ]}
-                >
-                  <Input placeholder="Department" />
-                </Form.Item>
+                
                 <Form.Item
                   name="password"
                   rules={[
@@ -287,16 +248,6 @@ name="Lastname"
                 >
                   <Input placeholder="Confirm password" />
                 </Form.Item>
-                <Form.Item
-                  name="confirmpassword"
-                  rules={[
-                    { required: true, message: "Please enter your confirm password!" },
-                  ]}
-                >
-                  <Input placeholder="Confirm Passwoed" />
-                </Form.Item>
-
-
                 <Form.Item name="remember" valuePropName="checked">
                   <Checkbox>
                     I agree the{" "}
