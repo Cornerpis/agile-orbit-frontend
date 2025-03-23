@@ -1,0 +1,50 @@
+export const list = [
+    {
+      id: 1, // Add a unique ID for each project
+      Title: "Soft UI Shopify Version",
+      bud: "23/03/2025",
+      desscription: "Redesign the uiux design of the company website",
+      budget: "$15",
+      priority: "High",
+    },
+    {
+      id: 2,
+      Title: "Progress Track",
+      bud: "12/04/2025",
+      desscription: "Change date of..",
+      budget: "$10",
+      priority: "Medium",
+    },
+    {
+      id: 3,
+      Title: "Fix Platform Errors",
+      bud: "04/04/2025",
+      desscription: "presentatation of accur..",
+      budget: "$5",
+      priority: "Low",
+    },
+    {
+      id: 4,
+      Title: "Launch new Mobile App",
+      bud: "15/05/2025",
+      desscription: "presentatation of accur..",
+      budget: "$7",
+      priority: "High",
+    },
+    {
+      id: 5,
+      Title: "Add the New Landing Page",
+      bud: "02/04/2025",
+      desscription: "Change date of..",
+      budget: "$4",
+      priority: "Medium",
+    },
+    {
+      id: 6,
+      Title: "Redesign Online Store",
+      bud: "31/03/2025",
+      desscription: "Design the looks and feel of our online store to contain the following features;",
+      budget: "$3",
+      priority: "Low",
+    },
+  ];
