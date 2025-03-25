@@ -91,7 +91,7 @@ function Home() {
       bnb: "bnb2",
     },
     {
-      today: "Project Budget",
+      today: "Project Completed",
       title: "15",
       icon: heart,
       bnb: "redtext",
@@ -148,7 +148,7 @@ function Home() {
             <Card bordered={false} className="criclebox cardbody h-full">
               <div className="project-ant">
                 <div>
-                  <Title level={5}>Project Overview </Title>
+                  <Title level={5}>Most Recent Projects </Title>
                 </div>
                 <div className="ant-filtertabs">
                   <Button
@@ -166,7 +166,7 @@ function Home() {
                     <tr>
                       <th>PROJECT NAME</th>
                       <th>BUDGET</th>
-                      <th>DESCRIPTION</th>
+                      <th>ASSIGNED TO</th>
                       <th>DEADLINE</th>
                       <th>PRIORITY</th>
                     </tr>
@@ -196,8 +196,8 @@ function Home() {
                         >
                           <td>{d.Title}</td>
                           <td>{d.budget}</td>
-                          <td>{d.desscription}</td>
-                          <td>{d.bud}</td>
+                          <td>{d.assignedto}</td>
+                          <td>{d.deadline}</td>
                           <td>
                             <span style={{ color: priorityColor, fontWeight: "bold" }}>
                               {d.priority}
@@ -212,7 +212,7 @@ function Home() {
             </Card>
           </Col>
           <Col xs={24} sm={24} md={12} lg={12} xl={8} className="mb-24">
-            <Card bordered={false} className="criclebox">
+            {/* <Card bordered={false} className="criclebox">
               <div className="timeline-box">
                 <Title level={5}>Project Completed</Title>
                 <Paragraph className="lastweek" style={{ marginBottom: 24 }}>
@@ -221,13 +221,19 @@ function Home() {
                 <Text>Current Score: 80%</Text>
                 <Progress percent={80} size="small" />
               </div>
-            </Card>
+            </Card> */}
             <Card style={{ marginTop: 16 }}>
               <Title level={5}>Recent Activities</Title>
               <ul>
                 <li>Project Alpha: Sprint 3 Completed</li>
                 <li>Project Beta: New backlog tasks added</li>
                 <li>Project Alpha: Sprint 3 Completed</li>
+                <li>Project Beta: New backlog tasks added</li>
+                <li>Project Alpha: Sprint 3 Completed</li>
+                <li>Project Beta: New backlog tasks added</li>
+                <li>Project Beta: New backlog tasks added</li>
+                <li>Project Alpha: Sprint 3 Completed</li>
+                <li>Project Beta: New backlog tasks added</li>
                 <li>Project Beta: New backlog tasks added</li>
                 <li>Project Alpha: Sprint 3 Completed</li>
                 <li>Project Beta: New backlog tasks added</li>

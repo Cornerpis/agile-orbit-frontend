@@ -1,14 +1,4 @@
-/*!
-=========================================================
-* Muse Ant Design Dashboard - v1.0.0
-=========================================================
-* Product Page: https://www.creative-tim.com/product/muse-ant-design-dashboard
-* Copyright 2021 Creative Tim (https://www.creative-tim.com)
-* Licensed under MIT (https://github.com/creativetimofficial/muse-ant-design-dashboard/blob/main/LICENSE.md)
-* Coded by Creative Tim
-=========================================================
-* The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
-*/
+
 import {
   Row,
   Col,
@@ -20,10 +10,10 @@ import {
   Progress,
   Button,
   Avatar,
-  Typography,
+  Typography, Tag
 } from "antd";
 
-import { ToTopOutlined } from "@ant-design/icons";
+import { ToTopOutlined, PlusOutlined } from "@ant-design/icons";
 import { Link } from "react-router-dom";
 
 // Images
@@ -62,26 +52,44 @@ const formProps = {
 // table code start
 const columns = [
   {
-    title: "AUTHOR",
+    title: "PROJECT NAME",
     dataIndex: "name",
     key: "name",
     width: "32%",
   },
   {
-    title: "FUNCTION",
+    title: "DESCRIPTION",
     dataIndex: "function",
     key: "function",
   },
 
   {
-    title: "STATUS",
+    title: "BUDGET",
     key: "status",
     dataIndex: "status",
   },
   {
-    title: "EMPLOYED",
+    title: "ASSIGNED TO",
     key: "employed",
     dataIndex: "employed",
+  },
+  {
+    title: "DEADLINE",
+    key: "deadline",
+    dataIndex: "deadline",
+  },
+  {
+    title: "PRIORITY",
+    key: "priority",
+    dataIndex: "priority",
+    // render: (priority) => {
+    //   const color = priority === "High" ? "red" : priority === "Medium" ? "orange" : "green";
+    //   return <Tag color={color}>{priority}</Tag>;
+    // }
+    render: (priority) => {
+      const color = priority === "High" ? "red" : priority === "Medium" ? "orange" : "green";
+      return <Tag color={color}>{priority}</Tag>;
+    }
   },
 ];
 
@@ -91,15 +99,15 @@ const data = [
     name: (
       <>
         <Avatar.Group>
-          <Avatar
+          {/* <Avatar
             className="shape-avatar"
             shape="square"
             size={40}
             src={face2}
-          ></Avatar>
+          ></Avatar> */}
           <div className="avatar-info">
-            <Title level={5}>Michael John</Title>
-            <p>michael@mail.com</p>
+            {/* <Title level={5}>Michael John</Title> */}
+            <p style={{color:"black"}}>Create an adminstrative dashboard</p>
           </div>
         </Avatar.Group>{" "}
       </>
@@ -107,24 +115,42 @@ const data = [
     function: (
       <>
         <div className="author-info">
-          <Title level={5}>Manager</Title>
-          <p>Organization</p>
+          {/* <Title level={5}>Manager</Title> */}
+          <p style={{color:"black"}}>Organization</p>
         </div>
       </>
     ),
 
     status: (
       <>
-        <Button type="primary" className="tag-primary">
+      <div className="author-info">
+          {/* <Title level={5}>Manager</Title> */}
+          <p style={{color:"black"}}>$560</p>
+        </div>
+        {/* <Button type="primary" className="tag-primary">
           ONLINE
-        </Button>
+        </Button> */}
       </>
     ),
     employed: (
       <>
-        <div className="ant-employed">
+        <div className="ant-employed" style={{color:"black"}}>
           <span>23/04/18</span>
           <a href="#pablo">Edit</a>
+        </div>
+      </>
+    ),
+    deadline: (
+      <>
+        <div className="author-info" >
+          <p style={{color:"black"}}>23/04/18</p>
+        </div>
+      </>
+    ),
+    priority: (
+      <>
+        <div className="author-info" >
+          <p>High</p>
         </div>
       </>
     ),
@@ -135,15 +161,15 @@ const data = [
     name: (
       <>
         <Avatar.Group>
-          <Avatar
+          {/* <Avatar
             className="shape-avatar"
             shape="square"
             size={40}
             src={face3}
-          ></Avatar>
+          ></Avatar> */}
           <div className="avatar-info">
-            <Title level={5}>Alexa Liras</Title>
-            <p>alexa@mail.com</p>
+            {/* <Title level={5}>Alexa Liras</Title> */}
+            <p style={{color:"black"}}>Front end web development</p>
           </div>
         </Avatar.Group>{" "}
       </>
@@ -151,22 +177,39 @@ const data = [
     function: (
       <>
         <div className="author-info">
-          <Title level={5}>Programator</Title>
-          <p>Developer</p>
+          {/* <Title level={5}>Programator</Title> */}
+          <p style={{color:"black"}}>Developer</p>
         </div>
       </>
     ),
 
     status: (
       <>
-        <Button className="tag-badge">ONLINE</Button>
+      <div className="author-info" >
+          <p style={{color:"black"}}>$678</p>
+        </div>
+        {/* <Button className="tag-badge">ONLINE</Button> */}
       </>
     ),
     employed: (
       <>
-        <div className="ant-employed">
+        <div className="ant-employed" style={{color:"black"}}>
           <span>23/12/20</span>
           <a href="#pablo">Edit</a>
+        </div>
+      </>
+    ),
+    deadline: (
+      <>
+        <div className="author-info" >
+          <p style={{color:"black"}}>23/04/18</p>
+        </div>
+      </>
+    ),
+    priority: (
+      <>
+        <div className="author-info" >
+          <p>Low</p>
         </div>
       </>
     ),
@@ -177,40 +220,55 @@ const data = [
     name: (
       <>
         <Avatar.Group>
-          <Avatar
+          {/* <Avatar
             className="shape-avatar"
             shape="square"
             size={40}
             src={face}
-          ></Avatar>
+          ></Avatar> */}
           <div className="avatar-info">
-            <Title level={5}>Laure Perrier</Title>
-            <p>laure@mail.com</p>
+            {/* <Title level={5}>Laure Perrier</Title> */}
+            <p style={{color:"black"}}>Mobile development</p>
           </div>
         </Avatar.Group>{" "}
       </>
     ),
     function: (
       <>
-        <div className="author-info">
-          <Title level={5}>Executive</Title>
-          <p>Projects</p>
+        <div className="author-info" >
+          {/* <Title level={5}>Executive</Title> */}
+          <p style={{color:"black"}}>Projects</p>
         </div>
       </>
     ),
 
     status: (
       <>
-        <Button type="primary" className="tag-primary">
+      <p style={{color:"black"}}>$235</p>
+        {/* <Button type="primary" className="tag-primary">
           ONLINE
-        </Button>
+        </Button> */}
       </>
     ),
     employed: (
       <>
-        <div className="ant-employed">
+        <div className="ant-employed" style={{color:"black"}}>
           <span>03/04/21</span>
           <a href="#pablo">Edit</a>
+        </div>
+      </>
+    ),
+    deadline: (
+      <>
+        <div className="author-info" >
+          <p style={{color:"black"}}>23/04/18</p>
+        </div>
+      </>
+    ),
+    priority: (
+      <>
+        <div className="author-info" >
+          <p>Medium</p>
         </div>
       </>
     ),
@@ -220,15 +278,15 @@ const data = [
     name: (
       <>
         <Avatar.Group>
-          <Avatar
+          {/* <Avatar
             className="shape-avatar"
             shape="square"
             size={40}
             src={face4}
-          ></Avatar>
+          ></Avatar> */}
           <div className="avatar-info">
-            <Title level={5}>Miriam Eric</Title>
-            <p>miriam@mail.com</p>
+            {/* <Title level={5}>Miriam Eric</Title> */}
+            <p style={{color:"black"}}>Web design</p>
           </div>
         </Avatar.Group>{" "}
       </>
@@ -236,24 +294,39 @@ const data = [
     function: (
       <>
         <div className="author-info">
-          <Title level={5}>Marketing</Title>
-          <p>Organization</p>
+          {/* <Title level={5}>Marketing</Title> */}
+          <p style={{color:"black"}}>Design a well structured</p>
         </div>
       </>
     ),
 
     status: (
       <>
-        <Button type="primary" className="tag-primary">
+      <p style={{color:"black"}}>$902</p>
+        {/* <Button type="primary" className="tag-primary">
           ONLINE
-        </Button>
+        </Button> */}
       </>
     ),
     employed: (
       <>
-        <div className="ant-employed">
+        <div className="ant-employed" style={{color:"black"}}>
           <span>03/04/21</span>
           <a href="#pablo">Edit</a>
+        </div>
+      </>
+    ),
+    deadline: (
+      <>
+        <div className="author-info" >
+          <p style={{color:"black"}}>23/04/18</p>
+        </div>
+      </>
+    ),
+    priority: (
+      <>
+        <div className="author-info" >
+          <p>High</p>
         </div>
       </>
     ),
@@ -263,15 +336,15 @@ const data = [
     name: (
       <>
         <Avatar.Group>
-          <Avatar
+          {/* <Avatar
             className="shape-avatar"
             shape="square"
             size={40}
             src={face5}
-          ></Avatar>
+          ></Avatar> */}
           <div className="avatar-info">
-            <Title level={5}>Richard Gran</Title>
-            <p>richard@mail.com</p>
+            {/* <Title level={5}>Richard Gran</Title> */}
+            <p style={{color:"black"}}>Networking</p>
           </div>
         </Avatar.Group>{" "}
       </>
@@ -279,22 +352,37 @@ const data = [
     function: (
       <>
         <div className="author-info">
-          <Title level={5}>Manager</Title>
-          <p>Organization</p>
+          {/* <Title level={5}>Manager</Title> */}
+          <p style={{color:"black"}}>Sprint creation</p>
         </div>
       </>
     ),
 
     status: (
       <>
-        <Button className="tag-badge">ONLINE</Button>
+      <p style={{color:"black"}}>$578</p>
+        {/* <Button className="tag-badge">ONLINE</Button> */}
       </>
     ),
     employed: (
       <>
-        <div className="ant-employed">
+        <div className="ant-employed" style={{color:"black"}}>
           <span>23/03/20</span>
           <a href="#pablo">Edit</a>
+        </div>
+      </>
+    ),
+    deadline: (
+      <>
+        <div className="author-info" >
+          <p style={{color:"black"}}>23/04/18</p>
+        </div>
+      </>
+    ),
+    priority: (
+      <>
+        <div className="author-info" >
+          <p>Medium</p>
         </div>
       </>
     ),
@@ -305,15 +393,15 @@ const data = [
     name: (
       <>
         <Avatar.Group>
-          <Avatar
+          {/* <Avatar
             className="shape-avatar"
             shape="square"
             size={40}
             src={face6}
-          ></Avatar>
+          ></Avatar> */}
           <div className="avatar-info">
-            <Title level={5}>John Levi</Title>
-            <p>john@mail.com</p>
+            {/* <Title level={5}>John Levi</Title> */}
+            <p style={{color:"black"}}>Project management</p>
           </div>
         </Avatar.Group>{" "}
       </>
@@ -321,22 +409,36 @@ const data = [
     function: (
       <>
         <div className="author-info">
-          <Title level={5}>Tester</Title>
-          <p>Developer</p>
+          {/* <Title level={5}>Tester</Title> */}
+          <p style={{color:"black"}}>Developer</p>
         </div>
       </>
     ),
 
     status: (
       <>
-        <Button className="tag-badge">ONLINE</Button>
+        <p style={{color:"black"}}>$786</p>
       </>
     ),
     employed: (
       <>
-        <div className="ant-employed">
+        <div className="ant-employed" style={{color:"black"}}>
           <span>14/04/17</span>
           <a href="#pablo">Edit</a>
+        </div>
+      </>
+    ),
+    deadline: (
+      <>
+        <div className="author-info" >
+          <p style={{color:"black"}}>23/04/18</p>
+        </div>
+      </>
+    ),
+    priority: (
+      <>
+        <div className="author-info" >
+          <p>Low</p>
         </div>
       </>
     ),
@@ -369,7 +471,7 @@ const dataproject = [
     name: (
       <>
         <Avatar.Group>
-          <Avatar className="shape-avatar" src={ava1} size={25} alt="" />
+          {/* <Avatar className="shape-avatar" src={ava1} size={25} alt="" /> */}
           <div className="avatar-info">
             <Title level={5}>Spotify Version</Title>
           </div>
@@ -405,7 +507,7 @@ const dataproject = [
     name: (
       <>
         <Avatar.Group>
-          <Avatar className="shape-avatar" src={ava2} size={25} alt="" />
+          {/* <Avatar className="shape-avatar" src={ava2} size={25} alt="" /> */}
           <div className="avatar-info">
             <Title level={5}>Progress Track</Title>
           </div>
@@ -441,7 +543,7 @@ const dataproject = [
     name: (
       <>
         <Avatar.Group>
-          <Avatar className="shape-avatar" src={ava3} size={25} alt="" />
+          {/* <Avatar className="shape-avatar" src={ava3} size={25} alt="" /> */}
           <div className="avatar-info">
             <Title level={5}> Jira Platform Errors</Title>
           </div>
@@ -477,7 +579,7 @@ const dataproject = [
     name: (
       <>
         <Avatar.Group>
-          <Avatar className="shape-avatar" src={ava5} size={25} alt="" />
+          {/* <Avatar className="shape-avatar" src={ava5} size={25} alt="" /> */}
           <div className="avatar-info">
             <Title level={5}> Launch new Mobile App</Title>
           </div>
@@ -518,7 +620,7 @@ const dataproject = [
     name: (
       <>
         <Avatar.Group>
-          <Avatar className="shape-avatar" src={ava5} size={25} alt="" />
+          {/* <Avatar className="shape-avatar" src={ava5} size={25} alt="" /> */}
           <div className="avatar-info">
             <Title level={5}>Web Dev</Title>
           </div>
@@ -554,9 +656,9 @@ const dataproject = [
     name: (
       <>
         <Avatar.Group>
-          <Avatar className="shape-avatar" src={ava6} size={25} alt="" />
+          {/* <Avatar className="shape-avatar" src={ava6} size={25} alt="" /> */}
           <div className="avatar-info">
-            <Title level={5}>Redesign Online Store</Title>
+            <Title level={5}>Redesign Online Stores</Title>
           </div>
         </Avatar.Group>
       </>
@@ -597,13 +699,15 @@ function Tables() {
             <Card
               bordered={false}
               className="criclebox tablespace mb-24"
-              title="Authors Table"
+              title="Project List"
               extra={
                 <>
-                  <Radio.Group onChange={onChange} defaultValue="a">
-                    <Radio.Button value="a">All</Radio.Button>
-                    <Radio.Button value="b">ONLINE</Radio.Button>
-                  </Radio.Group>
+                 <Button
+                    type="primary"
+                    className="width-100"
+                  >
+                    {<PlusOutlined />} Invite Team Member
+                  </Button>
                 </>
               }
             >
@@ -617,17 +721,18 @@ function Tables() {
               </div>
             </Card>
 
-            <Card
+            {/* <Card
               bordered={false}
               className="criclebox tablespace mb-24"
-              title="Projects Table"
+              title="Projects List"
               extra={
                 <>
-                  <Radio.Group onChange={onChange} defaultValue="all">
-                    <Radio.Button value="all">All</Radio.Button>
-                    <Radio.Button value="online">ONLINE</Radio.Button>
-                    <Radio.Button value="store">STORES</Radio.Button>
-                  </Radio.Group>
+                 <Button
+                    type="primary"
+                    className="width-100"
+                  >
+                    {<PlusOutlined />} Invite Team Member
+                  </Button>
                 </>
               }
             >
@@ -643,14 +748,14 @@ function Tables() {
                 <Upload {...formProps}>
                   <Button
                     type="dashed"
-                    className="ant-full-box"
+                    className="ant-medium-box"
                     icon={<ToTopOutlined />}
                   >
                     Click to Upload
                   </Button>
                 </Upload>
               </div>
-            </Card>
+            </Card> */}
           </Col>
         </Row>
       </div>
