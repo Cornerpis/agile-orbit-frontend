@@ -1,0 +1,50 @@
+export const list = [
+    {
+      id: 1, // Add a unique ID for each project
+      Title: "E-Commerce Website for Fresh Farm Produce",
+      deadline: "23/03/2025",
+      assignedto: "Timothy Agba",
+      budget: "$15,000",
+      priority: "High",
+    },
+    {
+      id: 2,
+      Title: "Progress Track",
+      deadline: "12/04/2025",
+      assignedto: "James John",
+      budget: "$10",
+      priority: "Medium",
+    },
+    {
+      id: 3,
+      Title: "Fix Platform Errors",
+      deadline: "04/04/2025",
+      assignedto: "Peter Jonathan",
+      budget: "$5",
+      priority: "Low",
+    },
+    {
+      id: 4,
+      Title: "Launch new Mobile App",
+      deadline: "15/05/2025",
+      assignedto: "Bulus Abubakar",
+      budget: "$7",
+      priority: "High",
+    },
+    {
+      id: 5,
+      Title: "Add the New Landing Page",
+      deadline: "02/04/2025",
+      assignedto: "Jeremiah Daniel",
+      budget: "$4",
+      priority: "Medium",
+    },
+    {
+      id: 6,
+      Title: "Redesign Online Store",
+      deadline: "31/03/2025",
+      assignedto: "Maria Moris",
+      budget: "$3",
+      priority: "Low",
+    },
+  ];
