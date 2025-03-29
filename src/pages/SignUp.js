@@ -128,7 +128,7 @@ export default class SignUp extends Component {
         <div className="layout-default ant-layout layout-sign-up">
           <Header>
             <div className="header-col header-brand">
-<h5>Agile Orbit Dashboard</h5>
+              <h5>Agile Orbit Dashboard</h5>
             </div>
             {/* <div className="header-col header-nav">
               <Menu mode="horizontal" defaultSelectedKeys={["1"]}>
@@ -168,16 +168,16 @@ export default class SignUp extends Component {
               <div className="content">
                 <Title>Sign Up</Title>
                 <p className="text-lg">
- Please provide the necessary details below to create your account. Ensure all information is accurate for a seamless experience.
+                  Please provide the necessary details below to create your
+                  account. Ensure all information is accurate for a seamless
+                  experience.
                 </p>
               </div>
             </div>
 
             <Card
               className="card-signup header-solid h-full ant-card pt-0"
-              title={
-                ""
-              }
+              title={""}
               bordered="false"
             >
               {/* <div className="sign-up-gateways">
@@ -197,7 +197,8 @@ export default class SignUp extends Component {
                 initialValues={{ remember: true }}
                 onFinish={onFinish}
                 onFinishFailed={onFinishFailed}
- className="row-col" style={{marginTop:20}}
+                className="row-col"
+                style={{ marginTop: 20 }}
               >
                 <Form.Item
                   name="Firstname"
@@ -208,7 +209,7 @@ export default class SignUp extends Component {
                   <Input placeholder="First name" />
                 </Form.Item>
                 <Form.Item
-name="Lastname"
+                  name="Lastname"
                   rules={[
                     { required: true, message: "Please enter your last name" },
                   ]}
@@ -218,12 +219,12 @@ name="Lastname"
                 <Form.Item
                   name="email"
                   rules={[
-{ required: true, message: "Please enter your email!" },
+                    { required: true, message: "Please enter your email!" },
                   ]}
                 >
                   <Input placeholder="Email" />
                 </Form.Item>
-                
+
                 <Form.Item
                   name="role"
                   rules={[
@@ -244,7 +245,7 @@ name="Lastname"
                 <Form.Item
                   name="password"
                   rules={[
-{ required: true, message: "Please enter your password" },
+                    { required: true, message: "Please enter your password" },
                   ]}
                 >
                   <Input placeholder="Password" />
@@ -252,12 +253,15 @@ name="Lastname"
                 <Form.Item
                   name="confirmpassword"
                   rules={[
-                    { required: true, message: "Please enter your confirm password" },
+                    {
+                      required: true,
+                      message: "Please enter your confirm password",
+                    },
                   ]}
                 >
                   <Input placeholder="Confirm password" />
                 </Form.Item>
-                
+
                 <Form.Item name="remember" valuePropName="checked">
                   <Checkbox>
                     I agree the{" "}
@@ -322,7 +326,8 @@ name="Lastname"
             </Menu>
             <p className="copyright">
               {" "}
-Copyright © 2025 by <a href="www.cornerpistech.com">Cornerpis Technology</a>.{" "}
+              Copyright © 2025 by{" "}
+              <a href="www.cornerpistech.com">Cornerpis Technology</a>.{" "}
             </p>
           </Footer>
         </div>

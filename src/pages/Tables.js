@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useHistory} from "react-router-dom";
+import { useHistory } from "react-router-dom";
 import {
   Row,
   Col,
@@ -11,7 +11,8 @@ import {
   Progress,
   Button,
   Avatar,
-  Typography, Tag
+  Typography,
+  Tag,
 } from "antd";
 
 import { ToTopOutlined, PlusOutlined } from "@ant-design/icons";
@@ -88,9 +89,14 @@ const columns = [
     //   return <Tag color={color}>{priority}</Tag>;
     // }
     render: (priority) => {
-      const color = priority === "High" ? "red" : priority === "Medium" ? "orange" : "green";
+      const color =
+        priority === "High"
+          ? "red"
+          : priority === "Medium"
+          ? "orange"
+          : "green";
       return <Tag color={color}>{priority}</Tag>;
-    }
+    },
   },
 ];
 
@@ -108,7 +114,7 @@ const data = [
           ></Avatar> */}
           <div className="avatar-info">
             {/* <Title level={5}>Michael John</Title> */}
-            <p style={{color:"black"}}>Create an adminstrative dashboard</p>
+            <p style={{ color: "black" }}>Create an adminstrative dashboard</p>
           </div>
         </Avatar.Group>{" "}
       </>
@@ -117,16 +123,16 @@ const data = [
       <>
         <div className="author-info">
           {/* <Title level={5}>Manager</Title> */}
-          <p style={{color:"black"}}>Organization</p>
+          <p style={{ color: "black" }}>Organization</p>
         </div>
       </>
     ),
 
     status: (
       <>
-      <div className="author-info">
+        <div className="author-info">
           {/* <Title level={5}>Manager</Title> */}
-          <p style={{color:"black"}}>$560</p>
+          <p style={{ color: "black" }}>$560</p>
         </div>
         {/* <Button type="primary" className="tag-primary">
           ONLINE
@@ -135,7 +141,7 @@ const data = [
     ),
     employed: (
       <>
-        <div className="ant-employed" style={{color:"black"}}>
+        <div className="ant-employed" style={{ color: "black" }}>
           <span>23/04/18</span>
           <a href="#pablo">Edit</a>
         </div>
@@ -143,14 +149,14 @@ const data = [
     ),
     deadline: (
       <>
-        <div className="author-info" >
-          <p style={{color:"black"}}>23/04/18</p>
+        <div className="author-info">
+          <p style={{ color: "black" }}>23/04/18</p>
         </div>
       </>
     ),
     priority: (
       <>
-        <div className="author-info" >
+        <div className="author-info">
           <p>High</p>
         </div>
       </>
@@ -170,7 +176,7 @@ const data = [
           ></Avatar> */}
           <div className="avatar-info">
             {/* <Title level={5}>Alexa Liras</Title> */}
-            <p style={{color:"black"}}>Front end web development</p>
+            <p style={{ color: "black" }}>Front end web development</p>
           </div>
         </Avatar.Group>{" "}
       </>
@@ -179,22 +185,22 @@ const data = [
       <>
         <div className="author-info">
           {/* <Title level={5}>Programator</Title> */}
-          <p style={{color:"black"}}>Developer</p>
+          <p style={{ color: "black" }}>Developer</p>
         </div>
       </>
     ),
 
     status: (
       <>
-      <div className="author-info" >
-          <p style={{color:"black"}}>$678</p>
+        <div className="author-info">
+          <p style={{ color: "black" }}>$678</p>
         </div>
         {/* <Button className="tag-badge">ONLINE</Button> */}
       </>
     ),
     employed: (
       <>
-        <div className="ant-employed" style={{color:"black"}}>
+        <div className="ant-employed" style={{ color: "black" }}>
           <span>23/12/20</span>
           <a href="#pablo">Edit</a>
         </div>
@@ -202,14 +208,14 @@ const data = [
     ),
     deadline: (
       <>
-        <div className="author-info" >
-          <p style={{color:"black"}}>23/04/18</p>
+        <div className="author-info">
+          <p style={{ color: "black" }}>23/04/18</p>
         </div>
       </>
     ),
     priority: (
       <>
-        <div className="author-info" >
+        <div className="author-info">
           <p>Low</p>
         </div>
       </>
@@ -229,23 +235,23 @@ const data = [
           ></Avatar> */}
           <div className="avatar-info">
             {/* <Title level={5}>Laure Perrier</Title> */}
-            <p style={{color:"black"}}>Mobile development</p>
+            <p style={{ color: "black" }}>Mobile development</p>
           </div>
         </Avatar.Group>{" "}
       </>
     ),
     function: (
       <>
-        <div className="author-info" >
+        <div className="author-info">
           {/* <Title level={5}>Executive</Title> */}
-          <p style={{color:"black"}}>Projects</p>
+          <p style={{ color: "black" }}>Projects</p>
         </div>
       </>
     ),
 
     status: (
       <>
-      <p style={{color:"black"}}>$235</p>
+        <p style={{ color: "black" }}>$235</p>
         {/* <Button type="primary" className="tag-primary">
           ONLINE
         </Button> */}
@@ -253,7 +259,7 @@ const data = [
     ),
     employed: (
       <>
-        <div className="ant-employed" style={{color:"black"}}>
+        <div className="ant-employed" style={{ color: "black" }}>
           <span>03/04/21</span>
           <a href="#pablo">Edit</a>
         </div>
@@ -261,14 +267,14 @@ const data = [
     ),
     deadline: (
       <>
-        <div className="author-info" >
-          <p style={{color:"black"}}>23/04/18</p>
+        <div className="author-info">
+          <p style={{ color: "black" }}>23/04/18</p>
         </div>
       </>
     ),
     priority: (
       <>
-        <div className="author-info" >
+        <div className="author-info">
           <p>Medium</p>
         </div>
       </>
@@ -287,7 +293,7 @@ const data = [
           ></Avatar> */}
           <div className="avatar-info">
             {/* <Title level={5}>Miriam Eric</Title> */}
-            <p style={{color:"black"}}>Web design</p>
+            <p style={{ color: "black" }}>Web design</p>
           </div>
         </Avatar.Group>{" "}
       </>
@@ -296,14 +302,14 @@ const data = [
       <>
         <div className="author-info">
           {/* <Title level={5}>Marketing</Title> */}
-          <p style={{color:"black"}}>Design a well structured</p>
+          <p style={{ color: "black" }}>Design a well structured</p>
         </div>
       </>
     ),
 
     status: (
       <>
-      <p style={{color:"black"}}>$902</p>
+        <p style={{ color: "black" }}>$902</p>
         {/* <Button type="primary" className="tag-primary">
           ONLINE
         </Button> */}
@@ -311,7 +317,7 @@ const data = [
     ),
     employed: (
       <>
-        <div className="ant-employed" style={{color:"black"}}>
+        <div className="ant-employed" style={{ color: "black" }}>
           <span>03/04/21</span>
           <a href="#pablo">Edit</a>
         </div>
@@ -319,14 +325,14 @@ const data = [
     ),
     deadline: (
       <>
-        <div className="author-info" >
-          <p style={{color:"black"}}>23/04/18</p>
+        <div className="author-info">
+          <p style={{ color: "black" }}>23/04/18</p>
         </div>
       </>
     ),
     priority: (
       <>
-        <div className="author-info" >
+        <div className="author-info">
           <p>High</p>
         </div>
       </>
@@ -345,7 +351,7 @@ const data = [
           ></Avatar> */}
           <div className="avatar-info">
             {/* <Title level={5}>Richard Gran</Title> */}
-            <p style={{color:"black"}}>Networking</p>
+            <p style={{ color: "black" }}>Networking</p>
           </div>
         </Avatar.Group>{" "}
       </>
@@ -354,20 +360,20 @@ const data = [
       <>
         <div className="author-info">
           {/* <Title level={5}>Manager</Title> */}
-          <p style={{color:"black"}}>Sprint creation</p>
+          <p style={{ color: "black" }}>Sprint creation</p>
         </div>
       </>
     ),
 
     status: (
       <>
-      <p style={{color:"black"}}>$578</p>
+        <p style={{ color: "black" }}>$578</p>
         {/* <Button className="tag-badge">ONLINE</Button> */}
       </>
     ),
     employed: (
       <>
-        <div className="ant-employed" style={{color:"black"}}>
+        <div className="ant-employed" style={{ color: "black" }}>
           <span>23/03/20</span>
           <a href="#pablo">Edit</a>
         </div>
@@ -375,14 +381,14 @@ const data = [
     ),
     deadline: (
       <>
-        <div className="author-info" >
-          <p style={{color:"black"}}>23/04/18</p>
+        <div className="author-info">
+          <p style={{ color: "black" }}>23/04/18</p>
         </div>
       </>
     ),
     priority: (
       <>
-        <div className="author-info" >
+        <div className="author-info">
           <p>Medium</p>
         </div>
       </>
@@ -402,7 +408,7 @@ const data = [
           ></Avatar> */}
           <div className="avatar-info">
             {/* <Title level={5}>John Levi</Title> */}
-            <p style={{color:"black"}}>Project management</p>
+            <p style={{ color: "black" }}>Project management</p>
           </div>
         </Avatar.Group>{" "}
       </>
@@ -411,19 +417,19 @@ const data = [
       <>
         <div className="author-info">
           {/* <Title level={5}>Tester</Title> */}
-          <p style={{color:"black"}}>Developer</p>
+          <p style={{ color: "black" }}>Developer</p>
         </div>
       </>
     ),
 
     status: (
       <>
-        <p style={{color:"black"}}>$786</p>
+        <p style={{ color: "black" }}>$786</p>
       </>
     ),
     employed: (
       <>
-        <div className="ant-employed" style={{color:"black"}}>
+        <div className="ant-employed" style={{ color: "black" }}>
           <span>14/04/17</span>
           <a href="#pablo">Edit</a>
         </div>
@@ -431,14 +437,14 @@ const data = [
     ),
     deadline: (
       <>
-        <div className="author-info" >
-          <p style={{color:"black"}}>23/04/18</p>
+        <div className="author-info">
+          <p style={{ color: "black" }}>23/04/18</p>
         </div>
       </>
     ),
     priority: (
       <>
-        <div className="author-info" >
+        <div className="author-info">
           <p>Low</p>
         </div>
       </>
@@ -691,7 +697,7 @@ const dataproject = [
 
 function Tables() {
   const onChange = (e) => console.log(`radio checked:${e.target.value}`);
-const history = useHistory();
+  const history = useHistory();
   const handleRowClick = (record) => {
     history.push(`/project/${record.key}`);
   };
@@ -707,7 +713,7 @@ const history = useHistory();
               title="Project List"
               extra={
                 <>
-                 {/* <Button
+                  {/* <Button
                     type="primary"
                     className="width-100"
                   >
@@ -724,7 +730,7 @@ const history = useHistory();
                   onRow={(record) => {
                     return {
                       onClick: () => handleRowClick(record), // click row
-                      style: { cursor: 'pointer' } // show pointer cursor on hover
+                      style: { cursor: "pointer" }, // show pointer cursor on hover
                     };
                   }}
                 />
