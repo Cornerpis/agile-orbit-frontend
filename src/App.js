@@ -26,7 +26,7 @@ function App() {
         <Route path="/sign-in" exact component={SignIn} />
         <Main>
           <Route exact path="/dashboard" component={Home} />
-          <Route exact path="/tables" component={Tables} />
+          <Route exact path="/project-management" component={Tables} />
           <Route exact path="/assesment" component={AgileMaturityAssessment} />
           <Route exact path="/profile" component={Profile} />
           <Route

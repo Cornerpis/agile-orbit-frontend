@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useHistory } from "react-router-dom";
-import { Card, Col, Row, Typography, Progress, Button } from "antd";
-import { PlusOutlined } from "@ant-design/icons";
+import { Card, Col, Row, Typography, Progress, Button, List } from "antd";
+import { PlusOutlined, ClockCircleOutlined } from "@ant-design/icons";
 import MyModal from "../pages/create-project";
 import { list } from "./data"; // Import the list array
 
@@ -18,8 +18,27 @@ function Home() {
   };
 
   const handleRowClick = (id) => {
-    history.push(`/project/${id}`); // Navigate to the project details page
+    history.push(`/project/${id}`);
   };
+
+  const recentActivities = [
+    {
+      id: 1,
+      text: "Sprint 3 Completed for Project Alpha",
+      time: "2 hours ago",
+    },
+    {
+      id: 2,
+      text: "New backlog tasks added to Project Beta",
+      time: "1 day ago",
+    },
+    { id: 3, text: "Project Gamma: Code review started", time: "3 days ago" },
+    {
+      id: 4,
+      text: "User stories updated for Project Delta",
+      time: "5 days ago",
+    },
+  ];
 
   const dollor = [
     <svg
@@ -113,17 +132,10 @@ function Home() {
             >
               <Card bordered={false} className="criclebox ">
                 <div className="number">
-                  <Row align="middle" gutter={[24, 0]}>
-                    <Col xs={18}>
-                      <span>{c.today}</span>
-                      <Title level={3}>
-                        {c.title} <small className={c.bnb}>{c.persent}</small>
-                      </Title>
-                    </Col>
-                    <Col xs={6}>
-                      <div className="icon-box">{c.icon}</div>
-                    </Col>
-                  </Row>
+                  <span>{c.today}</span>
+                  <Title level={3}>
+                    {c.title} <small className={c.bnb}>{c.persent}</small>
+                  </Title>
                 </div>
               </Card>
             </Col>
@@ -210,32 +222,20 @@ function Home() {
             </Card>
           </Col>
           <Col xs={24} sm={24} md={12} lg={12} xl={8} className="mb-24">
-            {/* <Card bordered={false} className="criclebox">
-              <div className="timeline-box">
-                <Title level={5}>Project Completed</Title>
-                <Paragraph className="lastweek" style={{ marginBottom: 24 }}>
-                  <span className="bnb2"></span>
-                </Paragraph>
-                <Text>Current Score: 80%</Text>
-                <Progress percent={80} size="small" />
-              </div>
-            </Card> */}
-            <Card style={{ marginTop: 16 }}>
-              <Title level={5}>Recent Activities</Title>
-              <ul>
-                <li>Project Alpha: Sprint 3 Completed</li>
-                <li>Project Beta: New backlog tasks added</li>
-                <li>Project Alpha: Sprint 3 Completed</li>
-                <li>Project Beta: New backlog tasks added</li>
-                <li>Project Alpha: Sprint 3 Completed</li>
-                <li>Project Beta: New backlog tasks added</li>
-                <li>Project Beta: New backlog tasks added</li>
-                <li>Project Alpha: Sprint 3 Completed</li>
-                <li>Project Beta: New backlog tasks added</li>
-                <li>Project Beta: New backlog tasks added</li>
-                <li>Project Alpha: Sprint 3 Completed</li>
-                <li>Project Beta: New backlog tasks added</li>
-              </ul>
+            <Card title="Recent Activities" bordered={false}>
+              <List
+                itemLayout="horizontal"
+                dataSource={recentActivities}
+                renderItem={(item) => (
+                  <List.Item>
+                    <List.Item.Meta
+                      avatar={<ClockCircleOutlined />}
+                      title={item.text}
+                      description={item.time}
+                    />
+                  </List.Item>
+                )}
+              />
             </Card>
           </Col>
         </Row>

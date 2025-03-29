@@ -17,40 +17,11 @@ import {
 
 import { ToTopOutlined, PlusOutlined } from "@ant-design/icons";
 import { Link } from "react-router-dom";
-
-// Images
-// import ava1 from "../assets/images/logo-shopify.svg";
-// import ava2 from "../assets/images/logo-atlassian.svg";
-// import ava3 from "../assets/images/logo-slack.svg";
-// import ava5 from "../assets/images/logo-jira.svg";
-// import ava6 from "../assets/images/logo-invision.svg";
-// import face from "../assets/images/face-1.jpg";
-// import face2 from "../assets/images/face-2.jpg";
-// import face3 from "../assets/images/face-3.jpg";
-// import face4 from "../assets/images/face-4.jpg";
-// import face5 from "../assets/images/face-5.jpeg";
-// import face6 from "../assets/images/face-6.jpeg";
 import pencil from "../assets/images/pencil.svg";
+import MyModal from "../pages/create-project";
 
 const { Title } = Typography;
 
-const formProps = {
-  name: "file",
-  action: "https://www.mocky.io/v2/5cc8019d300000980a055e76",
-  headers: {
-    authorization: "authorization-text",
-  },
-  onChange(info) {
-    if (info.file.status !== "uploading") {
-      console.log(info.file, info.fileList);
-    }
-    if (info.file.status === "done") {
-      message.success(`${info.file.name} file uploaded successfully`);
-    } else if (info.file.status === "error") {
-      message.error(`${info.file.name} file upload failed.`);
-    }
-  },
-};
 // table code start
 const columns = [
   {
@@ -84,10 +55,7 @@ const columns = [
     title: "PRIORITY",
     key: "priority",
     dataIndex: "priority",
-    // render: (priority) => {
-    //   const color = priority === "High" ? "red" : priority === "Medium" ? "orange" : "green";
-    //   return <Tag color={color}>{priority}</Tag>;
-    // }
+
     render: (priority) => {
       const color =
         priority === "High"
@@ -106,12 +74,6 @@ const data = [
     name: (
       <>
         <Avatar.Group>
-          {/* <Avatar
-            className="shape-avatar"
-            shape="square"
-            size={40}
-            src={face2}
-          ></Avatar> */}
           <div className="avatar-info">
             {/* <Title level={5}>Michael John</Title> */}
             <p style={{ color: "black" }}>Create an adminstrative dashboard</p>
@@ -168,12 +130,6 @@ const data = [
     name: (
       <>
         <Avatar.Group>
-          {/* <Avatar
-            className="shape-avatar"
-            shape="square"
-            size={40}
-            src={face3}
-          ></Avatar> */}
           <div className="avatar-info">
             {/* <Title level={5}>Alexa Liras</Title> */}
             <p style={{ color: "black" }}>Front end web development</p>
@@ -451,249 +407,6 @@ const data = [
     ),
   },
 ];
-// project table start
-const project = [
-  {
-    title: "COMPANIES",
-    dataIndex: "name",
-    width: "32%",
-  },
-  {
-    title: "BUDGET",
-    dataIndex: "age",
-  },
-  {
-    title: "STATUS",
-    dataIndex: "address",
-  },
-  {
-    title: "COMPLETION",
-    dataIndex: "completion",
-  },
-];
-const dataproject = [
-  {
-    key: "1",
-
-    name: (
-      <>
-        <Avatar.Group>
-          {/* <Avatar className="shape-avatar" src={ava1} size={25} alt="" /> */}
-          <div className="avatar-info">
-            <Title level={5}>Spotify Version</Title>
-          </div>
-        </Avatar.Group>
-      </>
-    ),
-    age: (
-      <>
-        <div className="semibold">$14,000</div>
-      </>
-    ),
-    address: (
-      <>
-        <div className="text-sm">working</div>
-      </>
-    ),
-    completion: (
-      <>
-        <div className="ant-progress-project">
-          <Progress percent={30} size="small" />
-          <span>
-            <Link to="/">
-              <img src={pencil} alt="" />
-            </Link>
-          </span>
-        </div>
-      </>
-    ),
-  },
-
-  {
-    key: "2",
-    name: (
-      <>
-        <Avatar.Group>
-          {/* <Avatar className="shape-avatar" src={ava2} size={25} alt="" /> */}
-          <div className="avatar-info">
-            <Title level={5}>Progress Track</Title>
-          </div>
-        </Avatar.Group>
-      </>
-    ),
-    age: (
-      <>
-        <div className="semibold">$3,000</div>
-      </>
-    ),
-    address: (
-      <>
-        <div className="text-sm">working</div>
-      </>
-    ),
-    completion: (
-      <>
-        <div className="ant-progress-project">
-          <Progress percent={10} size="small" />
-          <span>
-            <Link to="/">
-              <img src={pencil} alt="" />
-            </Link>
-          </span>
-        </div>
-      </>
-    ),
-  },
-
-  {
-    key: "3",
-    name: (
-      <>
-        <Avatar.Group>
-          {/* <Avatar className="shape-avatar" src={ava3} size={25} alt="" /> */}
-          <div className="avatar-info">
-            <Title level={5}> Jira Platform Errors</Title>
-          </div>
-        </Avatar.Group>
-      </>
-    ),
-    age: (
-      <>
-        <div className="semibold">Not Set</div>
-      </>
-    ),
-    address: (
-      <>
-        <div className="text-sm">done</div>
-      </>
-    ),
-    completion: (
-      <>
-        <div className="ant-progress-project">
-          <Progress percent={100} size="small" format={() => "done"} />
-          <span>
-            <Link to="/">
-              <img src={pencil} alt="" />
-            </Link>
-          </span>
-        </div>
-      </>
-    ),
-  },
-
-  {
-    key: "4",
-    name: (
-      <>
-        <Avatar.Group>
-          {/* <Avatar className="shape-avatar" src={ava5} size={25} alt="" /> */}
-          <div className="avatar-info">
-            <Title level={5}> Launch new Mobile App</Title>
-          </div>
-        </Avatar.Group>
-      </>
-    ),
-    age: (
-      <>
-        <div className="semibold">$20,600</div>
-      </>
-    ),
-    address: (
-      <>
-        <div className="text-sm">canceled</div>
-      </>
-    ),
-    completion: (
-      <>
-        <div className="ant-progress-project">
-          <Progress
-            percent={50}
-            size="small"
-            status="exception"
-            format={() => "50%"}
-          />
-          <span>
-            <Link to="/">
-              <img src={pencil} alt="" />
-            </Link>
-          </span>
-        </div>
-      </>
-    ),
-  },
-
-  {
-    key: "5",
-    name: (
-      <>
-        <Avatar.Group>
-          {/* <Avatar className="shape-avatar" src={ava5} size={25} alt="" /> */}
-          <div className="avatar-info">
-            <Title level={5}>Web Dev</Title>
-          </div>
-        </Avatar.Group>
-      </>
-    ),
-    age: (
-      <>
-        <div className="semibold">$4,000</div>
-      </>
-    ),
-    address: (
-      <>
-        <div className="text-sm">working</div>
-      </>
-    ),
-    completion: (
-      <>
-        <div className="ant-progress-project">
-          <Progress percent={80} size="small" />
-          <span>
-            <Link to="/">
-              <img src={pencil} alt="" />
-            </Link>
-          </span>
-        </div>
-      </>
-    ),
-  },
-
-  {
-    key: "6",
-    name: (
-      <>
-        <Avatar.Group>
-          {/* <Avatar className="shape-avatar" src={ava6} size={25} alt="" /> */}
-          <div className="avatar-info">
-            <Title level={5}>Redesign Online Stores</Title>
-          </div>
-        </Avatar.Group>
-      </>
-    ),
-    age: (
-      <>
-        <div className="semibold">$2,000</div>
-      </>
-    ),
-    address: (
-      <>
-        <div className="text-sm">canceled</div>
-      </>
-    ),
-    completion: (
-      <>
-        <div className="ant-progress-project">
-          <Progress percent={0} size="small" />
-          <span>
-            <Link to="/">
-              <img src={pencil} alt="" />
-            </Link>
-          </span>
-        </div>
-      </>
-    ),
-  },
-];
 
 function Tables() {
   const onChange = (e) => console.log(`radio checked:${e.target.value}`);
@@ -701,9 +414,19 @@ function Tables() {
   const handleRowClick = (record) => {
     history.push(`/project/${record.key}`);
   };
+  const [isModalVisible, setIsModalVisible] = useState(false);
+  const handleCreate = (values) => {
+    console.log("Project Created:", values);
+    setIsModalVisible(false);
+  };
 
   return (
     <>
+      <MyModal
+        visible={isModalVisible}
+        onCreate={handleCreate}
+        onCancel={() => setIsModalVisible(false)}
+      />
       <div className="tabled">
         <Row gutter={[24, 0]}>
           <Col xs="24" xl={24}>
@@ -713,12 +436,13 @@ function Tables() {
               title="Project List"
               extra={
                 <>
-                  {/* <Button
+                  <Button
                     type="primary"
+                    onClick={() => setIsModalVisible(true)}
                     className="width-100"
                   >
-                    {<PlusOutlined />} Invite Team Member
-                  </Button> */}
+                    {<PlusOutlined />} Create new project
+                  </Button>
                 </>
               }
             >
@@ -736,42 +460,6 @@ function Tables() {
                 />
               </div>
             </Card>
-
-            {/* <Card
-              bordered={false}
-              className="criclebox tablespace mb-24"
-              title="Projects List"
-              extra={
-                <>
-                 <Button
-                    type="primary"
-                    className="width-100"
-                  >
-                    {<PlusOutlined />} Invite Team Member
-                  </Button>
-                </>
-              }
-            >
-              <div className="table-responsive">
-                <Table
-                  columns={project}
-                  dataSource={dataproject}
-                  pagination={false}
-                  className="ant-border-space"
-                />
-              </div>
-              <div className="uploadfile pb-15 shadow-none">
-                <Upload {...formProps}>
-                  <Button
-                    type="dashed"
-                    className="ant-medium-box"
-                    icon={<ToTopOutlined />}
-                  >
-                    Click to Upload
-                  </Button>
-                </Upload>
-              </div>
-            </Card> */}
           </Col>
         </Row>
       </div>
