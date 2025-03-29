@@ -488,8 +488,6 @@ function Home() {
             </Card>
           </Col>
         </Row>
-
-        
       </div>
     </>
   );
