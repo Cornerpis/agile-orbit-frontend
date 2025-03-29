@@ -1,4 +1,3 @@
-
 import { Switch, Route, Redirect } from "react-router-dom";
 import Home from "./pages/Home";
 import Tables from "./pages/Tables";
@@ -11,7 +10,7 @@ import ProjectDetails from "./pages/project-details";
 import BackLog from "./pages/backlog";
 import SprintCreation from "./pages/sprint";
 import CreateUsers from "./pages/users";
-import { list } from "./pages/data"; // Import the list array
+import { list } from "./pages/data";
 import "antd/dist/antd.css";
 import "./assets/styles/main.css";
 import "./assets/styles/responsive.css";
@@ -22,6 +21,7 @@ function App() {
   return (
     <div className="App">
       <Switch>
+        <Route path="/" exact component={SignIn} />
         <Route path="/sign-up" exact component={SignUp} />
         <Route path="/sign-in" exact component={SignIn} />
         <Main>
@@ -29,16 +29,18 @@ function App() {
           <Route exact path="/tables" component={Tables} />
           <Route exact path="/assesment" component={AgileMaturityAssessment} />
           <Route exact path="/profile" component={Profile} />
-          <Route exact path="/project/:id" component={(props) => <ProjectDetails {...props} projects={list} />} />
-          {/* <Route exact path="/project/:id"
-          element={<ProjectDetails projects={list} />} /> */}
-           <Route exact path="/kansanboard" component={KanbanBoard} />
-           <Route exact path="/backlog" component={BackLog} />
-           <Route exact path="/sprint" component={SprintCreation} />
-           <Route exact path="/users" component={CreateUsers} />
-           <Route exact path="/scorecard" component={ScoreCards} />
-          <Redirect from="*" to="/dashboard" />
+          <Route
+            exact
+            path="/project/:id"
+            component={(props) => <ProjectDetails {...props} projects={list} />}
+          />
+          <Route exact path="/kansanboard" component={KanbanBoard} />
+          <Route exact path="/backlog" component={BackLog} />
+          <Route exact path="/sprint" component={SprintCreation} />
+          <Route exact path="/users" component={CreateUsers} />
+          <Route exact path="/scorecard" component={ScoreCards} />
         </Main>
+        <Redirect from="*" to="/sign-in" /> {/* Moved outside Main */}
       </Switch>
     </div>
   );

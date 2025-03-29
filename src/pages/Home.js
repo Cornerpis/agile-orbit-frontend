@@ -1,15 +1,8 @@
 import { useState } from "react";
 import { useHistory } from "react-router-dom";
-import {
-  Card,
-  Col,
-  Row,
-  Typography,
-  Progress,
-  Button,
-} from "antd";
+import { Card, Col, Row, Typography, Progress, Button } from "antd";
 import { PlusOutlined } from "@ant-design/icons";
-import MyModal from '../pages/create-project';
+import MyModal from "../pages/create-project";
 import { list } from "./data"; // Import the list array
 
 // Destructure Paragraph from Typography
@@ -97,7 +90,7 @@ function Home() {
       bnb: "redtext",
     },
     {
-      today: "Projects Inprogress",
+      today: "Projects Ongoing",
       title: "13,200",
       icon: cart,
       bnb: "bnb2",
@@ -199,7 +192,12 @@ function Home() {
                           <td>{d.assignedto}</td>
                           <td>{d.deadline}</td>
                           <td>
-                            <span style={{ color: priorityColor, fontWeight: "bold" }}>
+                            <span
+                              style={{
+                                color: priorityColor,
+                                fontWeight: "bold",
+                              }}
+                            >
                               {d.priority}
                             </span>
                           </td>

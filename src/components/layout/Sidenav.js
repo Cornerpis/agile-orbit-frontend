@@ -62,17 +62,17 @@ function Sidenav({ color }) {
       key={0}
     >
       <path
-      fillRule="evenodd"
-      clipRule="evenodd"
-      d="M12 4C9.79086 4 8 5.79086 8 8C8 10.2091 9.79086 12 12 12C14.2091 12 16 10.2091 16 8C16 5.79086 14.2091 4 12 4ZM6 8C6 4.68629 8.68629 2 12 2C15.3137 2 18 4.68629 18 8C18 11.3137 15.3137 14 12 14C8.68629 14 6 11.3137 6 8Z"
-      fill={color}
-    />
-    <path
-      fillRule="evenodd"
-      clipRule="evenodd"
-      d="M12 14C7.58172 14 4 17.5817 4 22C4 22.5523 4.44772 23 5 23H19C19.5523 23 20 22.5523 20 22C20 17.5817 16.4183 14 12 14ZM6 20C6.00393 18.1757 7.1786 16.569 8.86123 16.0907C10.182 15.7208 11.5545 15.5 12 15.5C12.4455 15.5 13.818 15.7208 15.1388 16.0907C16.8214 16.569 17.9961 18.1757 18 20H6Z"
-      fill={color}
-    ></path>
+        fillRule="evenodd"
+        clipRule="evenodd"
+        d="M12 4C9.79086 4 8 5.79086 8 8C8 10.2091 9.79086 12 12 12C14.2091 12 16 10.2091 16 8C16 5.79086 14.2091 4 12 4ZM6 8C6 4.68629 8.68629 2 12 2C15.3137 2 18 4.68629 18 8C18 11.3137 15.3137 14 12 14C8.68629 14 6 11.3137 6 8Z"
+        fill={color}
+      />
+      <path
+        fillRule="evenodd"
+        clipRule="evenodd"
+        d="M12 14C7.58172 14 4 17.5817 4 22C4 22.5523 4.44772 23 5 23H19C19.5523 23 20 22.5523 20 22C20 17.5817 16.4183 14 12 14ZM6 20C6.00393 18.1757 7.1786 16.569 8.86123 16.0907C10.182 15.7208 11.5545 15.5 12 15.5C12.4455 15.5 13.818 15.7208 15.1388 16.0907C16.8214 16.569 17.9961 18.1757 18 20H6Z"
+        fill={color}
+      ></path>
     </svg>,
   ];
 
@@ -106,42 +106,36 @@ function Sidenav({ color }) {
       xmlns="http://www.w3.org/2000/svg"
       key={0}
     >
-       {/* Board Header */}
-    <path
-      d="M2 3C1.44772 3 1 3.44772 1 4V5H19V4C19 3.44772 18.5523 3 18 3H2Z"
-      fill={color}
-    />
+      {/* Board Header */}
+      <path
+        d="M2 3C1.44772 3 1 3.44772 1 4V5H19V4C19 3.44772 18.5523 3 18 3H2Z"
+        fill={color}
+      />
       {/* Board Body with Columns */}
-    <path
-      fillRule="evenodd"
-      clipRule="evenodd"
-      d="M19 6H1V16C1 17.1046 1.89543 18 3 18H17C18.1046 18 19 17.1046 19 16V6ZM4 8C4 7.44772 4.44772 7 5 7H7C7.55228 7 8 7.44772 8 8V14C8 14.5523 7.55228 15 7 15H5C4.44772 15 4 14.5523 4 14V8ZM10 7C9.44772 7 9 7.44772 9 8V12C9 12.5523 9.44772 13 10 13H12C12.5523 13 13 12.5523 13 12V8C13 7.44772 12.5523 7 12 7H10ZM15 7C14.4477 7 14 7.44772 14 8V10C14 10.5523 14.4477 11 15 11H17C17.5523 11 18 10.5523 18 10V8C18 7.44772 17.5523 7 17 7H15Z"
-      fill={color}
-    />
+      <path
+        fillRule="evenodd"
+        clipRule="evenodd"
+        d="M19 6H1V16C1 17.1046 1.89543 18 3 18H17C18.1046 18 19 17.1046 19 16V6ZM4 8C4 7.44772 4.44772 7 5 7H7C7.55228 7 8 7.44772 8 8V14C8 14.5523 7.55228 15 7 15H5C4.44772 15 4 14.5523 4 14V8ZM10 7C9.44772 7 9 7.44772 9 8V12C9 12.5523 9.44772 13 10 13H12C12.5523 13 13 12.5523 13 12V8C13 7.44772 12.5523 7 12 7H10ZM15 7C14.4477 7 14 7.44772 14 8V10C14 10.5523 14.4477 11 15 11H17C17.5523 11 18 10.5523 18 10V8C18 7.44772 17.5523 7 17 7H15Z"
+        fill={color}
+      />
     </svg>,
   ];
-  
+
   // In your Sidenav component
-const backlog = [
-  <svg
-    width="20"
-    height="20"
-    viewBox="0 0 20 20"
-    fill="none"
-    key={0}
-  >
-    <path
-      d="M3 3C1.89543 3 1 3.89543 1 5V6H19V5C19 3.89543 18.1046 3 17 3H3Z"
-      fill={color}
-    />
-    <path
-      fillRule="evenodd"
-      clipRule="evenodd"
-      d="M19 7H1V16C1 17.1046 1.89543 18 3 18H17C18.1046 18 19 17.1046 19 16V7ZM4 10C4 9.44772 4.44772 9 5 9H6C6.55228 9 7 9.44772 7 10V12C7 12.5523 6.55228 13 6 13H5C4.44772 13 4 12.5523 4 12V10ZM9 9C8.44772 9 8 9.44772 8 10V12C8 12.5523 8.44772 13 9 13H10C10.5523 13 11 12.5523 11 12V10C11 9.44772 10.5523 9 10 9H9ZM14 9C13.4477 9 13 9.44772 13 10V12C13 12.5523 13.4477 13 14 13H15C15.5523 13 16 12.5523 16 12V10C16 9.44772 15.5523 9 15 9H14Z"
-      fill={color}
-    />
-  </svg>
-];
+  const backlog = [
+    <svg width="20" height="20" viewBox="0 0 20 20" fill="none" key={0}>
+      <path
+        d="M3 3C1.89543 3 1 3.89543 1 5V6H19V5C19 3.89543 18.1046 3 17 3H3Z"
+        fill={color}
+      />
+      <path
+        fillRule="evenodd"
+        clipRule="evenodd"
+        d="M19 7H1V16C1 17.1046 1.89543 18 3 18H17C18.1046 18 19 17.1046 19 16V7ZM4 10C4 9.44772 4.44772 9 5 9H6C6.55228 9 7 9.44772 7 10V12C7 12.5523 6.55228 13 6 13H5C4.44772 13 4 12.5523 4 12V10ZM9 9C8.44772 9 8 9.44772 8 10V12C8 12.5523 8.44772 13 9 13H10C10.5523 13 11 12.5523 11 12V10C11 9.44772 10.5523 9 10 9H9ZM14 9C13.4477 9 13 9.44772 13 10V12C13 12.5523 13.4477 13 14 13H15C15.5523 13 16 12.5523 16 12V10C16 9.44772 15.5523 9 15 9H14Z"
+        fill={color}
+      />
+    </svg>,
+  ];
   const sprint = [
     <svg
       width="20"
@@ -306,7 +300,7 @@ const backlog = [
             <span className="label">Users</span>
           </NavLink>
         </Menu.Item>
-        <Menu.Item key="3">
+        <Menu.Item key="4">
           <NavLink to="/assesment">
             <span
               className="icon"
@@ -319,7 +313,7 @@ const backlog = [
             <span className="label">Self Assessment</span>
           </NavLink>
         </Menu.Item>
-        <Menu.Item key="9">
+        <Menu.Item key="5">
           <NavLink to="/kansanboard">
             <span
               className="icon"
@@ -332,7 +326,7 @@ const backlog = [
             <span className="label">Kansan Board</span>
           </NavLink>
         </Menu.Item>
-        <Menu.Item key="10">
+        <Menu.Item key="6">
           <NavLink to="/backlog">
             <span
               className="icon"
@@ -345,7 +339,7 @@ const backlog = [
             <span className="label">Project Backlog</span>
           </NavLink>
         </Menu.Item>
-        <Menu.Item key="11">
+        <Menu.Item key="7">
           <NavLink to="/sprint">
             <span
               className="icon"
@@ -358,9 +352,7 @@ const backlog = [
             <span className="label">Sprint</span>
           </NavLink>
         </Menu.Item>
-        <Menu.Item key="4">
-        </Menu.Item>
-        <Menu.Item key="10">
+        <Menu.Item key="8">
           <NavLink to="/scorecard">
             <span
               className="icon"
@@ -376,7 +368,7 @@ const backlog = [
         {/* <Menu.Item className="menu-item-header" key="5">
           Account Pages
         </Menu.Item> */}
-        <Menu.Item key="6">
+        <Menu.Item key="9">
           <NavLink to="/profile">
             <span
               className="icon"
@@ -387,18 +379,6 @@ const backlog = [
               {profile}
             </span>
             <span className="label">Profile</span>
-          </NavLink>
-        </Menu.Item>
-        <Menu.Item key="7">
-          <NavLink to="/sign-in">
-            <span className="icon">{signin}</span>
-            <span className="label">Sign In</span>
-          </NavLink>
-        </Menu.Item>
-        <Menu.Item key="8">
-          <NavLink to="/sign-up">
-            <span className="icon">{signup}</span>
-            <span className="label">Sign Up</span>
           </NavLink>
         </Menu.Item>
       </Menu>
