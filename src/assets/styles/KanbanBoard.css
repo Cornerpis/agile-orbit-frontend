@@ -1,0 +1,356 @@
+/* Base Styles */
+.kanban-board {
+    padding: 12px;
+    height: 100vh;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    background-color: #f5f5f5;
+  }
+  
+  .columns-container {
+    display: flex;
+    gap: 12px;
+    height: calc(100vh - 24px);
+    /* min-width: fit-content; */
+    padding-bottom: 12px;
+  }
+  
+  .column {
+    min-width: 280px;
+    width: 280px;
+    background: #ffffff;
+    border-radius: 8px;
+    padding: 12px;
+    display: flex;
+    flex-direction: column;
+    height: fit-content;
+    max-height: 100%;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  }
+  
+  .column-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 12px;
+    padding: 0 4px;
+  }
+  
+  .column-actions {
+    display: flex;
+    gap: 4px;
+  }
+  
+  .action-button {
+    font-size: 16px;
+    padding: 4px 8px;
+    min-width: 32px;
+    height: 32px;
+  }
+  
+  .tasks-list {
+    flex: 1;
+    overflow-y: auto;
+    min-height: 60px;
+    padding: 8px;
+    border-radius: 4px;
+    background: rgba(250, 250, 250, 0.8);
+  }
+  
+  .task-card {
+    margin-bottom: 8px;
+    touch-action: none;
+  }
+  
+  .task-card .ant-card {
+    cursor: grab;
+    /* user-select: none; */
+    transition: box-shadow 0.2s;
+  }
+  
+  .task-card .ant-card:hover {
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  }
+  
+  .task-card .ant-card:active {
+    cursor: grabbing;
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+  }
+  
+  .add-column {
+    min-width: 280px;
+    width: 280px;
+  }
+  
+  .add-column-form {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    background: #ffffff;
+    padding: 12px;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  }
+  
+  .add-column-actions {
+    display: flex;
+    gap: 8px;
+    justify-content: flex-end;
+  }
+  
+  .add-column-button {
+    height: 56px;
+    border: 1px dashed #d9d9d9;
+    background: #fafafa;
+    color: rgba(0, 0, 0, 0.65);
+  }
+  
+  .add-column-button:hover {
+    border-color: #1890ff;
+    color: #1890ff;
+  }
+  
+  /* Mobile Styles */
+  .columns-container.mobile-view {
+    flex-direction: column;
+    height: auto;
+    min-width: 100%;
+    gap: 16px;
+  }
+  
+  .mobile-view .column {
+    width: 100%;
+    min-width: 100%;
+    margin-bottom: 0;
+  }
+  
+  .mobile-view .add-column {
+    width: 100%;
+    min-width: 100%;
+  }
+  
+  .mobile-view .task-card .ant-card-meta-description {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  
+  /* Responsive Breakpoints */
+  @media (max-width: 768px) {
+    .kanban-board {
+      padding: 8px;
+      height: auto;
+      min-height: 100vh;
+    }
+    
+    .columns-container {
+      height: auto;
+      gap: 8px;
+    }
+    
+    .column {
+      min-width: calc(100vw - 32px);
+    }
+  }
+  
+  @media (max-width: 480px) {
+    .column-header .ant-tag {
+      font-size: 12px;
+      padding: 2px 8px;
+    }
+    
+    .action-button {
+      font-size: 14px;
+      padding: 2px 6px;
+      min-width: 28px;
+      height: 28px;
+    }
+    
+    .task-card .ant-card-meta-title {
+      font-size: 14px;
+      margin-bottom: 2px;
+    }
+    
+    .task-card .ant-card-meta-description {
+      font-size: 12px;
+    }
+    
+    .add-column-button {
+      height: 48px;
+    }
+  }
+  
+  /* Accessibility Focus Styles */
+  .action-button:focus-visible,
+  .add-column-button:focus-visible,
+  .task-card:focus-visible {
+    outline: 2px solid #1890ff;
+    outline-offset: 2px;
+  }
+  
+  
+  
+  
+  /* This css for backlog start */
+  /* Base Styles */
+  .project-backlog {
+    padding: 16px;
+  }
+  
+  .task-title-container {
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .task-title {
+    font-weight: 500;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  
+  .task-description {
+    color: rgba(0, 0, 0, 0.45);
+    font-size: 12px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  
+  .overdue-task {
+    background-color: #fff1f0;
+  }
+  
+  .detail-row {
+    display: flex;
+    align-items: center;
+    margin-bottom: 12px;
+  }
+  
+  .detail-label {
+    font-weight: 500;
+    margin-right: 8px;
+    min-width: 100px;
+  }
+  
+  .task-detail {
+    padding: 8px;
+  }
+  
+  .task-detail h3 {
+    margin-bottom: 8px;
+  }
+  
+  .task-detail .task-description {
+    white-space: normal;
+    margin-bottom: 16px;
+  }
+  
+  /* Mobile Styles */
+  @media (max-width: 768px) {
+    .project-backlog {
+      padding: 8px;
+    }
+    
+    .ant-card-body {
+      padding: 12px;
+    }
+    
+    .ant-table-thead > tr > th,
+    .ant-table-tbody > tr > td {
+      padding: 8px;
+    }
+    
+    .task-title {
+      font-size: 14px;
+    }
+    
+    .task-description {
+      font-size: 12px;
+    }
+    
+    .detail-label {
+      min-width: 80px;
+    }
+  }
+  
+  /* Tablet Styles */
+  @media (min-width: 768px) and (max-width: 992px) {
+    .project-backlog {
+      padding: 12px;
+    }
+    
+    .ant-table-thead > tr > th,
+    .ant-table-tbody > tr > td {
+      padding: 12px 8px;
+    }
+  }
+  
+  /* Desktop Styles */
+  @media (min-width: 992px) {
+    .project-backlog {
+      padding: 24px;
+    }
+    
+    .task-title {
+      font-size: 16px;
+    }
+    
+    .task-description {
+      font-size: 14px;
+    }
+  }
+  
+  /* Accessibility */
+  .task-title-container:focus,
+  .task-title-container:focus-visible {
+    outline: 2px solid #1890ff;
+    outline-offset: 2px;
+  }
+  
+  .ant-table-row:hover {
+    background-color: #fafafa;
+  }
+  
+  /* Print Styles */
+  @media print {
+    .project-backlog {
+      padding: 0;
+    }
+    
+    .ant-table {
+      border: 1px solid #f0f0f0;
+    }
+    
+    .ant-table-thead > tr > th {
+      background-color: #fafafa !important;
+      -webkit-print-color-adjust: exact;
+      print-color-adjust: exact;
+    }
+  }
+  
+  /* Mobile styles */
+  @media (max-width: 768px) {
+    .project-backlog {
+      padding: 8px;
+    }
+    /* Other mobile-specific styles */
+  }
+  
+  /* Tablet styles */
+  @media (min-width: 769px) and (max-width: 1024px) {
+    .project-backlog {
+      padding: 12px;
+    }
+    /* Other tablet-specific styles */
+  }
+  
+  /* Desktop styles */
+  @media (min-width: 1025px) {
+    .project-backlog {
+      padding: 16px;
+    }
+    /* Other desktop-specific styles */
+  }
+  
+  /* Backlogs end */

@@ -24,7 +24,7 @@ function Footer() {
             © 2025, 
              by
             <a href="#pablo" className="font-weight-bold" target="_blank">
-              Cornerpis Technology
+              Cornerpis 
             </a>
            
           </div>

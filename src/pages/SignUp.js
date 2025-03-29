@@ -223,14 +223,7 @@ name="Lastname"
                 >
                   <Input placeholder="Email" />
                 </Form.Item>
-                <Form.Item
-                  name="phonenumber"
-                  rules={[
-                    { required: true, message: "Please enter your phone number" },
-                  ]}
-                >
-                  <Input placeholder="Phone number" />
-                </Form.Item>
+                
                 <Form.Item
                   name="role"
                   rules={[
@@ -247,30 +240,7 @@ name="Lastname"
                 >
                   <Input placeholder="Department" />
                 </Form.Item>
-                <Form.Item
-                  name="Phonenumber"
-                  rules={[
-                    { required: true, message: "Please enter your phone number" },
-                  ]}
-                >
-                  <Input placeholder="Phone number" />
-                </Form.Item>
-                <Form.Item
-                  name="Role"
-                  rules={[
-                    { required: true, message: "Please enter your role" },
-                  ]}
-                >
-                  <Input placeholder="Role" />
-                </Form.Item>
-                <Form.Item
-                  name="department"
-                  rules={[
-                    { required: true, message: "Please enter your department" },
-                  ]}
-                >
-                  <Input placeholder="Department" />
-                </Form.Item>
+
                 <Form.Item
                   name="password"
                   rules={[
@@ -287,16 +257,7 @@ name="Lastname"
                 >
                   <Input placeholder="Confirm password" />
                 </Form.Item>
-                <Form.Item
-                  name="confirmpassword"
-                  rules={[
-                    { required: true, message: "Please enter your confirm password!" },
-                  ]}
-                >
-                  <Input placeholder="Confirm Passwoed" />
-                </Form.Item>
-
-
+                
                 <Form.Item name="remember" valuePropName="checked">
                   <Checkbox>
                     I agree the{" "}

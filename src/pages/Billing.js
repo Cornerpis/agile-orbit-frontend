@@ -1,559 +1,812 @@
-/*!
-  =========================================================
-  * Muse Ant Design Dashboard - v1.0.0
-  =========================================================
-  * Product Page: https://www.creative-tim.com/product/muse-ant-design-dashboard
-  * Copyright 2021 Creative Tim (https://www.creative-tim.com)
-  * Licensed under MIT (https://github.com/creativetimofficial/muse-ant-design-dashboard/blob/main/LICENSE.md)
-  * Coded by Creative Tim
-  =========================================================
-  * The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
-*/
-
+import React, { useState } from 'react';
 import {
+  Card,
+  Form,
+  Radio,
+  Button,
   Row,
   Col,
-  Card,
-  Statistic,
-  Button,
-  List,
-  Descriptions,
-  Avatar,
-} from "antd";
+  Typography,
+  Divider,
+  Progress,
+  Steps,
+  Alert,
+  Collapse,
+  Grid,
+  Space,
+  Tag,
+  Tooltip
+} from 'antd';
+import {
+  CheckCircleOutlined,
+  InfoCircleOutlined,
+  ArrowLeftOutlined,
+  ArrowRightOutlined,
+  QuestionCircleOutlined
+} from '@ant-design/icons';
 
-import { PlusOutlined, ExclamationOutlined } from "@ant-design/icons";
-import mastercard from "../assets/images/mastercard-logo.png";
-import paypal from "../assets/images/paypal-logo-2.png";
-import visa from "../assets/images/visa-logo.png";
+const { Step } = Steps;
+const { Title, Text, Paragraph } = Typography;
+const { useBreakpoint } = Grid;
+const { Panel } = Collapse;
 
-function Billing() {
-  const data = [
-    {
-      title: "March, 01, 2021",
-      description: "#MS-415646",
-      amount: "$180",
-    },
-    {
-      title: "February, 12, 2021",
-      description: "#RV-126749",
-      amount: "$250",
-    },
-    {
-      title: "April, 05, 2020",
-      description: "#FB-212562",
-      amount: "$550",
-    },
-    {
-      title: "June, 25, 2019",
-      description: "#QW-103578",
-      amount: "$400",
-    },
-    {
-      title: "March, 03, 2019",
-      description: "#AR-803481",
-      amount: "$700",
-    },
-  ];
+const assessmentSections = [
+  {
+    key: 'framework',
+    title: 'Agile Framework & Team Structure',
+    shortTitle: 'Framework',
+    questions: [
+      {
+        text: 'What Agile framework does your team primarily use?',
+        options: [
+          { label: 'Scrum', value: 4 },
+          { label: 'Kanban', value: 3 },
+          { label: 'SAFe', value: 2 },
+          { label: 'Hybrid', value: 3 },
+          { label: 'No formal Agile methodology', value: 1 }
+        ],
+        tooltip: 'The methodology your team follows for Agile implementation'
+      },
+      {
+        text: 'How frequently does your team conduct Agile ceremonies?',
+        options: [
+          { label: 'After every sprint', value: 4 },
+          { label: 'Occasionally', value: 3 },
+          { label: 'Rarely', value: 2 },
+          { label: 'Never', value: 1 }
+        ],
+        tooltip: 'Regularity of stand-ups, sprint planning, retrospectives etc.'
+      },
+      {
+        text: 'How well does your team understand Agile principles and values?',
+        options: [
+          { label: 'Very well', value: 4 },
+          { label: 'Moderately well', value: 3 },
+          { label: 'Somewhat', value: 2 },
+          { label: 'Poorly', value: 1 },
+          { label: 'Not at all', value: 0 }
+        ],
+        tooltip: 'Team members\' comprehension of Agile fundamentals'
+      },
+      {
+        text: 'Does your organization provide Agile training to team members?',
+        options: [
+          { label: 'Yes, regularly', value: 4 },
+          { label: 'Occasionally', value: 3 },
+          { label: 'Rarely', value: 2 },
+          { label: 'No training provided', value: 1 }
+        ],
+        tooltip: 'Availability of formal Agile education for team members'
+      },
+      {
+        text: 'How often do team members participate in Agile retrospectives?',
+        options: [
+          { label: 'After every sprint', value: 4 },
+          { label: 'Every few sprints', value: 3 },
+          { label: 'Rarely', value: 2 },
+          { label: 'Never', value: 1 }
+        ],
+        tooltip: 'Participation in reflection and improvement sessions'
+      }
+    ]
+  },
+  {
+    key: 'planning',
+    title: 'Agile Planning & Estimation',
+    shortTitle: 'Planning',
+    questions: [
+      {
+        text: 'How does your team prioritize backlog items?',
+        options: [
+          { label: 'Business Value', value: 4 },
+          { label: 'Customer Feedback', value: 3 },
+          { label: 'Team Voting', value: 2 },
+          { label: 'No Prioritization Process', value: 1 }
+        ],
+        tooltip: 'Method used to determine work item importance'
+      },
+      {
+        text: 'Which estimation technique does your team primarily use?',
+        options: [
+          { label: 'Planning Poker', value: 4 },
+          { label: 'T-shirt Sizing', value: 3 },
+          { label: 'Story Points', value: 3 },
+          { label: 'No Formal Estimation', value: 1 }
+        ],
+        tooltip: 'Approach for sizing work items'
+      },
+      {
+        text: 'How often does your team refine backlog items?',
+        options: [
+          { label: 'Weekly', value: 4 },
+          { label: 'Bi-weekly', value: 3 },
+          { label: 'Before Every Sprint', value: 3 },
+          { label: 'Rarely or Never', value: 1 }
+        ],
+        tooltip: 'Regularity of backlog grooming sessions'
+      },
+      {
+        text: 'How accurate are your team\'s sprint estimations?',
+        options: [
+          { label: 'Very Accurate', value: 4 },
+          { label: 'Moderately Accurate', value: 3 },
+          { label: 'Somewhat Accurate', value: 2 },
+          { label: 'Inaccurate', value: 1 }
+        ],
+        tooltip: 'Precision of your team\'s planning predictions'
+      },
+      {
+        text: 'How does your team handle scope changes during sprints?',
+        options: [
+          { label: 'Strictly Follow Sprint Plan', value: 2 },
+          { label: 'Allow Minor Adjustments', value: 3 },
+          { label: 'Regularly Adapt Scope', value: 4 },
+          { label: 'No Clear Process', value: 1 }
+        ],
+        tooltip: 'Approach to mid-sprint requirement changes'
+      }
+    ]
+  },
+  {
+    key: 'execution',
+    title: 'Agile Execution & Delivery',
+    shortTitle: 'Execution',
+    questions: [
+      {
+        text: 'How often does your team deliver working software?',
+        options: [
+          { label: 'Every Sprint', value: 4 },
+          { label: 'Every Few Sprints', value: 3 },
+          { label: 'Only at Release Milestones', value: 2 },
+          { label: 'No Regular Delivery Schedule', value: 1 }
+        ],
+        tooltip: 'Frequency of production-ready deliverables'
+      },
+      {
+        text: 'How well does your team adapt to changing requirements?',
+        options: [
+          { label: 'Very Well', value: 4 },
+          { label: 'Moderately Well', value: 3 },
+          { label: 'Somewhat Struggles', value: 2 },
+          { label: 'Poorly', value: 1 }
+        ],
+        tooltip: 'Team responsiveness to evolving needs'
+      },
+      {
+        text: 'Does your team track work using a visual management system?',
+        options: [
+          { label: 'Yes, Always', value: 4 },
+          { label: 'Sometimes', value: 3 },
+          { label: 'Rarely', value: 2 },
+          { label: 'No Visual System', value: 1 }
+        ],
+        tooltip: 'Usage of Kanban boards or similar visual tools'
+      },
+      {
+        text: 'How frequently does your team measure and improve velocity?',
+        options: [
+          { label: 'After Every Sprint', value: 4 },
+          { label: 'Occasionally', value: 3 },
+          { label: 'Rarely', value: 2 },
+          { label: 'Never', value: 1 }
+        ],
+        tooltip: 'Tracking and optimizing work throughput'
+      },
+      {
+        text: 'How does your team handle technical debt?',
+        options: [
+          { label: 'Actively Manages & Reduces It', value: 4 },
+          { label: 'Occasionally Allocates Time', value: 3 },
+          { label: 'Rarely Addresses It', value: 2 },
+          { label: 'Ignores It Until It Becomes a Problem', value: 1 }
+        ],
+        tooltip: 'Approach to code quality and maintenance'
+      }
+    ]
+  },
+  {
+    key: 'culture',
+    title: 'Agile Culture & Continuous Improvement',
+    shortTitle: 'Culture',
+    questions: [
+      {
+        text: 'How well does your organization embrace Agile values and principles?',
+        options: [
+          { label: 'Very Well', value: 4 },
+          { label: 'Moderately Well', value: 3 },
+          { label: 'Somewhat Struggles', value: 2 },
+          { label: 'Poorly', value: 1 }
+        ],
+        tooltip: 'Organizational adoption of Agile mindset'
+      },
+      {
+        text: 'How frequently does your team conduct retrospectives and act on feedback?',
+        options: [
+          { label: 'After Every Sprint', value: 4 },
+          { label: 'Occasionally', value: 3 },
+          { label: 'Rarely', value: 2 },
+          { label: 'Never', value: 1 }
+        ],
+        tooltip: 'Regular reflection and implementation of improvements'
+      },
+      {
+        text: 'How open is your organization to feedback from customers and stakeholders?',
+        options: [
+          { label: 'Very Open', value: 4 },
+          { label: 'Moderately Open', value: 3 },
+          { label: 'Somewhat Resistant', value: 2 },
+          { label: 'Not Open at All', value: 1 }
+        ],
+        tooltip: 'Receptiveness to external input'
+      },
+      {
+        text: 'How often does your team engage in Agile coaching or training to improve processes?',
+        options: [
+          { label: 'Regularly', value: 4 },
+          { label: 'Occasionally', value: 3 },
+          { label: 'Rarely', value: 2 },
+          { label: 'Never', value: 1 }
+        ],
+        tooltip: 'Investment in process improvement education'
+      },
+      {
+        text: 'Does your organization encourage experimentation and innovation?',
+        options: [
+          { label: 'Yes, Strongly Encouraged', value: 4 },
+          { label: 'Somewhat Encouraged', value: 3 },
+          { label: 'Rarely Encouraged', value: 2 },
+          { label: 'Not Encouraged', value: 1 }
+        ],
+        tooltip: 'Support for trying new approaches'
+      }
+    ]
+  }
+];
 
-  const wifi = [
-    <svg
-      xmlns="http://www.w3.org/2000/svg"
-      width="25"
-      height="25"
-      viewBox="0 0 22.5 20.625"
-      key={0}
-    >
-      <g id="wifi" transform="translate(0.75 0.75)">
-        <circle
-          id="Oval"
-          cx="1.5"
-          cy="1.5"
-          r="1.5"
-          transform="translate(9 16.875)"
-          fill="#fff"
-        ></circle>
-        <path
-          id="Path"
-          d="M0,1.36a6.377,6.377,0,0,1,7.5,0"
-          transform="translate(6.75 11.86)"
-          fill="none"
-          stroke="#fff"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          strokeMiterlimit="10"
-          strokeWidth="1.5"
-        ></path>
-        <path
-          id="Path-2"
-          data-name="Path"
-          d="M14.138,2.216A12.381,12.381,0,0,0,0,2.216"
-          transform="translate(3.431 6)"
-          fill="none"
-          stroke="#fff"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          strokeMiterlimit="10"
-          strokeWidth="1.5"
-        ></path>
-        <path
-          id="Path-3"
-          data-name="Path"
-          d="M0,3.294a18.384,18.384,0,0,1,21,0"
-          fill="none"
-          stroke="#fff"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          strokeMiterlimit="10"
-          strokeWidth="1.5"
-        ></path>
-      </g>
-    </svg>,
-  ];
+const maturityLevels = [
+  { value: 0, label: 'Not Agile', description: 'No Agile practices in place', color: 'red' },
+  { value: 1, label: 'Initial', description: 'Ad-hoc processes', color: 'volcano' },
+  { value: 2, label: 'Developing', description: 'Some processes defined', color: 'orange' },
+  { value: 3, label: 'Defined', description: 'Standard processes established', color: 'gold' },
+  { value: 4, label: 'Managed', description: 'Measured and controlled', color: 'blue' },
+  { value: 5, label: 'Optimizing', description: 'Continuous improvement', color: 'green' }
+];
 
-  const angle = [
-    <svg
-      xmlns="http://www.w3.org/2000/svg"
-      width="22"
-      height="22"
-      viewBox="0 0 22 22"
-      key={0}
-    >
-      <g id="bank" transform="translate(0.75 0.75)">
-        <path
-          id="Shape"
-          transform="translate(0.707 9.543)"
-          fill="none"
-          stroke="#fff"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          strokeMiterlimit="10"
-          strokeWidth="1.5"
-        ></path>
-        <path
-          id="Path"
-          d="M10.25,0,20.5,9.19H0Z"
-          fill="none"
-          stroke="#fff"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          strokeMiterlimit="10"
-          strokeWidth="1.5"
-        ></path>
-        <path
-          id="Path-2"
-          data-name="Path"
-          d="M0,.707H20.5"
-          transform="translate(0 19.793)"
-          fill="none"
-          stroke="#fff"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          strokeMiterlimit="10"
-          strokeWidth="1.5"
-        ></path>
-      </g>
-    </svg>,
-  ];
+const AgileMaturityAssessment = () => {
+  const [currentStep, setCurrentStep] = useState(0);
+  const [answers, setAnswers] = useState({});
+  const [showResults, setShowResults] = useState(false);
+  const screens = useBreakpoint();
 
-  const pencil = [
-    <svg
-      width="20"
-      height="20"
-      viewBox="0 0 20 20"
-      fill="none"
-      xmlns="http://www.w3.org/2000/svg"
-      key={0}
-    >
-      <path
-        d="M13.5858 3.58579C14.3668 2.80474 15.6332 2.80474 16.4142 3.58579C17.1953 4.36683 17.1953 5.63316 16.4142 6.41421L15.6213 7.20711L12.7929 4.37868L13.5858 3.58579Z"
-        className="fill-gray-7"
-      ></path>
-      <path
-        d="M11.3787 5.79289L3 14.1716V17H5.82842L14.2071 8.62132L11.3787 5.79289Z"
-        className="fill-gray-7"
-      ></path>
-    </svg>,
-  ];
-  const download = [
-    <svg
-      width="15"
-      height="15"
-      viewBox="0 0 20 20"
-      fill="none"
-      xmlns="http://www.w3.org/2000/svg"
-      key="0"
-    >
-      <path
-        fillRule="evenodd"
-        clipRule="evenodd"
-        d="M3 17C3 16.4477 3.44772 16 4 16H16C16.5523 16 17 16.4477 17 17C17 17.5523 16.5523 18 16 18H4C3.44772 18 3 17.5523 3 17ZM6.29289 9.29289C6.68342 8.90237 7.31658 8.90237 7.70711 9.29289L9 10.5858L9 3C9 2.44772 9.44771 2 10 2C10.5523 2 11 2.44771 11 3L11 10.5858L12.2929 9.29289C12.6834 8.90237 13.3166 8.90237 13.7071 9.29289C14.0976 9.68342 14.0976 10.3166 13.7071 10.7071L10.7071 13.7071C10.5196 13.8946 10.2652 14 10 14C9.73478 14 9.48043 13.8946 9.29289 13.7071L6.29289 10.7071C5.90237 10.3166 5.90237 9.68342 6.29289 9.29289Z"
-        fill="#111827"
-      ></path>
-    </svg>,
-  ];
-  const deletebtn = [
-    <svg
-      width="16"
-      height="16"
-      viewBox="0 0 20 20"
-      fill="none"
-      xmlns="http://www.w3.org/2000/svg"
-      key={0}
-    >
-      <path
-        fillRule="evenodd"
-        clipRule="evenodd"
-        d="M9 2C8.62123 2 8.27497 2.214 8.10557 2.55279L7.38197 4H4C3.44772 4 3 4.44772 3 5C3 5.55228 3.44772 6 4 6L4 16C4 17.1046 4.89543 18 6 18H14C15.1046 18 16 17.1046 16 16V6C16.5523 6 17 5.55228 17 5C17 4.44772 16.5523 4 16 4H12.618L11.8944 2.55279C11.725 2.214 11.3788 2 11 2H9ZM7 8C7 7.44772 7.44772 7 8 7C8.55228 7 9 7.44772 9 8V14C9 14.5523 8.55228 15 8 15C7.44772 15 7 14.5523 7 14V8ZM12 7C11.4477 7 11 7.44772 11 8V14C11 14.5523 11.4477 15 12 15C12.5523 15 13 14.5523 13 14V8C13 7.44772 12.5523 7 12 7Z"
-        fill="#111827"
-        className="fill-danger"
-      ></path>
-    </svg>,
-  ];
+  // Responsive configuration
+  const isMobile = !screens.sm;
+  const isTablet = screens.sm && !screens.lg;
+  const isDesktop = screens.lg;
 
-  const information = [
-    {
-      title: "Oliver Liam",
-      description: "Viking Burrito",
-      address: "oliver@burrito.com",
-      vat: "FRB1235476",
-    },
-    {
-      title: "Lucas Harper",
-      description: "Stone Tech Zone",
-      address: "lucas@syone-tech.com",
-      vat: "FRB1235476",
-    },
-    {
-      title: "Oliver Liam",
-      description: "ethan@fiber.com",
-      vat: "NumberFRB1235476",
-    },
-  ];
-  const calender = [
-    <svg
-      width="18"
-      height="18"
-      viewBox="0 0 20 20"
-      fill="none"
-      xmlns="http://www.w3.org/2000/svg"
-      key={0}
-    >
-      <path
-        fillRule="evenodd"
-        clipRule="evenodd"
-        d="M6 2C5.44772 2 5 2.44772 5 3V4H4C2.89543 4 2 4.89543 2 6V16C2 17.1046 2.89543 18 4 18H16C17.1046 18 18 17.1046 18 16V6C18 4.89543 17.1046 4 16 4H15V3C15 2.44772 14.5523 2 14 2C13.4477 2 13 2.44772 13 3V4H7V3C7 2.44772 6.55228 2 6 2ZM6 7C5.44772 7 5 7.44772 5 8C5 8.55228 5.44772 9 6 9H14C14.5523 9 15 8.55228 15 8C15 7.44772 14.5523 7 14 7H6Z"
-        fill="#111827"
-        className="fill-muted"
-      ></path>
-    </svg>,
-  ];
-  const mins = [
-    <svg
-      width="10"
-      height="10"
-      viewBox="0 0 20 20"
-      fill="none"
-      xmlns="http://www.w3.org/2000/svg"
-      key={0}
-    >
-      <path
-        fillRule="evenodd"
-        clipRule="evenodd"
-        d="M5 10C5 9.44772 5.44772 9 6 9L14 9C14.5523 9 15 9.44772 15 10C15 10.5523 14.5523 11 14 11L6 11C5.44772 11 5 10.5523 5 10Z"
-        className="fill-danger"
-      ></path>
-    </svg>,
-  ];
-  const newest = [
-    {
-      headding: <h6>NEWEST</h6>,
-      avatar: mins,
-      title: "Netflix",
-      description: "27 March 2021, at 12:30 PM",
-      amount: "- $2,500",
-      textclass: "text-light-danger",
-      amountcolor: "text-danger",
-    },
-    {
-      avatar: <PlusOutlined style={{ fontSize: 10 }} />,
-      title: "Apple",
-      description: "27 March 2021, at 04:30 AM",
-      amount: "+ $2,000",
-      textclass: "text-fill",
-      amountcolor: "text-success",
-    },
-  ];
-  const yesterday = [
-    {
-      avatar: <PlusOutlined style={{ fontSize: 10 }} />,
-      title: "Stripe",
-      description: "26 March 2021, at 12:30 AM",
-      amount: "+ $750",
-      textclass: "text-fill",
-      amountcolor: "text-success",
-    },
-    {
-      avatar: <PlusOutlined style={{ fontSize: 10 }} />,
-      title: "HubSpot",
-      description: "26 March 2021, at 11:30 AM",
-      amount: "+ $1,050",
-      textclass: "text-fill",
-      amountcolor: "text-success",
-    },
-    {
-      avatar: <PlusOutlined style={{ fontSize: 10 }} />,
-      title: "Creative Tim",
-      description: "26 March 2021, at 07:30 AM",
-      amount: "+ $2,400",
-      textclass: "text-fill",
-      amountcolor: "text-success",
-    },
-    {
-      avatar: <ExclamationOutlined style={{ fontSize: 10 }} />,
-      title: "Webflow",
-      description: "26 March 2021, at 04:00 AM",
-      amount: "Pending",
-      textclass: "text-warning",
-      amountcolor: "text-warning-b",
-    },
-  ];
+  const handleAnswerChange = (sectionKey, questionIndex, value) => {
+    setAnswers(prev => ({
+      ...prev,
+      [`${sectionKey}_${questionIndex}`]: value
+    }));
+  };
+
+  const calculateResults = () => {
+    const sectionScores = {};
+    
+    assessmentSections.forEach(section => {
+      const sectionAnswers = [];
+      
+      section.questions.forEach((_, index) => {
+        const answer = answers[`${section.key}_${index}`];
+        if (answer !== undefined) {
+          sectionAnswers.push(answer);
+        }
+      });
+      
+      if (sectionAnswers.length > 0) {
+        const sum = sectionAnswers.reduce((a, b) => a + b, 0);
+        const average = sum / sectionAnswers.length;
+        const normalized = (average / 4) * 5; // Scale to 0-5
+        
+        sectionScores[section.key] = {
+          score: normalized,
+          title: section.title,
+          max: 5
+        };
+      }
+    });
+    
+    return sectionScores;
+  };
+
+  const nextStep = () => {
+    setCurrentStep(currentStep + 1);
+  };
+
+  const prevStep = () => {
+    setCurrentStep(currentStep - 1);
+  };
+
+  const renderQuestionStep = (section) => {
+    return (
+      <div style={{ 
+        padding: isMobile ? '12px' : '24px',
+        maxWidth: '800px',
+        margin: '0 auto'
+      }}>
+        <Title 
+          level={isMobile ? 4 : 3} 
+          style={{ 
+            marginBottom: isMobile ? '8px' : '16px',
+            fontSize: isMobile ? '18px' : '24px'
+          }}
+        >
+          {section.title}
+        </Title>
+        
+        <Paragraph type="secondary" style={{ fontSize: isMobile ? '14px' : '16px' }}>
+          Answer each question based on your team's current practices
+        </Paragraph>
+        
+        <Divider style={{ 
+          margin: isMobile ? '12px 0' : '16px 0',
+          borderWidth: '1px'
+        }} />
+        
+        <Space 
+          direction="vertical" 
+          size={isMobile ? 'middle' : 'large'} 
+          style={{ width: '100%' }}
+        >
+          {section.questions.map((question, qIndex) => (
+            <Card 
+              key={`${section.key}_${qIndex}`}
+              size="small"
+              style={{ 
+                borderRadius: '8px',
+                boxShadow: '0 1px 2px rgba(0,0,0,0.05)'
+              }}
+              bodyStyle={{
+                padding: isMobile ? '12px' : '16px'
+              }}
+            >
+              <div style={{ 
+                display: 'flex', 
+                justifyContent: 'space-between',
+                marginBottom: isMobile ? '6px' : '8px'
+              }}>
+                <Text strong style={{ 
+                  fontSize: isMobile ? '14px' : '16px',
+                  lineHeight: 1.4
+                }}>
+                  {question.text}
+                </Text>
+                {question.tooltip && (
+                  <Tooltip title={question.tooltip}>
+                    <QuestionCircleOutlined style={{ 
+                      color: '#1890ff',
+                      fontSize: isMobile ? '14px' : '16px',
+                      marginLeft: '8px'
+                    }} />
+                  </Tooltip>
+                )}
+              </div>
+              
+              <Radio.Group
+                onChange={(e) => handleAnswerChange(section.key, qIndex, e.target.value)}
+                value={answers[`${section.key}_${qIndex}`]}
+                style={{ width: '100%' }}
+              >
+                <Space direction="vertical" style={{ width: '100%' }}>
+                  {question.options.map((option, oIndex) => (
+                    <Radio 
+                      key={oIndex} 
+                      value={option.value}
+                      style={{ 
+                        display: 'flex', 
+                        alignItems: 'center',
+                        margin: isMobile ? '4px 0' : '8px 0',
+                        fontSize: isMobile ? '14px' : '16px',
+                        lineHeight: 1.4
+                      }}
+                    >
+                      {option.label}
+                    </Radio>
+                  ))}
+                </Space>
+              </Radio.Group>
+            </Card>
+          ))}
+        </Space>
+        
+        <Divider style={{ 
+          margin: isMobile ? '16px 0' : '24px 0',
+          borderWidth: '1px'
+        }} />
+        
+        <Row justify="space-between" gutter={isMobile ? 8 : 16}>
+          <Col flex={isMobile ? '80px' : '120px'}>
+            <Button 
+              icon={<ArrowLeftOutlined />} 
+              onClick={prevStep}
+              disabled={currentStep === 0}
+              size={isMobile ? 'small' : 'middle'}
+              block
+            >
+              {isMobile ? 'Back' : 'Previous'}
+            </Button>
+          </Col>
+          <Col flex={isMobile ? '100px' : '120px'}>
+            <Button 
+              type="primary" 
+              icon={<ArrowRightOutlined />} 
+              onClick={nextStep}
+              size={isMobile ? 'small' : 'middle'}
+              block
+              style={{ float: 'right' }}
+            >
+              {currentStep === assessmentSections.length - 1 ? 
+                'View Result' : 
+                'Next'}
+            </Button>
+          </Col>
+        </Row>
+      </div>
+    );
+  };
+
+  const renderResults = () => {
+    const results = calculateResults();
+    const overallScore = Object.values(results).reduce((sum, section) => 
+      sum + section.score, 0) / Object.keys(results).length;
+    
+    const currentLevel = maturityLevels.reduce((prev, curr) => 
+      Math.abs(curr.value - overallScore) < Math.abs(prev.value - overallScore) ? curr : prev
+    );
+
+    return (
+      <div style={{ 
+        padding: isMobile ? '12px' : '24px',
+        maxWidth: '1200px',
+        margin: '0 auto'
+      }}>
+        <Title 
+          level={isMobile ? 3 : 2} 
+          style={{ 
+            marginBottom: isMobile ? '12px' : '24px',
+            fontSize: isMobile ? '20px' : '28px'
+          }}
+        >
+          Agile Maturity Assessment Results
+        </Title>
+        
+        <Alert
+          message={<Text strong style={{ fontSize: isMobile ? '14px' : '16px' }}>Your Agile Maturity Level</Text>}
+          description={
+            <Space direction="vertical" size="small" style={{ marginTop: '8px' }}>
+              <Tag 
+                color={currentLevel.color} 
+                style={{ 
+                  fontSize: isMobile ? '14px' : '16px',
+                  padding: isMobile ? '4px 8px' : '6px 12px'
+                }}
+              >
+                {currentLevel.label} ({overallScore.toFixed(1)}/5)
+              </Tag>
+              <Text style={{ fontSize: isMobile ? '14px' : '16px' }}>
+                {currentLevel.description}
+              </Text>
+            </Space>
+          }
+          type="info"
+          showIcon
+          style={{ marginBottom: '24px' }}
+        />
+        
+        <Progress 
+          percent={(overallScore / 5) * 100} 
+          strokeColor={currentLevel.color}
+          format={() => (
+            <Text strong style={{ fontSize: isMobile ? '14px' : '16px' }}>
+              {overallScore.toFixed(1)} / 5
+            </Text>
+          )}
+          strokeWidth={isMobile ? 10 : 8}
+          style={{ marginBottom: '32px' }}
+        />
+        
+        <Title 
+          level={isMobile ? 5 : 4} 
+          style={{ 
+            marginBottom: isMobile ? '12px' : '16px',
+            fontSize: isMobile ? '16px' : '20px'
+          }}
+        >
+          Detailed Breakdown
+        </Title>
+        
+        <Row gutter={[16, 16]} style={{ marginBottom: '24px' }}>
+          {Object.entries(results).map(([key, section]) => {
+            const sectionLevel = maturityLevels.reduce((prev, curr) => 
+              Math.abs(curr.value - section.score) < Math.abs(prev.value - section.score) ? curr : prev
+            );
+            
+            return (
+              <Col 
+                key={key}
+                xs={24}
+                sm={12}
+                md={12}
+                lg={8}
+                xl={6}
+              >
+                <Card 
+                  title={
+                    <Text 
+                      strong 
+                      style={{ 
+                        fontSize: isMobile ? '14px' : '16px',
+                        whiteSpace: 'normal'
+                      }}
+                    >
+                      {section.title}
+                    </Text>
+                  } 
+                  bordered={false}
+                  headStyle={{ borderBottom: 0, padding: isMobile ? '12px' : '16px' }}
+                  bodyStyle={{ padding: isMobile ? '12px' : '16px' }}
+                  style={{ height: '100%' }}
+                >
+                  <div style={{ textAlign: 'center' }}>
+                    <Progress
+                      type="circle"
+                      percent={(section.score / section.max) * 100}
+                      width={isMobile ? 80 : 100}
+                      strokeColor={sectionLevel.color}
+                      format={() => (
+                        <Text strong style={{ fontSize: isMobile ? '16px' : '18px' }}>
+                          {section.score.toFixed(1)}
+                        </Text>
+                      )}
+                      style={{ marginBottom: '12px' }}
+                    />
+                    <Tag 
+                      color={sectionLevel.color}
+                      style={{ 
+                        fontSize: isMobile ? '12px' : '14px',
+                        padding: isMobile ? '2px 6px' : '4px 8px'
+                      }}
+                    >
+                      {sectionLevel.label}
+                    </Tag>
+                  </div>
+                </Card>
+              </Col>
+            );
+          })}
+        </Row>
+        
+        <Divider style={{ borderWidth: '1px' }} />
+        
+        <Title 
+          level={isMobile ? 5 : 4} 
+          style={{ 
+            marginBottom: isMobile ? '12px' : '16px',
+            fontSize: isMobile ? '16px' : '20px'
+          }}
+        >
+          Improvement Recommendations
+        </Title>
+        
+        <Collapse 
+          accordion
+          bordered={false}
+          style={{ background: 'transparent' }}
+        >
+          {assessmentSections.map(section => {
+            const score = results[section.key]?.score || 0;
+            const sectionLevel = maturityLevels.reduce((prev, curr) => 
+              Math.abs(curr.value - score) < Math.abs(prev.value - score) ? curr : prev
+            );
+            
+            let recommendations = [];
+            
+            if (score < 2) {
+              recommendations = [
+                `Establish basic ${section.title.split(' ')[0].toLowerCase()} practices`,
+                'Provide Agile training to team members',
+                'Set clear expectations for Agile adoption'
+              ];
+            } else if (score < 3.5) {
+              recommendations = [
+                `Standardize ${section.title.split(' ')[0].toLowerCase()} processes`,
+                'Increase consistency in practices',
+                'Measure current performance to identify gaps'
+              ];
+            } else {
+              recommendations = [
+                `Optimize ${section.title.split(' ')[0].toLowerCase()} processes`,
+                'Share best practices with other teams',
+                'Experiment with innovative approaches'
+              ];
+            }
+            
+            return (
+              <Panel 
+                key={section.key}
+                header={
+                  <Space>
+                    <Text strong style={{ fontSize: isMobile ? '14px' : '16px' }}>
+                      {section.title}
+                    </Text>
+                    <Tag color={sectionLevel.color}>{sectionLevel.label}</Tag>
+                    <Text type="secondary" style={{ fontSize: isMobile ? '12px' : '14px' }}>
+                      {score.toFixed(1)}/5
+                    </Text>
+                  </Space>
+                }
+                style={{
+                  marginBottom: '8px',
+                  border: '1px solid #f0f0f0',
+                  borderRadius: '8px'
+                }}
+              >
+                <Space direction="vertical" size="middle">
+                  <Paragraph style={{ fontSize: isMobile ? '14px' : '16px' }}>
+                    {sectionLevel.description}
+                  </Paragraph>
+                  
+                  <Text strong style={{ fontSize: isMobile ? '14px' : '16px' }}>
+                    Recommended Actions:
+                  </Text>
+                  <ul style={{ 
+                    paddingLeft: '20px',
+                    fontSize: isMobile ? '14px' : '16px'
+                  }}>
+                    {recommendations.map((rec, index) => (
+                      <li key={index} style={{ marginBottom: '8px' }}>
+                        {rec}
+                      </li>
+                    ))}
+                  </ul>
+                  
+                  {score < 3 && (
+                    <>
+                      <Text strong style={{ fontSize: isMobile ? '14px' : '16px' }}>
+                        Focus Areas:
+                      </Text>
+                      <ul style={{ 
+                        paddingLeft: '20px',
+                        fontSize: isMobile ? '14px' : '16px'
+                      }}>
+                        {section.questions
+                          .filter((_, index) => (answers[`${section.key}_${index}`] || 0) < 2)
+                          .map((q, index) => (
+                            <li key={index} style={{ marginBottom: '8px' }}>
+                              {q.text}
+                            </li>
+                          ))}
+                      </ul>
+                    </>
+                  )}
+                </Space>
+              </Panel>
+            );
+          })}
+        </Collapse>
+        
+        <Divider style={{ borderWidth: '1px' }} />
+        
+        <Button 
+          type="primary" 
+          icon={<CheckCircleOutlined />}
+          onClick={() => {
+            setCurrentStep(0);
+            setShowResults(false);
+            setAnswers({});
+          }}
+          block={isMobile}
+          size={isMobile ? 'large' : 'middle'}
+          style={{ 
+            marginTop: '16px',
+            height: isMobile ? '48px' : '40px',
+            fontSize: isMobile ? '16px' : '14px'
+          }}
+        >
+          Start New Assessment
+        </Button>
+      </div>
+    );
+  };
 
   return (
-    <>
-      <Row gutter={[24, 0]}>
-        <Col xs={24} md={16}>
-          <Row gutter={[24, 0]}>
-            <Col xs={24} xl={12} className="mb-24">
-              <Card
-                title={wifi}
-                bordered={false}
-                className="card-credit header-solid h-ful"
+    <div style={{ 
+      padding: isMobile ? '8px' : '16px',
+      maxWidth: '1400px',
+      margin: '0 auto'
+    }}>
+      <Card 
+        title={
+          <Text strong style={{ fontSize: isMobile ? '18px' : '24px' }}>
+            Agile Maturity Assessment
+          </Text>
+        } 
+        style={{ 
+          borderRadius: '12px',
+          boxShadow: '0 2px 8px rgba(0,0,0,0.1)'
+        }}
+        headStyle={{ 
+          borderBottom: 0,
+          padding: isMobile ? '16px' : '24px'
+        }}
+        bodyStyle={{ 
+          padding: 0 
+        }}
+      >
+        {!showResults ? (
+          <>
+            <div style={{ 
+              overflowX: 'auto',
+              padding: isMobile ? '0 8px' : '0 16px',
+              marginBottom: '16px'
+            }}>
+              <Steps 
+                current={currentStep} 
+                style={{ 
+                  minWidth: isMobile ? '500px' : '100%',
+                  padding: isMobile ? '8px 0' : '16px 0'
+                }}
+                responsive={false}
+                size={isMobile ? 'small' : 'default'}
               >
-                <h5 className="card-number">4562 1122 4594 7852</h5>
-
-                <div className="card-footer">
-                  <div className="mr-30">
-                    <p>Card Holder</p>
-                    <h6>Jack Peterson</h6>
-                  </div>
-                  <div className="mr-30">
-                    <p>Expires</p>
-                    <h6>11/22</h6>
-                  </div>
-                  <div className="card-footer-col col-logo ml-auto">
-                    <img src={mastercard} alt="mastercard" />
-                  </div>
-                </div>
-              </Card>
-            </Col>
-            <Col xs={12} xl={6} className="mb-24">
-              <Card bordered={false} className="widget-2 h-full">
-                <Statistic
-                  title={
-                    <>
-                      <div className="icon">{angle}</div>
-                      <h6>Salary</h6>
-                      <p>Belong Interactive</p>
-                    </>
-                  }
-                  value={"$2,000"}
-                  prefix={<PlusOutlined />}
-                />
-              </Card>
-            </Col>
-            <Col xs={12} xl={6} className="mb-24">
-              <Card bordered={false} className="widget-2 h-full">
-                <Statistic
-                  title={
-                    <>
-                      <div className="icon">
-                        <img src={paypal} alt="paypal" />
-                      </div>
-                      <h6>Paypal</h6>
-                      <p>Freelance Paymente</p>
-                    </>
-                  }
-                  value={"$49,000"}
-                  prefix={<PlusOutlined />}
-                />
-              </Card>
-            </Col>
-            <Col xs={24} className="mb-24">
-              <Card
-                className="header-solid h-full ant-card-p-0"
-                title={
-                  <>
-                    <Row
-                      gutter={[24, 0]}
-                      className="ant-row-flex ant-row-flex-middle"
-                    >
-                      <Col xs={24} md={12}>
-                        <h6 className="font-semibold m-0">Payment Methods</h6>
-                      </Col>
-                      <Col xs={24} md={12} className="d-flex">
-                        <Button type="primary">ADD NEW CARD</Button>
-                      </Col>
-                    </Row>
-                  </>
-                }
-              >
-                <Row gutter={[24, 0]}>
-                  <Col span={24} md={12}>
-                    <Card className="payment-method-card">
-                      <img src={mastercard} alt="mastercard" />
-                      <h6 className="card-number">**** **** **** 7362</h6>
-                      <Button type="link" className="ant-edit-link">
-                        {pencil}
-                      </Button>
-                    </Card>
-                  </Col>
-                  <Col span={24} md={12}>
-                    <Card className="payment-method-card">
-                      <img src={visa} alt="visa" />
-                      <h6 className="card-number">**** **** **** 3288</h6>
-                      <Button type="link" className="ant-edit-link">
-                        {pencil}
-                      </Button>
-                    </Card>
-                  </Col>
-                </Row>
-              </Card>
-            </Col>
-          </Row>
-        </Col>
-        <Col span={24} md={8} className="mb-24">
-          <Card
-            bordered={false}
-            className="header-solid h-full ant-invoice-card"
-            title={[<h6 className="font-semibold m-0">Invoices</h6>]}
-            extra={[
-              <Button type="primary">
-                <span>VIEW ALL</span>
-              </Button>,
-            ]}
-          >
-            <List
-              itemLayout="horizontal"
-              className="invoice-list"
-              dataSource={data}
-              renderItem={(item) => (
-                <List.Item
-                  actions={[<Button type="link">{download} PDF</Button>]}
+                {assessmentSections.map((section, index) => (
+                  <Step 
+                    key={section.key} 
+                    title={
+                      isMobile ? (
+                        <Tooltip title={section.title}>
+                          <span>{section.shortTitle || `Step ${index + 1}`}</span>
+                        </Tooltip>
+                      ) : (
+                        section.shortTitle || section.title.split(' ')[0]
+                      )
+                    }
+                  />
+                ))}
+              </Steps>
+            </div>
+            
+            {renderQuestionStep(assessmentSections[currentStep])}
+            
+            {currentStep === assessmentSections.length - 1 && (
+              <div style={{ 
+                textAlign: 'center', 
+                margin: isMobile ? '16px 8px' : '24px',
+                padding: isMobile ? '8px' : '16px',
+                borderTop: '1px solid #f0f0f0'
+              }}>
+                <Button 
+                  type="primary" 
+                  size={isMobile ? 'large' : 'middle'}
+                  onClick={() => setShowResults(true)}
+                  block={isMobile}
+                  icon={<CheckCircleOutlined />}
+                  style={{
+                    height: isMobile ? '48px' : '40px',
+                    fontSize: isMobile ? '16px' : '14px'
+                  }}
                 >
-                  <List.Item.Meta
-                    title={item.title}
-                    description={item.description}
-                  />
-                  <div className="amount">{item.amount}</div>
-                </List.Item>
-              )}
-            />
-          </Card>
-        </Col>
-      </Row>
-      <Row gutter={[24, 0]}>
-        <Col span={24} md={16} className="mb-24">
-          <Card
-            className="header-solid h-full"
-            bordered={false}
-            title={[<h6 className="font-semibold m-0">Billing Information</h6>]}
-            bodyStyle={{ paddingTop: "0" }}
-          >
-            <Row gutter={[24, 24]}>
-              {information.map((i, index) => (
-                <Col span={24} key={index}>
-                  <Card className="card-billing-info" bordered="false">
-                    <div className="col-info">
-                      <Descriptions title="Oliver Liam">
-                        <Descriptions.Item label="Company Name" span={3}>
-                          Viking Burrito
-                        </Descriptions.Item>
-
-                        <Descriptions.Item label="Email Address" span={3}>
-                          oliver@burrito.com
-                        </Descriptions.Item>
-                        <Descriptions.Item label="VAT Number" span={3}>
-                          FRB1235476
-                        </Descriptions.Item>
-                      </Descriptions>
-                    </div>
-                    <div className="col-action">
-                      <Button type="link" danger>
-                        {deletebtn}DELETE
-                      </Button>
-                      <Button type="link" className="darkbtn">
-                        {pencil} EDIT
-                      </Button>
-                    </div>
-                  </Card>
-                </Col>
-              ))}
-            </Row>
-          </Card>
-        </Col>
-        <Col span={24} md={8} className="mb-24">
-          <Card
-            bordered={false}
-            bodyStyle={{ paddingTop: 0 }}
-            className="header-solid h-full  ant-list-yes"
-            title={<h6 className="font-semibold m-0">Your Transactions</h6>}
-            extra={
-              <p className="card-header-date">
-                {calender}
-                <span>23 - 30 March 2021</span>
-              </p>
-            }
-          >
-            <List
-              header={<h6>NEWEST</h6>}
-              className="transactions-list ant-newest"
-              itemLayout="horizontal"
-              dataSource={newest}
-              renderItem={(item) => (
-                <List.Item>
-                  <List.Item.Meta
-                    avatar={
-                      <Avatar size="small" className={item.textclass}>
-                        {item.avatar}
-                      </Avatar>
-                    }
-                    title={item.title}
-                    description={item.description}
-                  />
-                  <div className="amount">
-                    <span className={item.amountcolor}>{item.amount}</span>
-                  </div>
-                </List.Item>
-              )}
-            />
-
-            <List
-              className="yestday transactions-list"
-              header={<h6>YESTERDAY</h6>}
-              itemLayout="horizontal"
-              dataSource={yesterday}
-              renderItem={(item) => (
-                <List.Item>
-                  <List.Item.Meta
-                    avatar={
-                      <Avatar size="small" className={item.textclass}>
-                        {item.avatar}
-                      </Avatar>
-                    }
-                    title={item.title}
-                    description={item.description}
-                  />
-                  <div className="amount">
-                    <span className={item.amountcolor}>{item.amount}</span>
-                  </div>
-                </List.Item>
-              )}
-            />
-          </Card>
-        </Col>
-      </Row>
-    </>
+                  Complete Assessment
+                </Button>
+              </div>
+            )}
+          </>
+        ) : (
+          renderResults()
+        )}
+      </Card>
+    </div>
   );
-}
+};
 
-export default Billing;
+export default AgileMaturityAssessment;
