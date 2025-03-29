@@ -52,6 +52,30 @@ function Sidenav({ color }) {
     </svg>,
   ];
 
+  const users = [
+    <svg
+      width="20"
+      height="20"
+      viewBox="0 0 20 20"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+      key={0}
+    >
+      <path
+      fillRule="evenodd"
+      clipRule="evenodd"
+      d="M12 4C9.79086 4 8 5.79086 8 8C8 10.2091 9.79086 12 12 12C14.2091 12 16 10.2091 16 8C16 5.79086 14.2091 4 12 4ZM6 8C6 4.68629 8.68629 2 12 2C15.3137 2 18 4.68629 18 8C18 11.3137 15.3137 14 12 14C8.68629 14 6 11.3137 6 8Z"
+      fill={color}
+    />
+    <path
+      fillRule="evenodd"
+      clipRule="evenodd"
+      d="M12 14C7.58172 14 4 17.5817 4 22C4 22.5523 4.44772 23 5 23H19C19.5523 23 20 22.5523 20 22C20 17.5817 16.4183 14 12 14ZM6 20C6.00393 18.1757 7.1786 16.569 8.86123 16.0907C10.182 15.7208 11.5545 15.5 12 15.5C12.4455 15.5 13.818 15.7208 15.1388 16.0907C16.8214 16.569 17.9961 18.1757 18 20H6Z"
+      fill={color}
+    ></path>
+    </svg>,
+  ];
+
   const billing = [
     <svg
       width="20"
@@ -139,7 +163,7 @@ const backlog = [
       ></path>
     </svg>,
   ];
-  const assesment = [
+  const assessment = [
     <svg
       width="20"
       height="20"
@@ -161,7 +185,7 @@ const backlog = [
     </svg>,
   ];
 
-  const rtl = [
+  const scorecard = [
     <svg
       width="20"
       height="20"
@@ -270,6 +294,19 @@ const backlog = [
           </NavLink>
         </Menu.Item>
         <Menu.Item key="3">
+          <NavLink to="/users">
+            <span
+              className="icon"
+              style={{
+                background: page === "users" ? color : "",
+              }}
+            >
+              {users}
+            </span>
+            <span className="label">Users</span>
+          </NavLink>
+        </Menu.Item>
+        <Menu.Item key="3">
           <NavLink to="/assesment">
             <span
               className="icon"
@@ -277,7 +314,7 @@ const backlog = [
                 background: page === "assesment" ? color : "",
               }}
             >
-              {assesment}
+              {assessment}
             </span>
             <span className="label">Self Assessment</span>
           </NavLink>
@@ -322,6 +359,19 @@ const backlog = [
           </NavLink>
         </Menu.Item>
         <Menu.Item key="4">
+        </Menu.Item>
+        <Menu.Item key="10">
+          <NavLink to="/scorecard">
+            <span
+              className="icon"
+              style={{
+                background: page === "scorecard" ? color : "",
+              }}
+            >
+              {scorecard}
+            </span>
+            <span className="label">Score Card</span>
+          </NavLink>
         </Menu.Item>
         {/* <Menu.Item className="menu-item-header" key="5">
           Account Pages

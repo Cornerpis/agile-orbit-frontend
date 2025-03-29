@@ -10,11 +10,13 @@ import Main from "./components/layout/Main";
 import ProjectDetails from "./pages/project-details";
 import BackLog from "./pages/backlog";
 import SprintCreation from "./pages/sprint";
+import CreateUsers from "./pages/users";
 import { list } from "./pages/data"; // Import the list array
 import "antd/dist/antd.css";
 import "./assets/styles/main.css";
 import "./assets/styles/responsive.css";
 import KanbanBoard from "./pages/kansanboard";
+import ScoreCards from "./pages/score-card";
 
 function App() {
   return (
@@ -33,6 +35,8 @@ function App() {
            <Route exact path="/kansanboard" component={KanbanBoard} />
            <Route exact path="/backlog" component={BackLog} />
            <Route exact path="/sprint" component={SprintCreation} />
+           <Route exact path="/users" component={CreateUsers} />
+           <Route exact path="/scorecard" component={ScoreCards} />
           <Redirect from="*" to="/dashboard" />
         </Main>
       </Switch>

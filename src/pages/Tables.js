@@ -1,4 +1,5 @@
-
+import { useState } from "react";
+import { useHistory} from "react-router-dom";
 import {
   Row,
   Col,
@@ -17,17 +18,17 @@ import { ToTopOutlined, PlusOutlined } from "@ant-design/icons";
 import { Link } from "react-router-dom";
 
 // Images
-import ava1 from "../assets/images/logo-shopify.svg";
-import ava2 from "../assets/images/logo-atlassian.svg";
-import ava3 from "../assets/images/logo-slack.svg";
-import ava5 from "../assets/images/logo-jira.svg";
-import ava6 from "../assets/images/logo-invision.svg";
-import face from "../assets/images/face-1.jpg";
-import face2 from "../assets/images/face-2.jpg";
-import face3 from "../assets/images/face-3.jpg";
-import face4 from "../assets/images/face-4.jpg";
-import face5 from "../assets/images/face-5.jpeg";
-import face6 from "../assets/images/face-6.jpeg";
+// import ava1 from "../assets/images/logo-shopify.svg";
+// import ava2 from "../assets/images/logo-atlassian.svg";
+// import ava3 from "../assets/images/logo-slack.svg";
+// import ava5 from "../assets/images/logo-jira.svg";
+// import ava6 from "../assets/images/logo-invision.svg";
+// import face from "../assets/images/face-1.jpg";
+// import face2 from "../assets/images/face-2.jpg";
+// import face3 from "../assets/images/face-3.jpg";
+// import face4 from "../assets/images/face-4.jpg";
+// import face5 from "../assets/images/face-5.jpeg";
+// import face6 from "../assets/images/face-6.jpeg";
 import pencil from "../assets/images/pencil.svg";
 
 const { Title } = Typography;
@@ -690,6 +691,10 @@ const dataproject = [
 
 function Tables() {
   const onChange = (e) => console.log(`radio checked:${e.target.value}`);
+const history = useHistory();
+  const handleRowClick = (record) => {
+    history.push(`/project/${record.key}`);
+  };
 
   return (
     <>
@@ -702,12 +707,12 @@ function Tables() {
               title="Project List"
               extra={
                 <>
-                 <Button
+                 {/* <Button
                     type="primary"
                     className="width-100"
                   >
                     {<PlusOutlined />} Invite Team Member
-                  </Button>
+                  </Button> */}
                 </>
               }
             >
@@ -716,7 +721,12 @@ function Tables() {
                   columns={columns}
                   dataSource={data}
                   pagination={false}
-                  className="ant-border-space"
+                  onRow={(record) => {
+                    return {
+                      onClick: () => handleRowClick(record), // click row
+                      style: { cursor: 'pointer' } // show pointer cursor on hover
+                    };
+                  }}
                 />
               </div>
             </Card>

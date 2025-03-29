@@ -1,10 +1,10 @@
 export const list = [
     {
       id: 1, // Add a unique ID for each project
-      Title: "Soft UI Shopify Version",
+      Title: "E-Commerce Website for Fresh Farm Produce",
       deadline: "23/03/2025",
-      assignedto: "Tomothy Agba",
-      budget: "$15",
+      assignedto: "Timothy Agba",
+      budget: "$15,000",
       priority: "High",
     },
     {
