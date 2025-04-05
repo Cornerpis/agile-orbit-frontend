@@ -11,18 +11,53 @@ import {
   Switch,
 } from "antd";
 import signinbg from "../assets/images/img-signin.jpg";
+import { signIn } from "../redux/action";
+import { useDispatch } from "react-redux";
+import { notification } from "antd";
 
 const { Title } = Typography;
 const { Header, Footer, Content } = Layout;
 
 const SignIn = () => {
+  const dispatch = useDispatch();
   const history = useHistory(); // Initialize history
 
-  const onFinish = (values) => {
-    console.log("Success:", values);
-    // Simulate login success (replace with your actual login logic)
-    // After successful login, redirect to a different route
-    history.push("/dashboard");
+  const [api, contextHolder] = notification.useNotification();
+
+  const onFinish = async (values) => {
+    const formData = {
+      ...values,
+    };
+
+    try {
+      const response = await dispatch(signIn(formData));
+
+      if (response.message == "success") {
+        const btn = (
+          <Button
+            type="primary"
+            size="small"
+            onClick={() => {
+              notification.destroy(); // optional: closes all notifications
+              history.push("/dashboard");
+            }}
+          >
+            OK
+          </Button>
+        );
+
+        notification.open({
+          message: "Login Successful ✅",
+          description: "Click OK to go to your dashboard.",
+          btn,
+          duration: 0, // stays until user clicks
+        });
+      } else {
+        alert(response.message);
+      }
+    } catch (error) {
+      console.error("Sign-in error:", error);
+    }
   };
 
   const onFinishFailed = (errorInfo) => {
@@ -31,6 +66,7 @@ const SignIn = () => {
 
   return (
     <Layout className="layout-default layout-signin">
+      {contextHolder}
       <Header>
         <div className="header-col header-brand">
           <h5>Agile Project Dashboard</h5>

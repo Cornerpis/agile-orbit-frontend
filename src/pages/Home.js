@@ -1,6 +1,15 @@
 import { useState } from "react";
 import { useHistory } from "react-router-dom";
-import { Card, Col, Row, Typography, Progress, Button, List } from "antd";
+import {
+  Card,
+  Col,
+  Row,
+  Typography,
+  Progress,
+  Button,
+  List,
+  notification,
+} from "antd";
 import { PlusOutlined, ClockCircleOutlined } from "@ant-design/icons";
 import MyModal from "../pages/create-project";
 import { list } from "./data"; // Import the list array
@@ -115,9 +124,10 @@ function Home() {
       bnb: "bnb2",
     },
   ];
-
+  const [api, contextHolder] = notification.useNotification();
   return (
     <>
+      {contextHolder}
       <div className="layout-content">
         <Row className="rowgap-vbox" gutter={[24, 0]}>
           {count.map((c, index) => (
