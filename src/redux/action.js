@@ -69,3 +69,30 @@ export const signUp = (credentials) => async (dispatch) => {
     }
   }
 };
+
+export const getStats = (token) => {
+  return async (dispatch) => {
+    try {
+      // Make an API call to fetch verification data
+      const response = await axios.get(`${baseUrl}/dashboard/quick-stats`, {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`, // Include the bearer token
+        },
+      });
+
+      // Dispatch the fetched data to the store
+      dispatch({
+        type: "GET_STATS_SUCCESS",
+        payload: response.data,
+      });
+    } catch (error) {
+      // Handle errors, dispatch an error action, or set an error state
+      console.error("Error fetching stats result:", error);
+      dispatch({
+        type: "GET_STATS_FAILURE",
+        payload: error,
+      });
+    }
+  };
+};

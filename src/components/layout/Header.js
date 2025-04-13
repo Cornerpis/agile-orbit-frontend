@@ -3,9 +3,6 @@ import { useState, useEffect } from "react";
 import {
   Row,
   Col,
-  Breadcrumb,
-  Badge,
-  Dropdown,
   Button,
   List,
   Avatar,
@@ -14,13 +11,6 @@ import {
   Typography,
   Switch,
 } from "antd";
-
-import {
-  SearchOutlined,
-  StarOutlined,
-  TwitterOutlined,
-  FacebookFilled,
-} from "@ant-design/icons";
 
 import { NavLink, Link } from "react-router-dom";
 import styled from "styled-components";
@@ -379,9 +369,12 @@ function Header({
               </div>
             </div>
           </Drawer>
-          <Link to="/sign-in" className="btn-sign-in">
+          <Link to="" className="btn-sign-in">
             {profile}
-            <span>Sign in</span>
+            <span>
+              {localStorage.getItem("first_name")}{" "}
+              {localStorage.getItem("last_name")}
+            </span>
           </Link>
           {/* <Input
             className="header-search"

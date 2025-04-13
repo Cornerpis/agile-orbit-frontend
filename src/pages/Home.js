@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useHistory } from "react-router-dom";
 import {
   Card,
@@ -13,6 +13,8 @@ import {
 import { PlusOutlined, ClockCircleOutlined } from "@ant-design/icons";
 import MyModal from "../pages/create-project";
 import { list } from "./data"; // Import the list array
+import { getStats } from "../redux/action";
+import { useDispatch, useSelector } from "react-redux";
 
 // Destructure Paragraph from Typography
 const { Title, Text, Paragraph } = Typography;
@@ -98,58 +100,54 @@ function Home() {
     </svg>,
   ];
 
-  const count = [
-    {
-      today: "Total Projects",
-      title: "53,000",
-      icon: dollor,
-      bnb: "bnb2",
-    },
-    {
-      today: "Total Users",
-      title: "3,200",
-      icon: profile,
-      bnb: "bnb2",
-    },
-    {
-      today: "Project Completed",
-      title: "15",
-      icon: heart,
-      bnb: "redtext",
-    },
-    {
-      today: "Projects Ongoing",
-      title: "13,200",
-      icon: cart,
-      bnb: "bnb2",
-    },
-  ];
   const [api, contextHolder] = notification.useNotification();
+
+  const dispatch = useDispatch();
+  useEffect(() => {
+    dispatch(getStats(localStorage.getItem("token")));
+  }, [dispatch]);
+
+  const stats = useSelector((state) => state.stats);
+
+  console.log("Stats from Redux:", stats);
+
   return (
     <>
       {contextHolder}
       <div className="layout-content">
         <Row className="rowgap-vbox" gutter={[24, 0]}>
-          {count.map((c, index) => (
-            <Col
-              key={index}
-              xs={24}
-              sm={24}
-              md={12}
-              lg={6}
-              xl={6}
-              className="mb-24"
-            >
-              <Card bordered={false} className="criclebox ">
-                <div className="number">
-                  <span>{c.today}</span>
-                  <Title level={3}>
-                    {c.title} <small className={c.bnb}>{c.persent}</small>
-                  </Title>
-                </div>
-              </Card>
-            </Col>
-          ))}
+          <Col xs={24} sm={24} md={12} lg={6} xl={6} className="mb-24">
+            <Card bordered={false} className="criclebox ">
+              <div className="number">
+                <span>Total Projects</span>
+                <Title level={3}>{stats.totalProjects}</Title>
+              </div>
+            </Card>
+          </Col>
+          <Col xs={24} sm={24} md={12} lg={6} xl={6} className="mb-24">
+            <Card bordered={false} className="criclebox ">
+              <div className="number">
+                <span>Total Users</span>
+                <Title level={3}>{stats.totalUsers}</Title>
+              </div>
+            </Card>
+          </Col>
+          <Col xs={24} sm={24} md={12} lg={6} xl={6} className="mb-24">
+            <Card bordered={false} className="criclebox ">
+              <div className="number">
+                <span>Project Completed</span>
+                <Title level={3}>{stats.completedProjects}</Title>
+              </div>
+            </Card>
+          </Col>
+          <Col xs={24} sm={24} md={12} lg={6} xl={6} className="mb-24">
+            <Card bordered={false} className="criclebox ">
+              <div className="number">
+                <span>Project Ongoing</span>
+                <Title level={3}>{stats.onGoingProjects}</Title>
+              </div>
+            </Card>
+          </Col>
         </Row>
 
         <MyModal
