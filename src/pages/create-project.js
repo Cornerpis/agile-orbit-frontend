@@ -1,11 +1,64 @@
 import React, { useState } from "react";
-import { Form, Input, DatePicker, Select, Modal, Row, Col } from "antd";
+import { Form, Input, DatePicker, Select, Modal, Row, Col, notification } from "antd";
+import { MyModal as CreateProject } from "../redux/action";
+import { useDispatch } from "react-redux";
 
 
 const { Option } = Select;
 
 const MyModal = ({ visible, onCreate, onCancel }) => {
+  const dispatch = useDispatch();
   const [form] = Form.useForm();
+  const [api, contextHolder] = notification.useNotification();
+
+  const handleSubmit = async (values) => {
+      try {
+        const response = await dispatch(CreateProject(localStorage.getItem("token"),values,));
+    
+        const successMessage = response?.message?.toLowerCase?.().includes("success");
+
+if (
+  response?.statusCode === 201 ||
+  response?.success === true ||
+  response?.success === "true" || // handle string values
+  successMessage // check if message suggests success
+) {
+  api.success({
+    message: response?.message || "User created successfully!",
+    description: "The new user has been successfully added to the system.",
+    duration: 3,
+  });
+  form.resetFields();
+  onCancel();
+} else if (response?.statusCode === 400) {
+  api.warning({
+    message: "User Creation Failed",
+    description: response?.message || "Please check your input and try again.",
+    duration: 4,
+  });
+} else if (response?.statusCode === 409) {
+  api.error({
+    message: "Duplicate Entry",
+    description: response?.message || "User already exists.",
+    duration: 4,
+  });
+} else {
+  api.error({
+    message: "Unexpected Error",
+    description: response?.message || "Something went wrong. Please try again later.",
+    duration: 4,
+  });
+}
+
+        
+      } catch (error) {
+        api.error({
+          message: "Network Error",
+          description: error.message || "Unable to connect to the server.",
+          duration: 4,
+        });
+      }
+    };
 
   return (
     <Modal
@@ -18,8 +71,7 @@ const MyModal = ({ visible, onCreate, onCancel }) => {
         form
           .validateFields()
           .then((values) => {
-            form.resetFields();
-            onCreate(values);
+            handleSubmit(values);
           })
           .catch((info) => {
             console.log("Validation Failed:", info);
@@ -27,6 +79,7 @@ const MyModal = ({ visible, onCreate, onCancel }) => {
       }}
     >
       <Form form={form} layout="vertical">
+      {contextHolder}
         <Row gutter={[16, 16]}>
           <Col xs={24} sm={24} md={12}>
             <Form.Item
@@ -59,7 +112,7 @@ const MyModal = ({ visible, onCreate, onCancel }) => {
         <Row gutter={[16, 16]}>
           <Col xs={24} sm={24} md={12}>
             <Form.Item
-              name="deadline"
+              name="end_time"
               label="Project Deadline"
               rules={[{ required: true, message: "Please select a deadline!" }]}
             >
@@ -68,7 +121,7 @@ const MyModal = ({ visible, onCreate, onCancel }) => {
           </Col>
           <Col xs={24} sm={24} md={12}>
             <Form.Item
-              name="priority"
+              name="priority_level"
               label="Priority"
               rules={[{ required: true, message: "Please select a priority level!" }]}
             >

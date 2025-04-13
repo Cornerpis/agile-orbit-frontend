@@ -323,7 +323,7 @@ function Sidenav({ color }) {
             >
               {kansanboard}
             </span>
-            <span className="label">Kansan Board</span>
+            <span className="label">Kanban Board</span>
           </NavLink>
         </Menu.Item>
         <Menu.Item key="6">

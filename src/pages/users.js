@@ -28,7 +28,15 @@ const users = [
     department: "product",
     status: "active",
   },
-  // Add more users as needed
+  {
+    key: "3",
+      first_name: "Peace",
+      last_name: "Timothy",
+      email: "peace@email.com",
+      role: "Nurse",
+      department: "Health",
+      status: "active",
+    },
 ];
 
 const CreateUsers = () => {
@@ -65,11 +73,6 @@ const CreateUsers = () => {
       title: 'Role',
       dataIndex: 'role',
       key: 'role',
-      // render: (role) => (
-      //   <Tag color={role === 'project_manager' ? 'blue' : 'default'}>
-      //     {role.split('_').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ')}
-      //   </Tag>
-      // ),
       responsive: ['sm']
     },
     {

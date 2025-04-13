@@ -10,7 +10,7 @@ import {
   Input,
   Switch,
 } from "antd";
-import signinbg from "../assets/images/img-signin.jpg";
+import signinbg from "../assets/images/img-signin.png";
 import { signIn } from "../redux/action";
 import { useDispatch } from "react-redux";
 import { notification } from "antd";
@@ -69,7 +69,7 @@ const SignIn = () => {
       {contextHolder}
       <Header>
         <div className="header-col header-brand">
-          <h5>Agile Project Dashboard</h5>
+          <h5>Agile Orbit </h5>
         </div>
       </Header>
       <Content className="signin">
@@ -94,20 +94,20 @@ const SignIn = () => {
                 label="Email"
                 name="email"
                 rules={[
-                  { required: true, message: "Please input your email!" },
+                  { required: true, message: "Please enter your email!" },
                 ]}
               >
                 <Input placeholder="Email" />
               </Form.Item>
               <Form.Item
-                className="username"
+                className="password"
                 label="Password"
                 name="password"
                 rules={[
-                  { required: true, message: "Please input your password!" },
+                  { required: true, message: "Please enter your password!" },
                 ]}
               >
-                <Input placeholder="Password" type="password" />
+                <Input placeholder="Enter Password" type="password" />
               </Form.Item>
               <Form.Item
                 name="remember"
@@ -141,13 +141,13 @@ const SignIn = () => {
             lg={{ span: 12 }}
             md={{ span: 12 }}
           >
-            <img src={signinbg} alt="Sign In" />
+            <img src={signinbg} alt="Sign In" style={{marginTop:70}}/>
           </Col>
         </Row>
       </Content>
-      <Footer>
+      <Footer style={{marginTop:160}}>
         <p className="copyright">
-          Copyright © 2021 Muse by <a href="#pablo">Creative Tim</a>.
+          Copyright © <a href="#pablo">Cornerpise</a> 2025
         </p>
       </Footer>
     </Layout>
