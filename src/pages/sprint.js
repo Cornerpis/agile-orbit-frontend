@@ -11,7 +11,6 @@ import {
   Typography, 
   Divider,
   message,
-  Select,
   Modal
 } from 'antd';
 import { 
@@ -21,12 +20,16 @@ import {
   CheckOutlined
 } from '@ant-design/icons';
 import dayjs from 'dayjs';
+import { useDispatch } from "react-redux";
+import {SprintCreation as createSprint } from "../redux/action";
 
 const { Title, Text } = Typography;
 const { RangePicker } = DatePicker;
 
 const SprintCreation = () => {
   const [form] = Form.useForm();
+  const dispatch = useDispatch();
+
   const [activeSprints, setActiveSprints] = useState([
     {
       id: 1,
@@ -51,29 +54,32 @@ const SprintCreation = () => {
   const [confirmLoading, setConfirmLoading] = useState(false);
 
   const onFinish = (values) => {
-    console.log('Received values:', values);
     const newSprint = {
-      id: upcomingSprints.length + activeSprints.length + 1,
       name: values.name,
       startDate: values.dates[0].format('YYYY-MM-DD'),
       endDate: values.dates[1].format('YYYY-MM-DD'),
       goal: values.goal,
       status: 'planned'
     };
-    
-    setUpcomingSprints([...upcomingSprints, newSprint]);
-    message.success('Sprint created successfully!');
+
+    dispatch(createSprint(newSprint));
+    message.success('Sprint created and saved to database!');
     form.resetFields();
     setIsModalVisible(false);
+
+    // Optional: Update UI instantly (if not reading from Redux store)
+    setUpcomingSprints([...upcomingSprints, {
+      ...newSprint,
+      id: upcomingSprints.length + activeSprints.length + 1
+    }]);
   };
 
   const startSprint = (id) => {
     setConfirmLoading(true);
-    // Simulate API call
     setTimeout(() => {
       const sprintToStart = upcomingSprints.find(sprint => sprint.id === id);
       const updatedUpcoming = upcomingSprints.filter(sprint => sprint.id !== id);
-      
+
       if (sprintToStart) {
         setActiveSprints([...activeSprints, { ...sprintToStart, status: 'active' }]);
         setUpcomingSprints(updatedUpcoming);
@@ -91,7 +97,6 @@ const SprintCreation = () => {
       okType: 'danger',
       cancelText: 'Cancel',
       onOk() {
-        // Simulate API call
         setTimeout(() => {
           const updatedActive = activeSprints.filter(sprint => sprint.id !== id);
           setActiveSprints(updatedActive);
@@ -102,7 +107,6 @@ const SprintCreation = () => {
   };
 
   const disabledDate = (current) => {
-    // Can not select days before today
     return current && current < dayjs().startOf('day');
   };
 
@@ -212,7 +216,7 @@ const SprintCreation = () => {
             <Title level={5} style={{ marginTop: '16px' }}>Sprint Duration Guide</Title>
             <Text>
               <ul>
-                <li>Typical sprints last 1-4 weeks</li>
+                <li>Typical sprints last 1–4 weeks</li>
                 <li>2 weeks is the most common duration</li>
                 <li>Consider team velocity when planning</li>
               </ul>

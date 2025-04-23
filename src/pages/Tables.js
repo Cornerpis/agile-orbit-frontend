@@ -20,12 +20,15 @@ import {
 } from "antd";
 import { PlusOutlined, EditOutlined, SearchOutlined } from "@ant-design/icons";
 import moment from "moment";
+import axios from "axios";
 import MyModal from "../pages/create-project";
 
 const { Title } = Typography;
 const { Search } = Input;
 const { Option } = Select;
 const { RangePicker } = DatePicker;
+
+const baseUrl = "https://api.example.com";
 
 const Tables = () => {
   const history = useHistory();
@@ -44,7 +47,6 @@ const Tables = () => {
   const [isEditModalVisible, setIsEditModalVisible] = useState(false);
   const [editingProject, setEditingProject] = useState(null);
 
-  // Fetch data from API
   const fetchProjects = async (params = {}) => {
     setLoading(true);
     try {
@@ -57,8 +59,8 @@ const Tables = () => {
         sortOrder: params.sort?.order,
       }).toString();
 
-      const response = await fetch(`https://api.example.com/projects?${queryParams}`);
-      const result = await response.json();
+      const response = await axios.get(`${baseUrl}/projects?${queryParams}`);
+      const result = response.data;
 
       const formattedData = result.data.map(project => ({
         key: project.id,
@@ -66,7 +68,7 @@ const Tables = () => {
         description: project.description,
         budget: project.budget,
         assignedTo: project.assignedTo,
-        deadline: moment(project.deadline).format("DD/MM/YYYY"),
+        end_time: moment(project.end_time).format("DD/MM/YYYY"),
         priority: project.priority,
       }));
 
@@ -117,12 +119,11 @@ const Tables = () => {
     history.push(`/project/${record.key}`);
   };
 
-  // Edit Project Functions
   const handleEdit = (project) => {
     setEditingProject(project);
     form.setFieldsValue({
       ...project,
-      deadline: moment(project.deadline, "DD/MM/YYYY")
+      end_time: moment(project.end_time, "DD/MM/YYYY")
     });
     setIsEditModalVisible(true);
   };
@@ -132,28 +133,18 @@ const Tables = () => {
       const values = await form.validateFields();
       setLoading(true);
 
-      // API call to update project
-      const response = await fetch(`https://api.example.com/projects/${editingProject.key}`, {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          ...values,
-          deadline: values.deadline.format("YYYY-MM-DD"),
-        }),
+      const response = await axios.put(`${baseUrl}/projects/${editingProject.key}`, {
+        ...values,
+        end_time: values.end_time.format("YYYY-MM-DD"),
       });
 
-      if (!response.ok) throw new Error("Update failed");
+      const updatedProject = response.data;
 
-      const updatedProject = await response.json();
-
-      // Update local state
       setData(data.map(item =>
         item.key === editingProject.key ? {
           ...item,
           ...updatedProject,
-          deadline: moment(updatedProject.deadline).format("DD/MM/YYYY"),
+          end_time: moment(updatedProject.end_time).format("DD/MM/YYYY"),
         } : item
       ));
 
@@ -198,8 +189,8 @@ const Tables = () => {
     },
     {
       title: "DEADLINE",
-      dataIndex: "deadline",
-      key: "deadline",
+      dataIndex: "end_time",
+      key: "end_time",
       sorter: true,
     },
     {
@@ -289,21 +280,18 @@ const Tables = () => {
         </Col>
       </Row>
 
-      {/* Create Project Modal */}
       <MyModal
         visible={isCreateModalVisible}
         onCreate={(values) => {
-          console.log("Create:", values);
           setIsCreateModalVisible(false);
           fetchProjects({ pagination, filters, sort });
         }}
         onCancel={() => setIsCreateModalVisible(false)}
       />
 
-      {/* Edit Project Modal */}
       <Modal
         title="Edit Project"
-        visible={isEditModalVisible}
+        open={isEditModalVisible}
         onOk={handleEditSubmit}
         onCancel={() => {
           setIsEditModalVisible(false);
@@ -354,7 +342,7 @@ const Tables = () => {
             </Col>
             <Col span={12}>
               <Form.Item
-                name="deadline"
+                name="end_time"
                 label="Deadline"
                 rules={[{ required: true, message: "Please select deadline" }]}
               >
