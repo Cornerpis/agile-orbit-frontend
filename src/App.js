@@ -16,8 +16,10 @@ import "./assets/styles/main.css";
 import "./assets/styles/responsive.css";
 import KanbanBoard from "./pages/kansanboard";
 import ScoreCards from "./pages/score-card";
+import { useSelector } from "react-redux";
 
 function App() {
+  const projects = useSelector((state) => state.projects);
   return (
     <div className="App">
       <Switch>
@@ -31,8 +33,10 @@ function App() {
           <Route exact path="/profile" component={Profile} />
           <Route
             exact
-            path="/project/:id"
-            component={(props) => <ProjectDetails {...props} projects={list} />}
+            path="/project/:_id"
+            render={(props) => (
+              <ProjectDetails {...props} projects={projects} />
+            )}
           />
           <Route exact path="/kansanboard" component={KanbanBoard} />
           <Route exact path="/backlog" component={BackLog} />

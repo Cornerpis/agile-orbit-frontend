@@ -96,3 +96,57 @@ export const getStats = (token) => {
     }
   };
 };
+
+export const fetchProjects = (token) => {
+  return async (dispatch) => {
+    try {
+      // Make an API call to fetch projects data
+      const response = await axios.get(`${baseUrl}/projects`, {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`, // Include the bearer token
+        },
+      });
+
+      // Dispatch the fetched data to the store
+      dispatch({
+        type: "FETCH_PROJECT_SUCCESS",
+        payload: response.data.data,
+      });
+    } catch (error) {
+      // Handle errors, dispatch an error action, or set an error state
+      console.error("Error fetching verification data:", error);
+      dispatch({
+        type: "GET_PROJECT_FAILURE",
+        payload: error,
+      });
+    }
+  };
+};
+
+export const fetchUsers = (token) => {
+  return async (dispatch) => {
+    try {
+      // Make an API call to fetch users
+      const response = await axios.get(`${baseUrl}/users`, {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      // Dispatch the fetched data to the store
+      dispatch({
+        type: "FETCH_USERS_SUCCESS",
+        payload: response.data.data, // Assuming response.data.data contains the list of users
+      });
+    } catch (error) {
+      // Handle errors, dispatch an error action, or set an error state
+      console.error("Error fetching users:", error);
+      dispatch({
+        type: "FETCH_USERS_FAILURE",
+        payload: error,
+      });
+    }
+  };
+};

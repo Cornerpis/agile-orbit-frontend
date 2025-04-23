@@ -4,6 +4,8 @@ const initialState = {
   stats: {},
   loading: false,
   error: null,
+  projects: [],
+  users: [],
 };
 
 const authReducer = (state = initialState, action) => {
@@ -19,6 +21,18 @@ const authReducer = (state = initialState, action) => {
     case "GET_STATS_FAILURE":
       return { ...state, error: action.payload, loading: false };
     case "GET_STATS_REQUEST":
+      return { ...state, loading: true };
+    case "FETCH_PROJECT_SUCCESS":
+      return { ...state, projects: action.payload, loading: false };
+    case "FETCH_PROJECT_FAILURE":
+      return { ...state, error: action.payload, loading: false };
+    case "FETCH_PROJECT_REQUEST":
+      return { ...state, loading: true };
+    case "FETCH_USERS_SUCCESS":
+      return { ...state, users: action.payload, loading: false };
+    case "FETCH_USERS_FAILURE":
+      return { ...state, error: action.payload, loading: false };
+    case "FETCH_USER_REQUEST":
       return { ...state, loading: true };
 
     default:

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useHistory } from "react-router-dom";
 import {
   Row,
@@ -19,6 +19,8 @@ import { ToTopOutlined, PlusOutlined } from "@ant-design/icons";
 import { Link } from "react-router-dom";
 import pencil from "../assets/images/pencil.svg";
 import MyModal from "../pages/create-project";
+import { fetchProjects } from "../redux/action";
+import { useDispatch, useSelector } from "react-redux";
 
 const { Title } = Typography;
 
@@ -32,111 +34,68 @@ const columns = [
   },
   {
     title: "DESCRIPTION",
-    dataIndex: "function",
-    key: "function",
+    dataIndex: "description",
+    key: "description",
   },
 
   {
     title: "BUDGET",
-    key: "status",
-    dataIndex: "status",
+    key: "budget",
+    dataIndex: "budget",
+    render: (amount) =>
+      amount != null
+        ? new Intl.NumberFormat("en-NG", {
+            style: "currency",
+            currency: "NGN",
+          }).format(amount)
+        : "-",
   },
   {
     title: "ASSIGNED TO",
-    key: "employed",
-    dataIndex: "employed",
+    key: "assigned_to",
+    dataIndex: "assigned_to",
   },
   {
     title: "DEADLINE",
-    key: "deadline",
-    dataIndex: "deadline",
+    key: "end_time",
+    dataIndex: "end_time",
+    render: (text) => (text ? new Date(text).toLocaleDateString() : "-"),
   },
   {
-    title: "PRIORITY",
-    key: "priority",
-    dataIndex: "priority",
+    title: "STATUS",
+    key: "status",
+    dataIndex: "status",
 
-    render: (priority) => {
+    render: (status) => {
       const color =
-        priority === "High"
+        status === "todo"
           ? "red"
-          : priority === "Medium"
+          : status === "in_progress"
           ? "orange"
           : "green";
-      return <Tag color={color}>{priority}</Tag>;
+      return <Tag color={color}>{status}</Tag>;
     },
   },
 ];
 
-const data = [
-  {
-    key: "1",
-    name: (
-      <>
-        <Avatar.Group>
-          <div className="avatar-info">
-            {/* <Title level={5}>Michael John</Title> */}
-            <p style={{ color: "black" }}>Create an adminstrative dashboard</p>
-          </div>
-        </Avatar.Group>{" "}
-      </>
-    ),
-    function: (
-      <>
-        <div className="author-info">
-          {/* <Title level={5}>Manager</Title> */}
-          <p style={{ color: "black" }}>Organization</p>
-        </div>
-      </>
-    ),
-
-    status: (
-      <>
-        <div className="author-info">
-          {/* <Title level={5}>Manager</Title> */}
-          <p style={{ color: "black" }}>$560</p>
-        </div>
-        {/* <Button type="primary" className="tag-primary">
-          ONLINE
-        </Button> */}
-      </>
-    ),
-    employed: (
-      <>
-        <div className="ant-employed" style={{ color: "black" }}>
-          <span>23/04/18</span>
-          <a href="#pablo">Edit</a>
-        </div>
-      </>
-    ),
-    deadline: (
-      <>
-        <div className="author-info">
-          <p style={{ color: "black" }}>23/04/18</p>
-        </div>
-      </>
-    ),
-    priority: (
-      <>
-        <div className="author-info">
-          <p>High</p>
-        </div>
-      </>
-    ),
-  },
-];
-
 function Tables() {
+  const projects = useSelector((state) => state.projects);
   const onChange = (e) => console.log(`radio checked:${e.target.value}`);
   const history = useHistory();
   const handleRowClick = (record) => {
-    history.push(`/project/${record.key}`);
+    history.push(`/project/${record._id}`);
   };
   const [isModalVisible, setIsModalVisible] = useState(false);
   const handleCreate = (values) => {
     console.log("Project Created:", values);
     setIsModalVisible(false);
   };
+
+  const dispatch = useDispatch();
+
+  useEffect(() => {
+    dispatch(fetchProjects(localStorage.getItem("token")));
+  }, []);
 
   return (
     <>
@@ -167,12 +126,21 @@ function Tables() {
               <div className="table-responsive">
                 <Table
                   columns={columns}
-                  dataSource={data}
-                  pagination={false}
+                  dataSource={projects.map((project) => ({
+                    ...project,
+                    key: project.id,
+                  }))}
+                  pagination={{
+                    pageSize: 10,
+                    showSizeChanger: true,
+                    pageSizeOptions: ["10", "20", "50", "100"],
+                    showTotal: (total, range) =>
+                      `${range[0]}-${range[1]} of ${total} items`,
+                  }}
                   onRow={(record) => {
                     return {
-                      onClick: () => handleRowClick(record), // click row
-                      style: { cursor: "pointer" }, // show pointer cursor on hover
+                      onClick: () => handleRowClick(record),
+                      style: { cursor: "pointer" },
                     };
                   }}
                 />
