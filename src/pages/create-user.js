@@ -5,7 +5,7 @@ import { CreateUserModal as CreateUser} from "../redux/action";
 
 
 
-const CreateUserModal = ({ visible, onCreate, onCancel }) => {
+const CreateUserModal = ({ visible, onCancel }) => {
   const dispatch = useDispatch();
   const [form] = Form.useForm();
   const [api, contextHolder] = notification.useNotification();
@@ -63,7 +63,7 @@ if (
 ) {
   api.success({
     message: response?.message || "User created successfully!",
-    description: "The new user has been successfully added to the system.",
+    description: response.message,
     duration: 3,
   });
   form.resetFields();

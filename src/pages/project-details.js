@@ -17,9 +17,9 @@ import {
   DatePicker,
   Progress,
   Divider,
-  Comment,
   Tooltip,
 } from "antd";
+import { Comment } from '@ant-design/compatible';
 import { PlusOutlined, UserAddOutlined } from "@ant-design/icons";
 import moment from "moment";
 import InviteTeam from "../pages/invite-team";
@@ -130,7 +130,7 @@ const ProjectDetails = ({ projects }) => {
               <Row gutter={[16, 16]}>
                 <Col span={12}>
                   <Text strong>Description:</Text>
-                  <Paragraph>{project.desscription}</Paragraph>
+                  <Paragraph>{project.description}</Paragraph>
                 </Col>
                 <Col span={12}>
                   <Text strong>Budget:</Text>
@@ -152,7 +152,7 @@ const ProjectDetails = ({ projects }) => {
                 </Col>
                 <Col span={12}>
                   <Text strong>Deadline:</Text>
-                  <Text>{project.priority}</Text>
+                  <Text>{project.deadline}</Text>
                 </Col>
                 <Col span={12}>
                   <Text strong>Start Date:</Text>
@@ -200,7 +200,6 @@ const ProjectDetails = ({ projects }) => {
                             ? moment(task.dueDate).format("YYYY-MM-DD")
                             : "N/A"}
                         </Text>
-                        ,
                         <Text>
                           {" "}
                           Assigned:{" "}

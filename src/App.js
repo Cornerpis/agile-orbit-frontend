@@ -11,7 +11,8 @@ import BackLog from "./pages/backlog";
 import SprintCreation from "./pages/sprint";
 import CreateUsers from "./pages/users";
 import { list } from "./pages/data";
-import "antd/dist/antd.css";
+// import "antd/dist/antd.css";
+import { ConfigProvider } from 'antd';
 import "./assets/styles/main.css";
 import "./assets/styles/responsive.css";
 import KanbanBoard from "./pages/kansanboard";
@@ -19,6 +20,7 @@ import ScoreCards from "./pages/score-card";
 
 function App() {
   return (
+    <ConfigProvider>
     <div className="App">
       <Switch>
         <Route path="/" exact component={SignIn} />
@@ -43,6 +45,7 @@ function App() {
         <Redirect from="*" to="/sign-in" /> {/* Moved outside Main */}
       </Switch>
     </div>
+    </ConfigProvider>
   );
 }
 

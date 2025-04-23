@@ -1,470 +1,383 @@
-import { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useHistory } from "react-router-dom";
 import {
   Row,
   Col,
   Card,
-  Radio,
   Table,
-  Upload,
-  message,
-  Progress,
   Button,
-  Avatar,
   Typography,
   Tag,
+  Input,
+  Space,
+  Spin,
+  Tooltip,
+  message,
+  Form,
+  Modal,
+  Select,
+  DatePicker
 } from "antd";
-
-import { ToTopOutlined, PlusOutlined } from "@ant-design/icons";
-import { Link } from "react-router-dom";
-import pencil from "../assets/images/pencil.svg";
+import { PlusOutlined, EditOutlined, SearchOutlined } from "@ant-design/icons";
+import moment from "moment";
 import MyModal from "../pages/create-project";
 
 const { Title } = Typography;
+const { Search } = Input;
+const { Option } = Select;
+const { RangePicker } = DatePicker;
 
-// table code start
-const columns = [
-  {
-    title: "PROJECT NAME",
-    dataIndex: "name",
-    key: "name",
-    width: "32%",
-  },
-  {
-    title: "DESCRIPTION",
-    dataIndex: "function",
-    key: "function",
-  },
-
-  {
-    title: "BUDGET",
-    key: "status",
-    dataIndex: "status",
-  },
-  {
-    title: "ASSIGNED TO",
-    key: "employed",
-    dataIndex: "employed",
-  },
-  {
-    title: "DEADLINE",
-    key: "deadline",
-    dataIndex: "deadline",
-  },
-  {
-    title: "PRIORITY",
-    key: "priority",
-    dataIndex: "priority",
-
-    render: (priority) => {
-      const color =
-        priority === "High"
-          ? "red"
-          : priority === "Medium"
-          ? "orange"
-          : "green";
-      return <Tag color={color}>{priority}</Tag>;
-    },
-  },
-];
-
-const data = [
-  {
-    key: "1",
-    name: (
-      <>
-        <Avatar.Group>
-          <div className="avatar-info">
-            {/* <Title level={5}>Michael John</Title> */}
-            <p style={{ color: "black" }}>Create an adminstrative dashboard</p>
-          </div>
-        </Avatar.Group>{" "}
-      </>
-    ),
-    function: (
-      <>
-        <div className="author-info">
-          {/* <Title level={5}>Manager</Title> */}
-          <p style={{ color: "black" }}>Organization</p>
-        </div>
-      </>
-    ),
-
-    status: (
-      <>
-        <div className="author-info">
-          {/* <Title level={5}>Manager</Title> */}
-          <p style={{ color: "black" }}>$560</p>
-        </div>
-        {/* <Button type="primary" className="tag-primary">
-          ONLINE
-        </Button> */}
-      </>
-    ),
-    employed: (
-      <>
-        <div className="ant-employed" style={{ color: "black" }}>
-          <span>23/04/18</span>
-          <a href="#pablo">Edit</a>
-        </div>
-      </>
-    ),
-    deadline: (
-      <>
-        <div className="author-info">
-          <p style={{ color: "black" }}>23/04/18</p>
-        </div>
-      </>
-    ),
-    priority: (
-      <>
-        <div className="author-info">
-          <p>High</p>
-        </div>
-      </>
-    ),
-  },
-
-  {
-    key: "2",
-    name: (
-      <>
-        <Avatar.Group>
-          <div className="avatar-info">
-            {/* <Title level={5}>Alexa Liras</Title> */}
-            <p style={{ color: "black" }}>Front end web development</p>
-          </div>
-        </Avatar.Group>{" "}
-      </>
-    ),
-    function: (
-      <>
-        <div className="author-info">
-          {/* <Title level={5}>Programator</Title> */}
-          <p style={{ color: "black" }}>Developer</p>
-        </div>
-      </>
-    ),
-
-    status: (
-      <>
-        <div className="author-info">
-          <p style={{ color: "black" }}>$678</p>
-        </div>
-        {/* <Button className="tag-badge">ONLINE</Button> */}
-      </>
-    ),
-    employed: (
-      <>
-        <div className="ant-employed" style={{ color: "black" }}>
-          <span>23/12/20</span>
-          <a href="#pablo">Edit</a>
-        </div>
-      </>
-    ),
-    deadline: (
-      <>
-        <div className="author-info">
-          <p style={{ color: "black" }}>23/04/18</p>
-        </div>
-      </>
-    ),
-    priority: (
-      <>
-        <div className="author-info">
-          <p>Low</p>
-        </div>
-      </>
-    ),
-  },
-
-  {
-    key: "3",
-    name: (
-      <>
-        <Avatar.Group>
-          {/* <Avatar
-            className="shape-avatar"
-            shape="square"
-            size={40}
-            src={face}
-          ></Avatar> */}
-          <div className="avatar-info">
-            {/* <Title level={5}>Laure Perrier</Title> */}
-            <p style={{ color: "black" }}>Mobile development</p>
-          </div>
-        </Avatar.Group>{" "}
-      </>
-    ),
-    function: (
-      <>
-        <div className="author-info">
-          {/* <Title level={5}>Executive</Title> */}
-          <p style={{ color: "black" }}>Projects</p>
-        </div>
-      </>
-    ),
-
-    status: (
-      <>
-        <p style={{ color: "black" }}>$235</p>
-        {/* <Button type="primary" className="tag-primary">
-          ONLINE
-        </Button> */}
-      </>
-    ),
-    employed: (
-      <>
-        <div className="ant-employed" style={{ color: "black" }}>
-          <span>03/04/21</span>
-          <a href="#pablo">Edit</a>
-        </div>
-      </>
-    ),
-    deadline: (
-      <>
-        <div className="author-info">
-          <p style={{ color: "black" }}>23/04/18</p>
-        </div>
-      </>
-    ),
-    priority: (
-      <>
-        <div className="author-info">
-          <p>Medium</p>
-        </div>
-      </>
-    ),
-  },
-  {
-    key: "4",
-    name: (
-      <>
-        <Avatar.Group>
-          {/* <Avatar
-            className="shape-avatar"
-            shape="square"
-            size={40}
-            src={face4}
-          ></Avatar> */}
-          <div className="avatar-info">
-            {/* <Title level={5}>Miriam Eric</Title> */}
-            <p style={{ color: "black" }}>Web design</p>
-          </div>
-        </Avatar.Group>{" "}
-      </>
-    ),
-    function: (
-      <>
-        <div className="author-info">
-          {/* <Title level={5}>Marketing</Title> */}
-          <p style={{ color: "black" }}>Design a well structured</p>
-        </div>
-      </>
-    ),
-
-    status: (
-      <>
-        <p style={{ color: "black" }}>$902</p>
-        {/* <Button type="primary" className="tag-primary">
-          ONLINE
-        </Button> */}
-      </>
-    ),
-    employed: (
-      <>
-        <div className="ant-employed" style={{ color: "black" }}>
-          <span>03/04/21</span>
-          <a href="#pablo">Edit</a>
-        </div>
-      </>
-    ),
-    deadline: (
-      <>
-        <div className="author-info">
-          <p style={{ color: "black" }}>23/04/18</p>
-        </div>
-      </>
-    ),
-    priority: (
-      <>
-        <div className="author-info">
-          <p>High</p>
-        </div>
-      </>
-    ),
-  },
-  {
-    key: "5",
-    name: (
-      <>
-        <Avatar.Group>
-          {/* <Avatar
-            className="shape-avatar"
-            shape="square"
-            size={40}
-            src={face5}
-          ></Avatar> */}
-          <div className="avatar-info">
-            {/* <Title level={5}>Richard Gran</Title> */}
-            <p style={{ color: "black" }}>Networking</p>
-          </div>
-        </Avatar.Group>{" "}
-      </>
-    ),
-    function: (
-      <>
-        <div className="author-info">
-          {/* <Title level={5}>Manager</Title> */}
-          <p style={{ color: "black" }}>Sprint creation</p>
-        </div>
-      </>
-    ),
-
-    status: (
-      <>
-        <p style={{ color: "black" }}>$578</p>
-        {/* <Button className="tag-badge">ONLINE</Button> */}
-      </>
-    ),
-    employed: (
-      <>
-        <div className="ant-employed" style={{ color: "black" }}>
-          <span>23/03/20</span>
-          <a href="#pablo">Edit</a>
-        </div>
-      </>
-    ),
-    deadline: (
-      <>
-        <div className="author-info">
-          <p style={{ color: "black" }}>23/04/18</p>
-        </div>
-      </>
-    ),
-    priority: (
-      <>
-        <div className="author-info">
-          <p>Medium</p>
-        </div>
-      </>
-    ),
-  },
-
-  {
-    key: "6",
-    name: (
-      <>
-        <Avatar.Group>
-          {/* <Avatar
-            className="shape-avatar"
-            shape="square"
-            size={40}
-            src={face6}
-          ></Avatar> */}
-          <div className="avatar-info">
-            {/* <Title level={5}>John Levi</Title> */}
-            <p style={{ color: "black" }}>Project management</p>
-          </div>
-        </Avatar.Group>{" "}
-      </>
-    ),
-    function: (
-      <>
-        <div className="author-info">
-          {/* <Title level={5}>Tester</Title> */}
-          <p style={{ color: "black" }}>Developer</p>
-        </div>
-      </>
-    ),
-
-    status: (
-      <>
-        <p style={{ color: "black" }}>$786</p>
-      </>
-    ),
-    employed: (
-      <>
-        <div className="ant-employed" style={{ color: "black" }}>
-          <span>14/04/17</span>
-          <a href="#pablo">Edit</a>
-        </div>
-      </>
-    ),
-    deadline: (
-      <>
-        <div className="author-info">
-          <p style={{ color: "black" }}>23/04/18</p>
-        </div>
-      </>
-    ),
-    priority: (
-      <>
-        <div className="author-info">
-          <p>Low</p>
-        </div>
-      </>
-    ),
-  },
-];
-
-function Tables() {
-  const onChange = (e) => console.log(`radio checked:${e.target.value}`);
+const Tables = () => {
   const history = useHistory();
+  const [form] = Form.useForm();
+  const [data, setData] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [pagination, setPagination] = useState({
+    current: 1,
+    pageSize: 10,
+    total: 0,
+  });
+  const [filters, setFilters] = useState({});
+  const [sort, setSort] = useState({});
+  const [searchText, setSearchText] = useState("");
+  const [isCreateModalVisible, setIsCreateModalVisible] = useState(false);
+  const [isEditModalVisible, setIsEditModalVisible] = useState(false);
+  const [editingProject, setEditingProject] = useState(null);
+
+  // Fetch data from API
+  const fetchProjects = async (params = {}) => {
+    setLoading(true);
+    try {
+      const queryParams = new URLSearchParams({
+        page: params.pagination?.current || 1,
+        pageSize: params.pagination?.pageSize || 10,
+        search: searchText,
+        ...params.filters,
+        sortField: params.sort?.field,
+        sortOrder: params.sort?.order,
+      }).toString();
+
+      const response = await fetch(`https://api.example.com/projects?${queryParams}`);
+      const result = await response.json();
+
+      const formattedData = result.data.map(project => ({
+        key: project.id,
+        name: project.name,
+        description: project.description,
+        budget: project.budget,
+        assignedTo: project.assignedTo,
+        deadline: moment(project.deadline).format("DD/MM/YYYY"),
+        priority: project.priority,
+      }));
+
+      setData(formattedData);
+      setPagination({
+        ...params.pagination,
+        total: result.total,
+      });
+    } catch (error) {
+      message.error("Failed to fetch projects");
+      console.error("API Error:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchProjects({
+      pagination,
+      filters,
+      sort,
+    });
+  }, [pagination.current, pagination.pageSize, filters, sort, searchText]);
+
+  const handleTableChange = (newPagination, newFilters, newSorter) => {
+    const sorter = {};
+    if (newSorter.field) {
+      sorter.field = newSorter.field;
+      sorter.order = newSorter.order;
+    }
+
+    fetchProjects({
+      pagination: newPagination,
+      filters: newFilters,
+      sort: sorter,
+    });
+    setPagination(newPagination);
+    setFilters(newFilters);
+    setSort(sorter);
+  };
+
+  const handleSearch = (value) => {
+    setSearchText(value);
+    setPagination({ ...pagination, current: 1 });
+  };
+
   const handleRowClick = (record) => {
     history.push(`/project/${record.key}`);
   };
-  const [isModalVisible, setIsModalVisible] = useState(false);
-  const handleCreate = (values) => {
-    console.log("Project Created:", values);
-    setIsModalVisible(false);
+
+  // Edit Project Functions
+  const handleEdit = (project) => {
+    setEditingProject(project);
+    form.setFieldsValue({
+      ...project,
+      deadline: moment(project.deadline, "DD/MM/YYYY")
+    });
+    setIsEditModalVisible(true);
   };
 
+  const handleEditSubmit = async () => {
+    try {
+      const values = await form.validateFields();
+      setLoading(true);
+
+      // API call to update project
+      const response = await fetch(`https://api.example.com/projects/${editingProject.key}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          ...values,
+          deadline: values.deadline.format("YYYY-MM-DD"),
+        }),
+      });
+
+      if (!response.ok) throw new Error("Update failed");
+
+      const updatedProject = await response.json();
+
+      // Update local state
+      setData(data.map(item =>
+        item.key === editingProject.key ? {
+          ...item,
+          ...updatedProject,
+          deadline: moment(updatedProject.deadline).format("DD/MM/YYYY"),
+        } : item
+      ));
+
+      message.success("Project updated successfully");
+      setIsEditModalVisible(false);
+      setEditingProject(null);
+    } catch (error) {
+      message.error("Failed to update project");
+      console.error("Update Error:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const columns = [
+    {
+      title: "PROJECT NAME",
+      dataIndex: "name",
+      key: "name",
+      width: "25%",
+      sorter: true,
+      render: (name) => <span style={{ color: "#000" }}>{name}</span>,
+    },
+    {
+      title: "DESCRIPTION",
+      dataIndex: "description",
+      key: "description",
+      render: (text) => <span style={{ color: "#000" }}>{text}</span>,
+    },
+    {
+      title: "BUDGET",
+      dataIndex: "budget",
+      key: "budget",
+      sorter: true,
+      render: (budget) => `$${budget}`,
+    },
+    {
+      title: "ASSIGNED TO",
+      dataIndex: "assignedTo",
+      key: "assignedTo",
+      render: (name) => <span style={{ color: "#000" }}>{name}</span>,
+    },
+    {
+      title: "DEADLINE",
+      dataIndex: "deadline",
+      key: "deadline",
+      sorter: true,
+    },
+    {
+      title: "PRIORITY",
+      dataIndex: "priority",
+      key: "priority",
+      filters: [
+        { text: "High", value: "High" },
+        { text: "Medium", value: "Medium" },
+        { text: "Low", value: "Low" },
+      ],
+      onFilter: (value, record) => record.priority === value,
+      render: (priority) => {
+        const colorMap = {
+          High: "red",
+          Medium: "orange",
+          Low: "green",
+        };
+        return <Tag color={colorMap[priority]}>{priority}</Tag>;
+      },
+    },
+    {
+      title: "ACTIONS",
+      key: "actions",
+      width: "100px",
+      render: (_, record) => (
+        <Tooltip title="Edit">
+          <Button
+            type="text"
+            icon={<EditOutlined />}
+            onClick={(e) => {
+              e.stopPropagation();
+              handleEdit(record);
+            }}
+          />
+        </Tooltip>
+      ),
+    },
+  ];
+
   return (
-    <>
-      <MyModal
-        visible={isModalVisible}
-        onCreate={handleCreate}
-        onCancel={() => setIsModalVisible(false)}
-      />
-      <div className="tabled">
-        <Row gutter={[24, 0]}>
-          <Col xs="24" xl={24}>
-            <Card
-              bordered={false}
-              className="criclebox tablespace mb-24"
-              title="Project List"
-              extra={
-                <>
-                  <Button
-                    type="primary"
-                    onClick={() => setIsModalVisible(true)}
-                    className="width-100"
-                  >
-                    {<PlusOutlined />} Create new project
-                  </Button>
-                </>
-              }
-            >
-              <div className="table-responsive">
-                <Table
-                  columns={columns}
-                  dataSource={data}
-                  pagination={false}
-                  onRow={(record) => {
-                    return {
-                      onClick: () => handleRowClick(record), // click row
-                      style: { cursor: "pointer" }, // show pointer cursor on hover
-                    };
-                  }}
+    <div className="tabled">
+      <Row gutter={[24, 0]}>
+        <Col span={24}>
+          <Card
+            bordered={false}
+            className="criclebox tablespace mb-24"
+            title="Project List"
+            extra={
+              <Space>
+                <Search
+                  placeholder="Search projects"
+                  allowClear
+                  enterButton={<SearchOutlined />}
+                  size="middle"
+                  onSearch={handleSearch}
+                  style={{ width: 250 }}
                 />
-              </div>
-            </Card>
-          </Col>
-        </Row>
-      </div>
-    </>
+                <Button
+                  type="primary"
+                  onClick={() => setIsCreateModalVisible(true)}
+                  icon={<PlusOutlined />}
+                >
+                  New Project
+                </Button>
+              </Space>
+            }
+          >
+            <Spin spinning={loading}>
+              <Table
+                columns={columns}
+                dataSource={data}
+                pagination={{
+                  ...pagination,
+                  showSizeChanger: true,
+                  pageSizeOptions: ["10", "20", "50"],
+                  showTotal: (total) => `Total ${total} projects`,
+                }}
+                onChange={handleTableChange}
+                onRow={(record) => ({
+                  onClick: () => handleRowClick(record),
+                  style: { cursor: "pointer" },
+                })}
+              />
+            </Spin>
+          </Card>
+        </Col>
+      </Row>
+
+      {/* Create Project Modal */}
+      <MyModal
+        visible={isCreateModalVisible}
+        onCreate={(values) => {
+          console.log("Create:", values);
+          setIsCreateModalVisible(false);
+          fetchProjects({ pagination, filters, sort });
+        }}
+        onCancel={() => setIsCreateModalVisible(false)}
+      />
+
+      {/* Edit Project Modal */}
+      <Modal
+        title="Edit Project"
+        visible={isEditModalVisible}
+        onOk={handleEditSubmit}
+        onCancel={() => {
+          setIsEditModalVisible(false);
+          setEditingProject(null);
+        }}
+        confirmLoading={loading}
+        width={700}
+      >
+        <Form form={form} layout="vertical">
+          <Row gutter={16}>
+            <Col span={12}>
+              <Form.Item
+                name="name"
+                label="Project Name"
+                rules={[{ required: true, message: "Please enter project name" }]}
+              >
+                <Input placeholder="Project name" />
+              </Form.Item>
+            </Col>
+            <Col span={12}>
+              <Form.Item
+                name="budget"
+                label="Budget"
+                rules={[{ required: true, message: "Please enter budget" }]}
+              >
+                <Input prefix="$" type="number" placeholder="Budget" />
+              </Form.Item>
+            </Col>
+          </Row>
+
+          <Form.Item
+            name="description"
+            label="Description"
+            rules={[{ required: true, message: "Please enter description" }]}
+          >
+            <Input.TextArea rows={3} placeholder="Project description" />
+          </Form.Item>
+
+          <Row gutter={16}>
+            <Col span={12}>
+              <Form.Item
+                name="assignedTo"
+                label="Assigned To"
+                rules={[{ required: true, message: "Please select assignee" }]}
+              >
+                <Input placeholder="Team member name" />
+              </Form.Item>
+            </Col>
+            <Col span={12}>
+              <Form.Item
+                name="deadline"
+                label="Deadline"
+                rules={[{ required: true, message: "Please select deadline" }]}
+              >
+                <DatePicker style={{ width: "100%" }} format="DD/MM/YYYY" />
+              </Form.Item>
+            </Col>
+          </Row>
+
+          <Form.Item
+            name="priority"
+            label="Priority"
+            rules={[{ required: true, message: "Please select priority" }]}
+          >
+            <Select placeholder="Select priority level">
+              <Option value="High">High</Option>
+              <Option value="Medium">Medium</Option>
+              <Option value="Low">Low</Option>
+            </Select>
+          </Form.Item>
+        </Form>
+      </Modal>
+    </div>
   );
-}
+};
 
 export default Tables;

@@ -1,5 +1,5 @@
 import React from "react";
-import { Link, useHistory } from "react-router-dom"; // Import useHistory
+import { Link, useHistory } from "react-router-dom";
 import {
   Layout,
   Button,
@@ -9,20 +9,18 @@ import {
   Form,
   Input,
   Switch,
+  message,
 } from "antd";
 import signinbg from "../assets/images/img-signin.png";
 import { signIn } from "../redux/action";
 import { useDispatch } from "react-redux";
-import { notification } from "antd";
 
 const { Title } = Typography;
 const { Header, Footer, Content } = Layout;
 
 const SignIn = () => {
   const dispatch = useDispatch();
-  const history = useHistory(); // Initialize history
-
-  const [api, contextHolder] = notification.useNotification();
+  const history = useHistory();
 
   const onFinish = async (values) => {
     const formData = {
@@ -32,44 +30,44 @@ const SignIn = () => {
     try {
       const response = await dispatch(signIn(formData));
 
-      if (response.message == "success") {
-        const btn = (
-          <Button
-            type="primary"
-            size="small"
-            onClick={() => {
-              notification.destroy(); // optional: closes all notifications
+      // Handle successful authentication
+      if (response?.status === 200 || response?.message?.toLowerCase().includes('success')) {
+        message.loading('Authenticating...', 1.5)
+          .then(() => {
+            message.success('Login successful! Redirecting...', 2);
+            setTimeout(() => {
               history.push("/dashboard");
-            }}
-          >
-            OK
-          </Button>
-        );
-
-        notification.open({
-          message: "Login Successful ✅",
-          description: "Click OK to go to your dashboard.",
-          btn,
-          duration: 0, // stays until user clicks
-        });
-      } else {
-        alert(response.message);
+            }, 2000);
+          });
+      } 
+      // Handle case where credentials are correct but message differs
+      else if (response?.data?.authenticated) {
+        message.success('Welcome back! You will be redirected shortly...', 2.5);
+        setTimeout(() => {
+          history.push("/dashboard");
+        }, 2500);
+      }
+      else {
+        // Show backend message if available, otherwise neutral error
+        const errorMessage = response?.message || 'Authentication failed. Please try again.';
+        message.warning(errorMessage);
       }
     } catch (error) {
       console.error("Sign-in error:", error);
+      message.error('Could not complete authentication at this time');
     }
   };
 
   const onFinishFailed = (errorInfo) => {
     console.log("Failed:", errorInfo);
+    message.warning('Please complete all required fields correctly');
   };
 
   return (
     <Layout className="layout-default layout-signin">
-      {contextHolder}
       <Header>
         <div className="header-col header-brand">
-          <h5>Agile Orbit </h5>
+          <h5>Agile Orbit</h5>
         </div>
       </Header>
       <Content className="signin">
@@ -90,24 +88,24 @@ const SignIn = () => {
               className="row-col"
             >
               <Form.Item
-                className="username"
-                label="Email"
                 name="email"
+                label="Email"
                 rules={[
                   { required: true, message: "Please enter your email!" },
+                  { type: 'email', message: 'Please enter a valid email' }
                 ]}
               >
                 <Input placeholder="Email" />
               </Form.Item>
               <Form.Item
-                className="password"
-                label="Password"
                 name="password"
+                label="Password"
                 rules={[
                   { required: true, message: "Please enter your password!" },
+                  { min: 6, message: 'Password must be at least 6 characters' }
                 ]}
               >
-                <Input placeholder="Enter Password" type="password" />
+                <Input.Password placeholder="Enter Password" visibilityToggle={false} />
               </Form.Item>
               <Form.Item
                 name="remember"
@@ -141,11 +139,11 @@ const SignIn = () => {
             lg={{ span: 12 }}
             md={{ span: 12 }}
           >
-            <img src={signinbg} alt="Sign In" style={{marginTop:70}}/>
+            <img src={signinbg} alt="Sign In" style={{ marginTop: 70 }} />
           </Col>
         </Row>
       </Content>
-      <Footer style={{marginTop:160}}>
+      <Footer style={{ marginTop: 160 }}>
         <p className="copyright">
           Copyright © <a href="#pablo">Cornerpise</a> 2025
         </p>
