@@ -1,6 +1,5 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { useParams } from "react-router-dom";
-import { useDispatch, useSelector } from "react-redux"; // Import useDispatch and useSelector
 import {
   Card,
   Typography,
@@ -18,22 +17,22 @@ import {
   DatePicker,
   Progress,
   Divider,
-  Comment,
   Tooltip,
 } from "antd";
+import { Comment } from '@ant-design/compatible';
 import { PlusOutlined, UserAddOutlined } from "@ant-design/icons";
 import moment from "moment";
 import InviteTeam from "../pages/invite-team";
-import { fetchUsers } from "../redux/action";
 
 const { Title, Text, Paragraph } = Typography;
 const { Option } = Select;
 const { TextArea } = Input;
 
 const ProjectDetails = ({ projects }) => {
-  const dispatch = useDispatch(); // Initialize dispatch
-  const { _id } = useParams();
-  const project = projects.find((p) => p._id === _id);
+  const [isModalVisible, setIsModalVisible] = useState(false);
+  const [isTaskModalVisible, setIsTaskModalVisible] = useState(false);
+  const { id } = useParams();
+  const project = projects.find((p) => p.id === parseInt(id));
   const [assignedUsers, setAssignedUsers] = useState(
     project ? project.assignedUsers || [] : []
   );
@@ -41,15 +40,19 @@ const ProjectDetails = ({ projects }) => {
   const [taskForm] = Form.useForm();
   const [comments, setComments] = useState([]);
   const [newComment, setNewComment] = useState("");
-  const [isModalVisible, setIsModalVisible] = useState(false);
-  const [isTaskModalVisible, setIsTaskModalVisible] = useState(false);
 
-  const { users, loading, error } = useSelector((state) => state.users);
+  const mockUsers = [
+    { id: 1, name: "Alice Smith" },
+    { id: 2, name: "Bob Johnson" },
+    { id: 3, name: "Charlie Williams" },
+    { id: 4, name: "David Brown" },
+    { id: 5, name: "Eve Davis" },
+  ];
 
-  useEffect(() => {
-    // Fetch users when the component mounts
-    dispatch(fetchUsers(localStorage.getItem("token")));
-  }, [dispatch]);
+  const handleCreate = (values) => {
+    console.log("Project Created:", values);
+    setIsModalVisible(false);
+  };
 
   const handleAssignUser = (userIds) => {
     setAssignedUsers(userIds);
@@ -88,13 +91,13 @@ const ProjectDetails = ({ projects }) => {
     >
       <InviteTeam
         visible={isModalVisible}
-        onCreate={() => setIsModalVisible(false)}
+        onCreate={handleCreate}
         onCancel={() => setIsModalVisible(false)}
       />
       <Row justify="space-between" align="middle" style={{ marginBottom: 24 }}>
         <Col>
           <Title level={2} style={{ marginBottom: 0 }}>
-            {project.name}
+            {project.Title}
           </Title>
         </Col>
         <Col>
@@ -130,39 +133,34 @@ const ProjectDetails = ({ projects }) => {
                   <Paragraph>{project.description}</Paragraph>
                 </Col>
                 <Col span={12}>
-                  <Text strong>Budget: </Text>
-                  <Paragraph>
-                    {project.budget != null
-                      ? new Intl.NumberFormat("en-NG", {
-                          style: "currency",
-                          currency: "NGN",
-                        }).format(project.budget)
-                      : "-"}
-                  </Paragraph>
+                  <Text strong>Budget:</Text>
+                  <Text>{project.budget}</Text>
                 </Col>
                 <Col span={12}>
-                  <Text strong>Status: </Text>
-                  <Paragraph>
-                    <Tag
-                      color={
-                        project.status === "todo"
-                          ? "red"
-                          : project.status === "in_progress"
-                          ? "orange"
-                          : "green"
-                      }
-                    >
-                      {project.status}
-                    </Tag>
-                  </Paragraph>
+                  <Text strong>Priority:</Text>
+                  <Tag
+                    color={
+                      project.priority === "High"
+                        ? "red"
+                        : project.priority === "Medium"
+                        ? "orange"
+                        : "green"
+                    }
+                  >
+                    {project.priority}
+                  </Tag>
                 </Col>
                 <Col span={12}>
                   <Text strong>Deadline:</Text>
-                  <Paragraph>
-                    {project.end_time
-                      ? new Date(project.end_time).toLocaleDateString()
-                      : "-"}
-                  </Paragraph>
+                  <Text>{project.deadline}</Text>
+                </Col>
+                <Col span={12}>
+                  <Text strong>Start Date:</Text>
+                  <Text>{project.startDate}</Text>
+                </Col>
+                <Col span={12}>
+                  <Text strong>End Date:</Text>
+                  <Text>{project.endDate}</Text>
                 </Col>
               </Row>
               <Progress percent={progress} style={{ marginTop: 16 }} />
@@ -202,11 +200,10 @@ const ProjectDetails = ({ projects }) => {
                             ? moment(task.dueDate).format("YYYY-MM-DD")
                             : "N/A"}
                         </Text>
-                        ,
                         <Text>
                           {" "}
                           Assigned:{" "}
-                          {users.find((user) => user.id === task.assignee)
+                          {mockUsers.find((user) => user.id === task.assignee)
                             ?.name || "N/A"}
                         </Text>
                       </>
@@ -256,9 +253,8 @@ const ProjectDetails = ({ projects }) => {
               placeholder="Assign team members"
               value={assignedUsers}
               onChange={handleAssignUser}
-              loading={loading} // Add loading state
             >
-              {users.map((user) => (
+              {mockUsers.map((user) => (
                 <Option key={user.id} value={user.id}>
                   {user.name}
                 </Option>
@@ -267,7 +263,7 @@ const ProjectDetails = ({ projects }) => {
 
             <List
               itemLayout="horizontal"
-              dataSource={users.filter((user) =>
+              dataSource={mockUsers.filter((user) =>
                 assignedUsers.includes(user.id)
               )}
               renderItem={(user) => (
@@ -307,7 +303,7 @@ const ProjectDetails = ({ projects }) => {
           </Form.Item>
           <Form.Item label="Assignee" name="assignee">
             <Select>
-              {users.map((user) => (
+              {mockUsers.map((user) => (
                 <Option key={user.id} value={user.id}>
                   {user.name}
                 </Option>

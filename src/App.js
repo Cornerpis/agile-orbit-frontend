@@ -11,16 +11,16 @@ import BackLog from "./pages/backlog";
 import SprintCreation from "./pages/sprint";
 import CreateUsers from "./pages/users";
 import { list } from "./pages/data";
-import "antd/dist/antd.css";
+// import "antd/dist/antd.css";
+import { ConfigProvider } from 'antd';
 import "./assets/styles/main.css";
 import "./assets/styles/responsive.css";
 import KanbanBoard from "./pages/kansanboard";
 import ScoreCards from "./pages/score-card";
-import { useSelector } from "react-redux";
 
 function App() {
-  const projects = useSelector((state) => state.projects);
   return (
+    <ConfigProvider>
     <div className="App">
       <Switch>
         <Route path="/" exact component={SignIn} />
@@ -33,10 +33,8 @@ function App() {
           <Route exact path="/profile" component={Profile} />
           <Route
             exact
-            path="/project/:_id"
-            render={(props) => (
-              <ProjectDetails {...props} projects={projects} />
-            )}
+            path="/project/:id"
+            component={(props) => <ProjectDetails {...props} projects={list} />}
           />
           <Route exact path="/kansanboard" component={KanbanBoard} />
           <Route exact path="/backlog" component={BackLog} />
@@ -47,6 +45,7 @@ function App() {
         <Redirect from="*" to="/sign-in" /> {/* Moved outside Main */}
       </Switch>
     </div>
+    </ConfigProvider>
   );
 }
 
