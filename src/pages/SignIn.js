@@ -10,7 +10,7 @@ import {
   Input,
   Switch,
 } from "antd";
-import signinbg from "../assets/images/img-signin.jpg";
+import signinbg from "../assets/images/img-signin.png";
 import { signIn } from "../redux/action";
 import { useDispatch } from "react-redux";
 import { notification } from "antd";
@@ -146,13 +146,13 @@ const SignIn = () => {
             lg={{ span: 12 }}
             md={{ span: 12 }}
           >
-            <img src={signinbg} alt="Sign In" />
+            <img src={signinbg} alt="Sign In" style={{ marginTop: 70 }} />
           </Col>
         </Row>
       </Content>
-      <Footer>
+      <Footer style={{ marginTop: 160 }}>
         <p className="copyright">
-          Copyright © 2021 Muse by <a href="#pablo">Creative Tim</a>.
+          Copyright © <a href="#pablo">Cornerpise</a> 2025
         </p>
       </Footer>
     </Layout>

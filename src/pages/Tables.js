@@ -80,7 +80,7 @@ const columns = [
 
 function Tables() {
   const projects = useSelector((state) => state.projects);
-  const onChange = (e) => console.log(`radio checked:${e.target.value}`);
+  const onChange = (e) => console.log(`radio checked: ${e.target.value}`);
   const history = useHistory();
   const handleRowClick = (record) => {
     history.push(`/project/${record._id}`);

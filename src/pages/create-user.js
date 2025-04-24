@@ -1,36 +1,95 @@
-import React, { useState } from "react";
-import { Form, Input, DatePicker, Select, Modal, Row, Col } from "antd";
+import React from "react";
+import { Form, Input, Modal, Row, Col, notification } from "antd";
+import { useDispatch } from "react-redux";
+import { CreateUserModal as CreateUser } from "../redux/action";
 
-
-const { Option } = Select;
-
-const CreateUserModal = ({ visible, onCreate, onCancel }) => {
+const CreateUserModal = ({ visible, onCancel }) => {
+  const dispatch = useDispatch();
   const [form] = Form.useForm();
+  const [api, contextHolder] = notification.useNotification();
+
+  const passwordRules = [
+    { required: true, message: 'Please enter your password!' },
+    { min: 6, message: 'Password must be at least 6 characters!' },
+    {
+      pattern: /^(?=.*[!@#$%^&*])/,
+      message: 'Password must contain at least one special character!',
+    },
+  ];
+
+  const confirmPasswordRules = [
+    { required: true, message: 'Please confirm your password!' },
+    ({ getFieldValue }) => ({
+      validator(_, value) {
+        if (!value || getFieldValue('password') === value) {
+          return Promise.resolve();
+        }
+        return Promise.reject(new Error('Password mismatch!'));
+      },
+    }),
+  ];
+
+  const emailRules = [
+    { required: true, message: 'Please enter your email!' },
+    { type: 'email', message: 'Please enter a valid email address!' },
+    {
+      validator: async (_, value) => {
+        if (!value) return Promise.resolve();
+        const emailRegex = /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i;
+        if (!emailRegex.test(value)) {
+          return Promise.reject('Invalid email format');
+        }
+      }
+    }
+  ];
+
+  const inputStyle = {
+    padding: '8px 11px',
+    borderRadius: '5px',
+    width: '100%',
+    height: '40px'
+  };
+
+  const handleOk = () => {
+    form
+      .validateFields()
+      .then((values) => {
+        dispatch(CreateUser(values))
+          .then((res) => {
+            api.success({
+              message: 'User Created',
+              description: 'The new user has been successfully created.',
+            });
+            form.resetFields();
+            onCancel();
+          })
+          .catch((err) => {
+            api.error({
+              message: 'User Creation Failed',
+              description: err?.message || 'Something went wrong. Please try again.',
+            });
+          });
+      })
+      .catch((info) => {
+        console.log("Validation Failed:", info);
+      });
+  };
 
   return (
     <Modal
-      open={visible} // Ant Design v5 uses 'open' instead of 'visible'
+      open={visible}
       title="Create New User"
       okText="Create"
       cancelText="Cancel"
       onCancel={onCancel}
-      onOk={() => {
-        form
-          .validateFields()
-          .then((values) => {
-            form.resetFields();
-            onCreate(values);
-          })
-          .catch((info) => {
-            console.log("Validation Failed:", info);
-          });
-      }}
+      onOk={handleOk}
     >
+      {contextHolder}
       <Form form={form} layout="vertical">
         <Row gutter={[16, 16]}>
           <Col xs={24} sm={24} md={12}>
             <Form.Item
-              name="fname"
+              name="first_name"
               label="First Name"
               rules={[{ required: true, message: "Please enter your first name!" }]}
             >
@@ -39,11 +98,11 @@ const CreateUserModal = ({ visible, onCreate, onCancel }) => {
           </Col>
           <Col xs={24} sm={24} md={12}>
             <Form.Item
-              name="lname"
+              name="last_name"
               label="Last Name"
               rules={[{ required: true, message: "Please enter last name!" }]}
             >
-              <Input placeholder="Enter your last name" type="text" />
+              <Input placeholder="Enter your last name" />
             </Form.Item>
           </Col>
         </Row>
@@ -51,9 +110,10 @@ const CreateUserModal = ({ visible, onCreate, onCancel }) => {
         <Form.Item
           name="email"
           label="Email"
-          rules={[{ required: true, message: "Please enter your email!" }]}
+          rules={emailRules}
+          hasFeedback
         >
-          <Input rows={4} placeholder="Enter your email" type="text"/>
+          <Input placeholder="Enter your email" style={inputStyle} />
         </Form.Item>
 
         <Row gutter={[16, 16]}>
@@ -61,76 +121,48 @@ const CreateUserModal = ({ visible, onCreate, onCancel }) => {
             <Form.Item
               name="role"
               label="Role"
-              rules={[{ required: true, message: "Please select a role!" }]}
+              rules={[{ required: true, message: "Please enter your role!" }]}
             >
-                <Select placeholder="Select role">
-                <Option value="productmanager">Product Manager</Option>
-                <Option value="developer">Developer</Option>
-                <Option value="projectmanager">Project Manager</Option>
-              </Select>
-             
+              <Input placeholder="Enter your role" />
             </Form.Item>
           </Col>
           <Col xs={24} sm={24} md={12}>
             <Form.Item
               name="department"
               label="Department"
-              rules={[{ required: true, message: "Please select a department!" }]}
+              rules={[{ required: true, message: "Please enter your department!" }]}
             >
-              <Select placeholder="Select department">
-                <Option value="software">Software Development</Option>
-                <Option value="admin">Adminstrative</Option>
-                <Option value="product">Product Department</Option>
-              </Select>
+              <Input placeholder="Enter your department" />
             </Form.Item>
           </Col>
         </Row>
+
         <Row gutter={[16, 16]}>
-            <Col xs={24} sm={24} md={12}>
-                <Form.Item
-                name="password"
-                label="Password"
-                rules={[{ required: true, message: "Please enter your password!" }]}
-                >
-                <Input placeholder="Enter password" type="password" />
-                </Form.Item>
-            </Col>
-            <Col xs={24} sm={24} md={12}>
-                <Form.Item
-                name="confirmpassword"
-                label="Confirm Password"
-                rules={[{ required: true, message: "Please enter your confirm password!" }]}
-                >
-                <Input placeholder="Enter your confirm password" type="password" />
-                </Form.Item>
-            </Col>
-            
+          <Col xs={24} sm={24} md={12}>
+            <Form.Item
+              name="password"
+              label="Password"
+              rules={passwordRules}
+              hasFeedback
+            >
+              <Input.Password placeholder="Enter password" style={inputStyle} />
+            </Form.Item>
+          </Col>
+          <Col xs={24} sm={24} md={12}>
+            <Form.Item
+              name="confirmpassword"
+              label="Confirm Password"
+              dependencies={["password"]}
+              rules={confirmPasswordRules}
+              hasFeedback
+            >
+              <Input.Password placeholder="Confirm password" style={inputStyle} />
+            </Form.Item>
+          </Col>
         </Row>
-            
       </Form>
     </Modal>
   );
 };
 
 export default CreateUserModal;
-
-const App = () => {
-  // Modal is always visible
-  const [isModalVisible, setIsModalVisible] = useState(true);
-
-  const handleCreate = (values) => {
-    console.log("Project Created:", values);
-    // If you want to keep the modal open after submission, remove this line:
-    setIsModalVisible(false);
-  };
-
-  return (
-    <CreateUserModal
-      visible={isModalVisible}
-      onCreate={handleCreate}
-      onCancel={() => setIsModalVisible(false)}
-    />
-  );
-};
-
-// export default App;
