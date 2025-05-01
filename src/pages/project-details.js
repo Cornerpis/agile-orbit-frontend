@@ -19,20 +19,22 @@ import {
   Divider,
   Tooltip,
 } from "antd";
-import { Comment } from '@ant-design/compatible';
+import { Comment } from "@ant-design/compatible";
 import { PlusOutlined, UserAddOutlined } from "@ant-design/icons";
 import moment from "moment";
 import InviteTeam from "../pages/invite-team";
+import { useSelector } from "react-redux";
 
 const { Title, Text, Paragraph } = Typography;
 const { Option } = Select;
 const { TextArea } = Input;
 
-const ProjectDetails = ({ projects }) => {
+const ProjectDetails = () => {
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [isTaskModalVisible, setIsTaskModalVisible] = useState(false);
   const { id } = useParams();
-  const project = projects.find((p) => p.id === parseInt(id));
+  const projects = useSelector((state) => state.projects);
+  const project = projects.find((p) => p._id === id);
   const [assignedUsers, setAssignedUsers] = useState(
     project ? project.assignedUsers || [] : []
   );
@@ -140,19 +142,19 @@ const ProjectDetails = ({ projects }) => {
                   <Text strong>Priority:</Text>
                   <Tag
                     color={
-                      project.priority === "High"
+                      project.priority_level === "High"
                         ? "red"
-                        : project.priority === "Medium"
+                        : project.priority_level === "Medium"
                         ? "orange"
                         : "green"
                     }
                   >
-                    {project.priority}
+                    {project.priority_level}
                   </Tag>
                 </Col>
                 <Col span={12}>
                   <Text strong>Deadline:</Text>
-                  <Text>{project.deadline}</Text>
+                  <Text>{project.end_time}</Text>
                 </Col>
                 <Col span={12}>
                   <Text strong>Start Date:</Text>
@@ -160,7 +162,7 @@ const ProjectDetails = ({ projects }) => {
                 </Col>
                 <Col span={12}>
                   <Text strong>End Date:</Text>
-                  <Text>{project.endDate}</Text>
+                  <Text>{project.end_time}</Text>
                 </Col>
               </Row>
               <Progress percent={progress} style={{ marginTop: 16 }} />
@@ -196,7 +198,7 @@ const ProjectDetails = ({ projects }) => {
                       <>
                         <Text>
                           Due:{" "}
-                          {task.dueDate
+                          {task.end_time
                             ? moment(task.dueDate).format("YYYY-MM-DD")
                             : "N/A"}
                         </Text>
