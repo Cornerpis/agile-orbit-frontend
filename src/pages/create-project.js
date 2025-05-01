@@ -1,74 +1,66 @@
-import React, { useState, useEffect } from "react";
+import React from "react";
 import { Form, Input, DatePicker, Select, Modal, Row, Col, notification } from "antd";
-import { MyModal as CreateProject } from "../redux/action";
 import { useDispatch } from "react-redux";
+import { createProject } from "../redux/action";
 import moment from "moment";
-// import axios from "axios";  // Assuming you're using Axios for the API call
 
 const { Option } = Select;
 
-const MyModal = ({ visible, onCreate, onCancel, initialValues }) => {
+const CreateProject = ({ visible, onCancel }) => {
   const dispatch = useDispatch();
   const [form] = Form.useForm();
   const [api, contextHolder] = notification.useNotification();
-  const [loading, setLoading] = useState(false);
 
-  // Set form values when initialValues change (for edit)
-  useEffect(() => {
-    if (initialValues) {
-      form.setFieldsValue({
-        name: initialValues.name?.props?.children || initialValues.name,
-        budget: initialValues.status?.props?.children?.replace('$', '') || '',
-        description: initialValues.function?.props?.children || initialValues.function,
-        end_time: initialValues.deadline ? moment(initialValues.deadline?.props?.children, 'DD/MM/YY') : null,
-        priority_level: initialValues.priority?.toLowerCase(),
-      });
-    } else {
-      form.resetFields();
-    }
-  }, [initialValues, form]);
-
-  const handleOk = () => {
-    form
-      .validateFields()
-      .then((values) => {
-        setLoading(true); // Set loading to true while making the API call
-        // Create a project object
-        const projectData = {
-          name: values.name,
-          budget: values.budget,
-          description: values.description,
-          deadline: values.end_time ? values.end_time.format("DD/MM/YYYY") : null,
-          priority: values.priority_level,
-        };
-
-        // Dispatch the create project action
-        dispatch(CreateProject(projectData))
-          .then((res) => {
-            // On successful response from the backend
-            api.success({
-              message: "Project Created",
-              description: "New project has been successfully created.",
-            });
-            form.resetFields();
-            onCancel();
-          })
-          .catch((err) => {
-            // Handle errors
-            api.error({
-              message: "Project Creation Failed",
-              description: err?.message || "Something went wrong. Please try again.",
-            });
-          })
-          .finally(() => {
-            setLoading(false); // Reset loading state
-          });
-      })
-      .catch((info) => {
-        console.log("Validation Failed:", info);
-      });
-  };
-
+  const handleSubmit = async (values) => {
+    const token = localStorage.getItem('token'); //Gets token
+      try {
+        const response = await dispatch(createProject(token, values));
+         console.log("API Response:", response);
+    
+        const successMessage = response?.message?.toLowerCase?.().includes("success");
+  
+  if (
+    response?.statusCode === 201 ||
+    response?.success === true ||
+    response?.success === "true" || // handle string values
+    successMessage // check if message suggests success
+  ) {
+    api.success({
+      message: response?.message || "Project created successfully!",
+      description: response.message,
+      duration: 3,
+    });
+    form.resetFields();
+    onCancel();
+  } else if (response?.statusCode === 400) {
+    api.warning({
+      message: "User Creation Failed",
+      description: response?.message || "Please check your input and try again.",
+      duration: 4,
+    });
+  } else if (response?.statusCode === 409) {
+    api.error({
+      message: "Duplicate Entry",
+      description: response?.message || "User already exists.",
+      duration: 4,
+    });
+  } else {
+    api.error({
+      message: "Unexpected Error",
+      description: response?.message || "Something went wrong. Please try again later.",
+      duration: 4,
+    });
+  }
+  
+      } catch (error) {
+        api.error({
+          message: "Network Error",
+          description: error.message || "Unable to connect to the server.",
+          duration: 4,
+        });
+      }
+    };
+  
   const inputStyle = {
     height: '40px',
     width: '100%',
@@ -76,16 +68,24 @@ const MyModal = ({ visible, onCreate, onCancel, initialValues }) => {
 
   return (
     <Modal
-      open={visible}
-      title={initialValues ? "Edit Project" : "Create New Project"}
-      okText={initialValues ? "Update" : "Create"}
-      cancelText="Cancel"
-      onCancel={onCancel}
-      confirmLoading={loading}
-      onOk={handleOk} // Use the handleOk method for form submission
+    open={visible} // Ant Design v5 uses 'open' instead of 'visible'
+    title="Create New User"
+    okText="Create"
+    cancelText="Cancel"
+    onCancel={onCancel}
+    onOk={() => {
+      form
+        .validateFields()
+        .then((values) => {
+          handleSubmit(values); // This submits to the API and handles notification
+        })
+        .catch((info) => {
+          console.log("Validation Failed:", info);
+        });
+    }}
     >
-      {contextHolder}
       <Form form={form} layout="vertical">
+      {contextHolder}
         <Row gutter={[16, 16]}>
           <Col xs={24} sm={24} md={12}>
             <Form.Item
@@ -102,7 +102,7 @@ const MyModal = ({ visible, onCreate, onCancel, initialValues }) => {
               label="Project Budget"
               rules={[{ required: true, message: "Please enter the budget!" }]}
             >
-              <Input prefix="" placeholder="Enter budget amount" type="number" style={inputStyle} />
+              <Input prefix="NGN" placeholder="Enter budget amount" type="number" style={inputStyle} />
             </Form.Item>
           </Col>
         </Row>
@@ -122,7 +122,10 @@ const MyModal = ({ visible, onCreate, onCancel, initialValues }) => {
               label="Project Deadline"
               rules={[{ required: true, message: "Please select a deadline!" }]}
             >
-              <DatePicker style={{ ...inputStyle, padding: '4px 11px' }} format="DD/MM/YYYY" />
+              <DatePicker
+                style={{ ...inputStyle, padding: '4px 11px' }}
+                format="DD/MM/YYYY"
+              />
             </Form.Item>
           </Col>
           <Col xs={24} sm={24} md={12}>
@@ -144,4 +147,4 @@ const MyModal = ({ visible, onCreate, onCancel, initialValues }) => {
   );
 };
 
-export default MyModal;
+export default CreateProject;

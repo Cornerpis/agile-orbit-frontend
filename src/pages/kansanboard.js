@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
-import { Card, Input, Button, Tag, Modal, Form, Dropdown, Menu, message, Grid } from 'antd';
+import { Card, Input, Button, Tag, Modal, Form, Dropdown, DatePicker,Select, Menu, message, Grid } from 'antd';
 import { 
   PlusOutlined, 
   EditOutlined, 
@@ -13,6 +13,7 @@ import '../assets/styles/KanbanBoard.css';
 
 const { TextArea } = Input;
 const { useBreakpoint } = Grid;
+const { Option } = Select;
 
 const KanbanBoard = () => {
   // Initialize with empty columns to prevent undefined errors
@@ -49,22 +50,22 @@ const KanbanBoard = () => {
         id: 'todo',
         title: 'To Do',
         items: [
-          { id: 'task-1', content: 'Task 1', description: 'Description for Task 1' },
-          { id: 'task-2', content: 'Task 2', description: 'Description for Task 2' },
+          { id: 'task-1', title: 'Task 1', description: 'Description for Task 1' },
+          { id: 'task-2', title: 'Task 2', description: 'Description for Task 2' },
         ],
       },
       'in-progress': {
         id: 'in-progress',
         title: 'In Progress',
         items: [
-          { id: 'task-3', content: 'Task 3', description: 'Description for Task 3' },
+          { id: 'task-3', title: 'Task 3', description: 'Description for Task 3' },
         ],
       },
       'done': {
         id: 'done',
         title: 'Done',
         items: [
-          { id: 'task-4', content: 'Task 4', description: 'Description for Task 4' },
+          { id: 'task-4', title: 'Task 4', description: 'Description for Task 4' },
         ],
       },
     });
@@ -141,7 +142,7 @@ const KanbanBoard = () => {
     form.resetFields();
     setEditingTask({ ...task, columnId });
     form.setFieldsValue({
-      content: task.content,
+      title: task.title,
       description: task.description,
       columnId,
     });
@@ -150,7 +151,7 @@ const KanbanBoard = () => {
 
   const handleTaskSubmit = () => {
     form.validateFields().then(values => {
-      const { content, description, columnId } = values;
+      const { title, description, columnId } = values;
       
       if (editingTask) {
         // Update existing task
@@ -159,7 +160,7 @@ const KanbanBoard = () => {
           [columnId]: {
             ...columns[columnId],
             items: columns[columnId].items.map(item => 
-              item.id === editingTask.id ? { ...item, content, description } : item
+              item.id === editingTask.id ? { ...item, title, description } : item
             ),
           },
         };
@@ -168,7 +169,7 @@ const KanbanBoard = () => {
         // Add new task
         const newTask = {
           id: `task-${Date.now()}`,
-          content,
+          title,
           description,
         };
         
@@ -308,18 +309,18 @@ const KanbanBoard = () => {
                             key="edit" 
                             onClick={() => showEditTaskModal(task, column.id)}
                             className="action-button"
-                            aria-label={`Edit ${task.content}`}
+                            aria-label={`Edit ${task.title}`}
                           />,
                           <DeleteOutlined 
                             key="delete" 
                             onClick={() => deleteTask(task.id, column.id)}
                             className="action-button"
-                            aria-label={`Delete ${task.content}`}
+                            aria-label={`Delete ${task.title}`}
                           />,
                         ]}
                       >
                         <Card.Meta
-                          title={task.content}
+                          title={task.title}
                           description={
                             mobileView && task.description.length > 30
                               ? `${task.description.substring(0, 30)}...`
@@ -339,6 +340,11 @@ const KanbanBoard = () => {
     ));
   };
 
+  const inputStyle = {
+    height: '40px',
+    width: '100%',
+  };
+  
   return (
     <div className="kanban-board">
       <DragDropContext onDragEnd={onDragEnd}>
@@ -400,12 +406,33 @@ const KanbanBoard = () => {
       >
         <Form form={form} layout="vertical">
           <Form.Item
-            name="content"
+            name="title"
             label="Task Title"
             rules={[{ required: true, message: 'Please enter a title' }]}
           >
             <Input placeholder="Task title" aria-label="Task title" />
           </Form.Item>
+          <Form.Item 
+          name="due_date"
+          label="Task Deadline"
+          rules={[{required: true, message: 'Pleae select task deadline'}]}
+          >
+          <DatePicker
+                style={{ ...inputStyle, padding: '4px 11px' }}
+                format="DD/MM/YYYY"
+              /> 
+          </Form.Item>
+          <Form.Item
+              name="assigned_to"
+              label="Assigned To"
+              rules={[{ required: true, message: "Please select a priority level!" }]}
+            >
+              <Select placeholder="Select user to assign task" style={inputStyle}>
+                <Option value="user1">Peace Timothy</Option>
+                <Option value="user2">Timothy Agba</Option>
+                <Option value="user3">Daniel Okoro</Option>
+              </Select>
+            </Form.Item>
           <Form.Item
             name="description"
             label="Description"
