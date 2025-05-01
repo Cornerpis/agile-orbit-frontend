@@ -4,20 +4,13 @@ import {
   Row,
   Col,
   Card,
-  Radio,
   Table,
-  Upload,
-  message,
-  Progress,
   Button,
-  Avatar,
   Typography,
   Tag,
 } from "antd";
 
-import { ToTopOutlined, PlusOutlined } from "@ant-design/icons";
-import { Link } from "react-router-dom";
-import pencil from "../assets/images/pencil.svg";
+import {  PlusOutlined } from "@ant-design/icons";
 import MyModal from "../pages/create-project";
 import { fetchProjects } from "../redux/action";
 import { useDispatch, useSelector } from "react-redux";

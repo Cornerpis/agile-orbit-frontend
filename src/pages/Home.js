@@ -9,19 +9,28 @@ import {
   Button,
   List,
   notification,
+  Table,
+  Tag,
 } from "antd";
 import { PlusOutlined, ClockCircleOutlined } from "@ant-design/icons";
 import MyModal from "../pages/create-project";
-import { list } from "./data"; // Import the list array
+import { list } from "./data"; // Static list array
 import { getStats } from "../redux/action";
 import { useDispatch, useSelector } from "react-redux";
 
-// Destructure Paragraph from Typography
 const { Title, Text, Paragraph } = Typography;
 
 function Home() {
   const [isModalVisible, setIsModalVisible] = useState(false);
-  const history = useHistory(); // Initialize useHistory
+  const history = useHistory();
+  const dispatch = useDispatch();
+  const [api, contextHolder] = notification.useNotification();
+
+  const stats = useSelector((state) => state.stats);
+
+  useEffect(() => {
+    dispatch(getStats(localStorage.getItem("token")));
+  }, [dispatch]);
 
   const handleCreate = (values) => {
     console.log("Project Created:", values);
@@ -51,65 +60,54 @@ function Home() {
     },
   ];
 
-  const dollor = [
-    <svg
-      width="22"
-      height="22"
-      viewBox="0 0 20 20"
-      fill="none"
-      xmlns="http://www.w3.org/2000/svg"
-      key={0}
-    >
-      {/* SVG path for dollar icon */}
-    </svg>,
+  const columns = [
+    {
+      title: "PROJECT NAME",
+      dataIndex: "Title",
+      key: "Title",
+      width: "25%",
+    },
+    {
+      title: "BUDGET",
+      dataIndex: "budget",
+      key: "budget",
+      render: (amount) =>
+        amount != null
+          ? new Intl.NumberFormat("en-NG", {
+              style: "currency",
+              currency: "NGN",
+            }).format(amount)
+          : "-",
+    },
+    {
+      title: "ASSIGNED TO",
+      dataIndex: "assignedto",
+      key: "assignedto",
+    },
+    {
+      title: "DEADLINE",
+      dataIndex: "deadline",
+      key: "deadline",
+    },
+    {
+      title: "PRIORITY",
+      dataIndex: "priority",
+      key: "priority",
+      render: (priority) => {
+        let color =
+          priority === "low"
+            ? "green"
+            : priority === "medium"
+            ? "orange"
+            : "red";
+        return (
+          <Tag color={color} style={{ fontWeight: 500 }}>
+            {priority?.toUpperCase()}
+          </Tag>
+        );
+      },
+    },
   ];
-  const profile = [
-    <svg
-      width="22"
-      height="22"
-      viewBox="0 0 20 20"
-      fill="none"
-      xmlns="http://www.w3.org/2000/svg"
-      key={0}
-    >
-      {/* SVG path for profile icon */}
-    </svg>,
-  ];
-  const heart = [
-    <svg
-      width="22"
-      height="22"
-      viewBox="0 0 20 20"
-      fill="none"
-      xmlns="http://www.w3.org/2000/svg"
-      key={0}
-    >
-      {/* SVG path for heart icon */}
-    </svg>,
-  ];
-  const cart = [
-    <svg
-      width="22"
-      height="22"
-      viewBox="0 0 20 20"
-      fill="none"
-      xmlns="http://www.w3.org/2000/svg"
-      key={0}
-    >
-      {/* SVG path for cart icon */}
-    </svg>,
-  ];
-
-  const [api, contextHolder] = notification.useNotification();
-
-  const dispatch = useDispatch();
-  useEffect(() => {
-    dispatch(getStats(localStorage.getItem("token")));
-  }, [dispatch]);
-
-  const stats = useSelector((state) => state.stats);
-
-  console.log("Stats from Redux:", stats);
 
   return (
     <>
@@ -161,7 +159,7 @@ function Home() {
             <Card bordered={false} className="criclebox cardbody h-full">
               <div className="project-ant">
                 <div>
-                  <Title level={5}>Most Recent Projects </Title>
+                  <Title level={5}>Most Recent Projects</Title>
                 </div>
                 <div className="ant-filtertabs">
                   <Button
@@ -169,66 +167,28 @@ function Home() {
                     className="width-100"
                     onClick={() => setIsModalVisible(true)}
                   >
-                    {<PlusOutlined />} Create New Project
+                    <PlusOutlined /> Create New Project
                   </Button>
                 </div>
               </div>
-              <div className="ant-list-box table-responsive">
-                <table className="width-100">
-                  <thead>
-                    <tr>
-                      <th>PROJECT NAME</th>
-                      <th>BUDGET</th>
-                      <th>ASSIGNED TO</th>
-                      <th>DEADLINE</th>
-                      <th>PRIORITY</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {list.map((d, index) => {
-                      let priorityColor;
-                      switch (d.priority.toLowerCase()) {
-                        case "low":
-                          priorityColor = "green";
-                          break;
-                        case "medium":
-                          priorityColor = "orange";
-                          break;
-                        case "high":
-                          priorityColor = "red";
-                          break;
-                        default:
-                          priorityColor = "black";
-                      }
 
-                      return (
-                        <tr
-                          key={index}
-                          onClick={() => handleRowClick(d.id)} // Make the row clickable
-                          style={{ cursor: "pointer" }} // Add pointer cursor
-                        >
-                          <td>{d.Title}</td>
-                          <td>{d.budget}</td>
-                          <td>{d.assignedto}</td>
-                          <td>{d.deadline}</td>
-                          <td>
-                            <span
-                              style={{
-                                color: priorityColor,
-                                fontWeight: "bold",
-                              }}
-                            >
-                              {d.priority}
-                            </span>
-                          </td>
-                        </tr>
-                      );
-                    })}
-                  </tbody>
-                </table>
+              <div className="table-responsive">
+                <Table
+                  columns={columns}
+                  dataSource={list.map((item) => ({
+                    ...item,
+                    key: item.id,
+                  }))}
+                  pagination={false}
+                  onRow={(record) => ({
+                    onClick: () => handleRowClick(record.id),
+                    style: { cursor: "pointer" },
+                  })}
+                />
               </div>
             </Card>
           </Col>
+
           <Col xs={24} sm={24} md={12} lg={12} xl={8} className="mb-24">
             <Card title="Recent Activities" bordered={false}>
               <List

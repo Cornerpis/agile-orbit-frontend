@@ -1,6 +1,7 @@
 // src/redux/actions.js
 import axios from "axios";
 import baseUrl from "../apiConfig";
+import { message } from 'antd';
 import { persistor } from "./store";
 
 export const signIn = (credentials) => async (dispatch) => {
@@ -127,7 +128,6 @@ export const fetchProjects = (token) => {
 export const fetchUsers = (token) => {
   return async (dispatch) => {
     try {
-      // Make an API call to fetch users
       const response = await axios.get(`${baseUrl}/users`, {
         headers: {
           "Content-Type": "application/json",
@@ -135,48 +135,19 @@ export const fetchUsers = (token) => {
         },
       });
 
-      // Dispatch the fetched data to the store
       dispatch({
-        type: "FETCH_USERS_SUCCESS",
-        payload: response.data.data, // Assuming response.data.data contains the list of users
-      });
-    } catch (error) {
-      // Handle errors, dispatch an error action, or set an error state
-      console.error("Error fetching users:", error);
-      dispatch({
-        type: "FETCH_USERS_FAILURE",
-        payload: error,
-      });
-    }
-  };
-};
-export const fetchUser = (token) => {
-  return async (dispatch) => {
-    try {
-      // Make an API call to fetch projects data
-      const response = await axios.get(`${baseUrl}/users`, {
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`, // Include the bearer token
-        },
-      });
-
-      // Dispatch the fetched data to the store
-      dispatch({
-        type: "FETCH_PROJECT_SUCCESS",
+        type: "FETCH_USERS_SUCCESS", // Ensure your reducer handles this action type
         payload: response.data.data,
       });
     } catch (error) {
-      // Handle errors, dispatch an error action, or set an error state
-      console.error("Error fetching verification data:", error);
+      console.error("Error fetching users:", error);
       dispatch({
-        type: "GET_PROJECT_FAILURE",
+        type: "GET_USERS_FAILURE", // Ensure you handle this in your reducer
         payload: error,
       });
     }
   };
 };
-
 export const CreateUserModal = (credentials) => async (dispatch) => {
   try {
     const response = await axios.post(
@@ -211,11 +182,20 @@ export const CreateUserModal = (credentials) => async (dispatch) => {
     }
   }
 };
-export const MyModal = (token,credentials) => async (dispatch) => {
+// Update user start
+export const UpdateUserAction = (id, data) => async (dispatch) => {
+  try {
+    const response = await axios.put(`${baseUrl}/users/:id/update`, data);
+    return response.data;
+  } catch (error) {
+    return { success: false, message: error.message };
+  }
+};
+// update user ends
+export const createProject = (token, credentials) => async (dispatch) => {
   try {
     const response = await axios.post(
       `${baseUrl}/create/project`,
-      
       credentials,
       {
         headers:{
@@ -229,7 +209,7 @@ export const MyModal = (token,credentials) => async (dispatch) => {
     const userData = response.data;
 
     dispatch({
-      type: "MY_MODAL",
+      type: "CREATE_PROJECT",
       payload: userData,
     });
 
@@ -254,3 +234,6 @@ export const MyModal = (token,credentials) => async (dispatch) => {
     }
   }
 };
+
+
+
