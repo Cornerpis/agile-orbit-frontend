@@ -1,7 +1,7 @@
 // src/redux/actions.js
 import axios from "axios";
 import baseUrl from "../apiConfig";
-import { message } from 'antd';
+import { message } from "antd";
 import { persistor } from "./store";
 
 export const signIn = (credentials) => async (dispatch) => {
@@ -150,10 +150,7 @@ export const fetchUsers = (token) => {
 };
 export const CreateUserModal = (credentials) => async (dispatch) => {
   try {
-    const response = await axios.post(
-      `${baseUrl}/register`,
-      credentials
-    );
+    const response = await axios.post(`${baseUrl}/register`, credentials);
     const userData = response.data;
 
     dispatch({
@@ -185,7 +182,7 @@ export const CreateUserModal = (credentials) => async (dispatch) => {
 // Update user start
 export const UpdateUserAction = (id, data) => async (dispatch) => {
   try {
-    const response = await axios.put(`${baseUrl}/users/:id/update`, data);
+    const response = await axios.put(`${baseUrl}/users/${id}/update`, data);
     return response.data;
   } catch (error) {
     return { success: false, message: error.message };
@@ -198,13 +195,11 @@ export const createProject = (token, credentials) => async (dispatch) => {
       `${baseUrl}/create/project`,
       credentials,
       {
-        headers:{
-        "Content-Type": "application/json",
-        Authorization:`Bearer ${token}`
-        
-        }
-       
-      },
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+      }
     );
     const userData = response.data;
 
@@ -235,5 +230,80 @@ export const createProject = (token, credentials) => async (dispatch) => {
   }
 };
 
+export const addTaskToProject =
+  (token, projectId, credentials) => async (dispatch) => {
+    try {
+      const response = await axios.post(
+        `${baseUrl}/project/${projectId}/task`,
+        credentials,
+        {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      const addTaskResponse = response.data;
 
+      return addTaskResponse;
+    } catch (error) {
+      if (error.response) {
+        return error.response.data;
+      } else {
+        // Something happened in setting up the request that triggered an Error
+        console.error("Error setting up the request:", error.message);
+        return { status: "failed", message: "Error setting up the request" };
+      }
+    }
+  };
 
+export const getUsersAssignToProject =
+  (token, projectId) => async (dispatch) => {
+    try {
+      const response = await axios.get(
+        `${baseUrl}/project/${projectId}/members`,
+
+        {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      const usersAssignToProject = response.data;
+
+      return usersAssignToProject;
+    } catch (error) {
+      if (error.response) {
+        return error.response.data;
+      } else {
+        // Something happened in setting up the request that triggered an Error
+        console.error("Error setting up the request:", error.message);
+        return { status: "failed", message: "Error setting up the request" };
+      }
+    }
+  };
+
+export const createAssessment = (token, payload) => async (dispatch) => {
+  try {
+    const response = await axios.post(
+      `${baseUrl}/assessments/create`,
+      payload,
+      {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+
+    return response.data;
+  } catch (error) {
+    if (error.response) {
+      return error.response.data;
+    } else {
+      console.error("Request error:", error.message);
+      return { status: "failed", message: "Error setting up the request" };
+    }
+  }
+};

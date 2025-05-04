@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
 import {
   Card,
@@ -17,13 +17,15 @@ import {
   DatePicker,
   Progress,
   Divider,
+  notification,
   Tooltip,
 } from "antd";
 import { Comment } from "@ant-design/compatible";
 import { PlusOutlined, UserAddOutlined } from "@ant-design/icons";
 import moment from "moment";
 import InviteTeam from "../pages/invite-team";
-import { useSelector } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
+import { addTaskToProject, getUsersAssignToProject } from "../redux/action";
 
 const { Title, Text, Paragraph } = Typography;
 const { Option } = Select;
@@ -42,11 +44,14 @@ const ProjectDetails = () => {
   const [taskForm] = Form.useForm();
   const [comments, setComments] = useState([]);
   const [newComment, setNewComment] = useState("");
+  const dispatch = useDispatch();
+  const [form] = Form.useForm();
+  const [api, contextHolder] = notification.useNotification();
 
   const mockUsers = [
-    { id: 1, name: "Alice Smith" },
-    { id: 2, name: "Bob Johnson" },
-    { id: 3, name: "Charlie Williams" },
+    { id: "67def5752d8ea77f37229a1b", name: "Alice Smith" },
+    { id: "67def5752d8ea77f37229a1b", name: "Bob Johnson" },
+    { id: "67def5752d8ea77f37229a1b", name: "Charlie Williams" },
     { id: 4, name: "David Brown" },
     { id: 5, name: "Eve Davis" },
   ];
@@ -60,10 +65,57 @@ const ProjectDetails = () => {
     setAssignedUsers(userIds);
   };
 
-  const handleAddTask = (taskValues) => {
-    setTasks([...tasks, { id: Date.now(), status: "To Do", ...taskValues }]);
-    setIsTaskModalVisible(false);
-    taskForm.resetFields();
+  useEffect(() => {
+    const fetchAssignedUsers = async () => {
+      const token = localStorage.getItem("token");
+
+      try {
+        const res = await dispatch(getUsersAssignToProject(token, id));
+        const team = res.team_members || [];
+        console.log("timot", team);
+
+        setAssignedUsers(team);
+      } catch (error) {
+        console.error("Failed to load assigned users:", error);
+      }
+    };
+
+    fetchAssignedUsers();
+  }, []);
+
+  const handleAddTask = async (taskValues) => {
+    const token = localStorage.getItem("token");
+    const projectId = project._id;
+
+    try {
+      const response = await dispatch(
+        addTaskToProject(token, projectId, taskValues)
+      );
+
+      const successMessage = response?.message;
+
+      if (successMessage) {
+        api.success({
+          message: response?.message,
+          duration: 3,
+        });
+        form.resetFields();
+        setTasks([
+          ...tasks,
+          { id: Date.now(), status: "To Do", ...taskValues },
+        ]);
+        setIsTaskModalVisible(false);
+        taskForm.resetFields();
+      } else {
+        api.warning({
+          message: "Task Not Added. Try again",
+          description: "Please check your input and try again.",
+          duration: 4,
+        });
+      }
+    } catch (error) {
+      console.log(error);
+    }
   };
 
   const handleCommentSubmit = () => {
@@ -199,14 +251,15 @@ const ProjectDetails = () => {
                         <Text>
                           Due:{" "}
                           {task.end_time
-                            ? moment(task.dueDate).format("YYYY-MM-DD")
+                            ? moment(task.due_date).format("YYYY-MM-DD")
                             : "N/A"}
                         </Text>
                         <Text>
                           {" "}
                           Assigned:{" "}
-                          {mockUsers.find((user) => user.id === task.assignee)
-                            ?.name || "N/A"}
+                          {mockUsers.find(
+                            (user) => user.id === task.assigned_to
+                          )?.name || "N/A"}
                         </Text>
                       </>
                     }
@@ -249,16 +302,10 @@ const ProjectDetails = () => {
 
         <Col span={8}>
           <Card title="Team Members" bordered={false}>
-            <Select
-              mode="multiple"
-              style={{ width: "100%", marginBottom: 16 }}
-              placeholder="Assign team members"
-              value={assignedUsers}
-              onChange={handleAssignUser}
-            >
-              {mockUsers.map((user) => (
-                <Option key={user.id} value={user.id}>
-                  {user.name}
+            <Select placeholder="Select assignee">
+              {assignedUsers.map((user) => (
+                <Option key={user._id} value={user._id}>
+                  {user.first_name} {user.last_name}
                 </Option>
               ))}
             </Select>
@@ -300,14 +347,14 @@ const ProjectDetails = () => {
           <Form.Item label="Description" name="description">
             <TextArea />
           </Form.Item>
-          <Form.Item label="Due Date" name="dueDate">
+          <Form.Item label="Due Date" name="due_date">
             <DatePicker style={{ width: "100%" }} />
           </Form.Item>
-          <Form.Item label="Assignee" name="assignee">
-            <Select>
-              {mockUsers.map((user) => (
-                <Option key={user.id} value={user.id}>
-                  {user.name}
+          <Form.Item label="Assignee" name="assigned_to">
+            <Select placeholder="Select assignee">
+              {assignedUsers.map((user) => (
+                <Option key={user._id} value={user._id}>
+                  {user.first_name} {user.last_name}
                 </Option>
               ))}
             </Select>

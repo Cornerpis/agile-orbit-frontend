@@ -7,6 +7,8 @@ function Sidenav({ color }) {
   const { pathname } = useLocation();
   const page = pathname.replace("/", "");
 
+  const userRole = localStorage.getItem("role");
+
   const dashboard = [
     <svg
       width="20"
@@ -275,148 +277,156 @@ function Sidenav({ color }) {
   ];
 
   return (
-    <>
+    <div>
       <div className="brand">
         <img src={logo} alt="" />
         <span>Agile Project Dashboard</span>
       </div>
       <hr />
       <Menu theme="light" mode="inline">
-        <Menu.Item key="1">
-          <NavLink to="/dashboard">
-            <span
-              className="icon"
-              style={{
-                background: page === "dashboard" ? color : "",
-              }}
-            >
-              {dashboard}
-            </span>
-            <span className="label">Dashboard</span>
-          </NavLink>
-        </Menu.Item>
-        <Menu.Item key="2">
-          <NavLink to="/project-management">
-            <span
-              className="icon"
-              style={{
-                background: page === "tables" ? color : "",
-              }}
-            >
-              {tables}
-            </span>
-            <span className="label">Project Management</span>
-          </NavLink>
-        </Menu.Item>
-        <Menu.Item key="3">
-          <NavLink to="/users">
-            <span
-              className="icon"
-              style={{
-                background: page === "users" ? color : "",
-              }}
-            >
-              {users}
-            </span>
-            <span className="label">Users</span>
-          </NavLink>
-        </Menu.Item>
-        <Menu.Item key="4">
-          <NavLink to="/assesment">
-            <span
-              className="icon"
-              style={{
-                background: page === "assesment" ? color : "",
-              }}
-            >
-              {assessment}
-            </span>
-            <span className="label">Self Assessment</span>
-          </NavLink>
-        </Menu.Item>
-        <Menu.Item key="5">
-          <NavLink to="/kansanboard">
-            <span
-              className="icon"
-              style={{
-                background: page === "kansanboard" ? color : "",
-              }}
-            >
-              {kansanboard}
-            </span>
-            <span className="label">Kansan Board</span>
-          </NavLink>
-        </Menu.Item>
-        <Menu.Item key="6">
-          <NavLink to="/backlog">
-            <span
-              className="icon"
-              style={{
-                background: page === "backlog" ? color : "",
-              }}
-            >
-              {backlog}
-            </span>
-            <span className="label">Project Backlog</span>
-          </NavLink>
-        </Menu.Item>
-        <Menu.Item key="7">
-          <NavLink to="/sprint">
-            <span
-              className="icon"
-              style={{
-                background: page === "sprint" ? color : "",
-              }}
-            >
-              {sprint}
-            </span>
-            <span className="label">Sprint</span>
-          </NavLink>
-        </Menu.Item>
-        <Menu.Item key="8">
-          <NavLink to="/scorecard">
-            <span
-              className="icon"
-              style={{
-                background: page === "scorecard" ? color : "",
-              }}
-            >
-              {scorecard}
-            </span>
-            <span className="label">Score Card</span>
-          </NavLink>
-        </Menu.Item>
-        {/* <Menu.Item className="menu-item-header" key="5">
-          Account Pages
-        </Menu.Item> */}
-        <Menu.Item key="9">
-          <NavLink to="/profile">
-            <span
-              className="icon"
-              style={{
-                background: page === "profile" ? color : "",
-              }}
-            >
-              {profile}
-            </span>
-            <span className="label">Profile</span>
-          </NavLink>
-        </Menu.Item>
-        <Menu.Item key="10">
-          <NavLink to="/setquestion">
-            <span
-              className="icon"
-              style={{
-                background: page === "setquestion" ? color : "",
-              }}
-            >
-              {profile}
-            </span>
-            <span className="label">SetQuestions</span>
-          </NavLink>
-        </Menu.Item>
+        {userRole === "project_manager" ? (
+          <>
+            <Menu.Item key="1">
+              <NavLink to="/dashboard">
+                <span
+                  className="icon"
+                  style={{
+                    background: page === "dashboard" ? color : "",
+                  }}
+                >
+                  {dashboard}
+                </span>
+                <span className="label">Dashboard</span>
+              </NavLink>
+            </Menu.Item>
+
+            <Menu.Item key="2">
+              <NavLink to="/project-management">
+                <span
+                  className="icon"
+                  style={{
+                    background: page === "tables" ? color : "",
+                  }}
+                >
+                  {tables}
+                </span>
+                <span className="label">Project Management</span>
+              </NavLink>
+            </Menu.Item>
+
+            <Menu.Item key="3">
+              <NavLink to="/users">
+                <span
+                  className="icon"
+                  style={{
+                    background: page === "users" ? color : "",
+                  }}
+                >
+                  {users}
+                </span>
+                <span className="label">Users</span>
+              </NavLink>
+            </Menu.Item>
+
+            <Menu.Item key="6">
+              <NavLink to="/backlog">
+                <span
+                  className="icon"
+                  style={{
+                    background: page === "backlog" ? color : "",
+                  }}
+                >
+                  {backlog}
+                </span>
+                <span className="label">Project Backlog</span>
+              </NavLink>
+            </Menu.Item>
+
+            <Menu.Item key="10">
+              <NavLink to="/assessment/create">
+                <span
+                  className="icon"
+                  style={{
+                    background: page === "setquestion" ? color : "",
+                  }}
+                ></span>
+                <span className="label">Create Assessments</span>
+              </NavLink>
+            </Menu.Item>
+
+            <Menu.Item key="7">
+              <NavLink to="/sprint">
+                <span
+                  className="icon"
+                  style={{
+                    background: page === "sprint" ? color : "",
+                  }}
+                >
+                  {sprint}
+                </span>
+                <span className="label">Sprint</span>
+              </NavLink>
+            </Menu.Item>
+
+            <Menu.Item key="8">
+              <NavLink to="/scorecard">
+                <span
+                  className="icon"
+                  style={{
+                    background: page === "scorecard" ? color : "",
+                  }}
+                >
+                  {scorecard}
+                </span>
+                <span className="label">Score Card</span>
+              </NavLink>
+            </Menu.Item>
+          </>
+        ) : (
+          <>
+            <Menu.Item key="5">
+              <NavLink to="/kansanboard">
+                <span
+                  className="icon"
+                  style={{
+                    background: page === "kansanboard" ? color : "",
+                  }}
+                >
+                  {kansanboard}
+                </span>
+                <span className="label">Kanban Board</span>
+              </NavLink>
+            </Menu.Item>
+            <Menu.Item key="4">
+              <NavLink to="/assesment">
+                <span
+                  className="icon"
+                  style={{
+                    background: page === "assesment" ? color : "",
+                  }}
+                >
+                  {assessment}
+                </span>
+                <span className="label">Self Assessment</span>
+              </NavLink>
+            </Menu.Item>
+            <Menu.Item key="9">
+              <NavLink to="/profile">
+                <span
+                  className="icon"
+                  style={{
+                    background: page === "profile" ? color : "",
+                  }}
+                >
+                  {profile}
+                </span>
+                <span className="label">Profile</span>
+              </NavLink>
+            </Menu.Item>
+          </>
+        )}
       </Menu>
-    </>
+    </div>
   );
 }
 
