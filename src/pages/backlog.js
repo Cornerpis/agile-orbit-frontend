@@ -16,6 +16,7 @@ import {
   Popconfirm,
   Grid,
   Drawer,
+  notification,
   Divider
 } from 'antd';
 import { 
@@ -29,7 +30,8 @@ import {
   CloseOutlined
 } from '@ant-design/icons';
 import dayjs from 'dayjs';
-import '../assets/styles/KanbanBoard.css';
+import { useDispatch } from "react-redux";
+import { CreateTask} from "../redux/action";
 
 const { TextArea } = Input;
 const { Option } = Select;
@@ -53,31 +55,31 @@ const priorityColors = {
 const initialTasks = [
   {
     key: '1',
-    id: 'TASK-101',
     title: 'Implement user authentication',
     description: 'Set up JWT authentication for the API',
     status: 'todo',
     priority: 'high',
-    assignee: 'JD',
-    dueDate: dayjs().add(3, 'days'),
+    assigned_to: 'JD',
+    due_date: dayjs().add(3, 'days'),
     createdAt: dayjs().subtract(2, 'days'),
     storyPoints: 5
   },
   {
     key: '2',
-    id: 'TASK-102',
     title: 'Design dashboard UI',
     description: 'Create mockups for the admin dashboard',
     status: 'in-progress',
     priority: 'medium',
-    assignee: 'AS',
-    dueDate: dayjs().add(5, 'days'),
+    assigned_to: 'AS',
+    due_date: dayjs().add(5, 'days'),
     createdAt: dayjs().subtract(5, 'days'),
     storyPoints: 3
   }
 ];
 
 const BackLog = () => {
+  const dispatch = useDispatch();
+  const [api, contextHolder] = notification.useNotification();
   const [tasks, setTasks] = useState(initialTasks);
   const [filteredTasks, setFilteredTasks] = useState(initialTasks);
   const [isModalVisible, setIsModalVisible] = useState(false);
@@ -88,7 +90,7 @@ const BackLog = () => {
   const [filters, setFilters] = useState({
     status: null,
     priority: null,
-    assignee: null
+    assigned_to: null
   });
   const [sortConfig, setSortConfig] = useState({
     key: 'createdAt',
@@ -121,8 +123,8 @@ const BackLog = () => {
     if (filters.priority) {
       result = result.filter(task => task.priority === filters.priority);
     }
-    if (filters.assignee) {
-      result = result.filter(task => task.assignee === filters.assignee);
+    if (filters.assigned_to) {
+      result = result.filter(task => task.assigned_to === filters.assigned_to);
     }
     
     // Apply sorting
@@ -166,7 +168,7 @@ const BackLog = () => {
     if (task) {
       form.setFieldsValue({
         ...task,
-        dueDate: task.dueDate
+        due_date: task.due_date
       });
     }
     setIsModalVisible(true);
@@ -176,7 +178,7 @@ const BackLog = () => {
     form.validateFields().then(values => {
       const newTask = {
         ...values,
-        dueDate: values.dueDate,
+        due_date: values.due_date,
         createdAt: values.createdAt || dayjs(),
         key: editingTask ? editingTask.key : `task-${Date.now()}`,
         id: editingTask ? editingTask.id : `TASK-${Math.floor(100 + Math.random() * 900)}`
@@ -218,16 +220,32 @@ const BackLog = () => {
   const getColumns = () => {
     const baseColumns = [
       {
-        title: 'ID',
-        dataIndex: 'id',
-        key: 'id',
-        width: 100,
-        responsive: ['md'],
-      },
-      {
         title: 'Title',
         dataIndex: 'title',
         key: 'title',
+        render: (text, record) => (
+          <div className="task-title-container">
+            <div className="task-title">{text}</div>
+            {!isMobile && <div className="task-description">{record.description}</div>}
+            {isMobile && (
+              <Space size="small" style={{ marginTop: 4 }}>
+                <Tag color={statusColors[record.status]} style={{ margin: 0 }}>
+                  {record.status.charAt(0).toUpperCase() + record.status.slice(1)}
+                </Tag>
+                {record.priority && (
+                  <Tag color={priorityColors[record.priority]} style={{ margin: 0 }}>
+                    {record.priority.charAt(0).toUpperCase()}
+                  </Tag>
+                )}
+              </Space>
+            )}
+          </div>
+        ),
+      },
+      {
+        title: 'Description',
+        dataIndex: 'description',
+        key: 'description',
         render: (text, record) => (
           <div className="task-title-container">
             <div className="task-title">{text}</div>
@@ -272,35 +290,25 @@ const BackLog = () => {
         ),
       },
       {
-        title: 'Assignee',
-        dataIndex: 'assignee',
-        key: 'assignee',
+        title: 'Assigned To',
+        dataIndex: 'assigned_to',
+        key: 'assigned_to',
         width: 100,
         responsive: ['md'],
-        render: assignee => assignee ? (
-          <Avatar size="small">{assignee}</Avatar>
+        render: assigned_to => assigned_to ? (
+          <Avatar size="small">{assigned_to}</Avatar>
         ) : <Tag>Unassigned</Tag>,
       },
       {
         title: 'Due Date',
-        dataIndex: 'dueDate',
-        key: 'dueDate',
+        dataIndex: 'due_date',
+        key: 'due_date',
         width: 120,
         responsive: ['md'],
         render: date => date ? (
           <Tag color={dayjs().isAfter(date) && !dayjs(date).isSame(dayjs(), 'day') ? 'red' : 'default'}>
             {date.format('MMM D')}
           </Tag>
-        ) : '-',
-      },
-      {
-        title: 'Points',
-        dataIndex: 'storyPoints',
-        key: 'storyPoints',
-        width: 80,
-        responsive: ['md'],
-        render: points => points ? (
-          <Tag>{points}</Tag>
         ) : '-',
       },
       {
@@ -338,10 +346,59 @@ const BackLog = () => {
       }
     ];
 
+    const handleSubmit = async (values) => {
+        try {
+          const response = await dispatch(CreateTask(values));
+      
+          const successMessage = response?.message?.toLowerCase?.().includes("success");
+    
+    if (
+      response?.statusCode === 201 ||
+      response?.success === true ||
+      response?.success === "true" || // handle string values
+      successMessage // check if message suggests success
+    ) {
+      api.success({
+        message: response?.message || "Task created successfully!",
+        description: response.message,
+        duration: 3,
+      });
+      form.resetFields();
+      // onCancel();
+    } else if (response?.statusCode === 400) {
+      api.warning({
+        message: "Task Creation Failed",
+        description: response?.message || "Please check your input and try again.",
+        duration: 4,
+      });
+    } else if (response?.statusCode === 409) {
+      api.error({
+        message: "Duplicate Entry",
+        description: response?.message || "Task already exists.",
+        duration: 4,
+      });
+    } else {
+      api.error({
+        message: "Unexpected Error",
+        description: response?.message || "Something went wrong. Please try again later.",
+        duration: 4,
+      });
+    }
+    
+        } catch (error) {
+          api.error({
+            message: "Network Error",
+            description: error.message || "Unable to connect to the server.",
+            duration: 4,
+          });
+        }
+      };
+    
+
     // Add sorting functionality for non-mobile views
     if (!isMobile) {
       return baseColumns.map(col => {
-        if (col.key === 'id' || col.key === 'title' || col.key === 'dueDate' || col.key === 'storyPoints') {
+        if (col.key === 'id' || col.key === 'title' || col.key === 'due_date') {
           return {
             ...col,
             sorter: true,
@@ -375,42 +432,27 @@ const BackLog = () => {
           
           <Divider orientation="left">Details</Divider>
           
-          <div className="detail-row">
-            <span className="detail-label">Status:</span>
-            <Tag color={statusColors[task.status]}>
-              {task.status.split('-').map(s => s.charAt(0).toUpperCase() + s.slice(1)).join(' ')}
-            </Tag>
-          </div>
           
-          <div className="detail-row">
-            <span className="detail-label">Priority:</span>
-            <Tag color={priorityColors[task.priority]}>
-              {task.priority.charAt(0).toUpperCase() + task.priority.slice(1)}
-            </Tag>
-          </div>
           
-          {task.assignee && (
+          
+          
+          {task.assigned_to && (
             <div className="detail-row">
-              <span className="detail-label">Assignee:</span>
-              <Avatar size="small">{task.assignee}</Avatar>
+              <span className="detail-label">assigned_to:</span>
+              <Avatar size="small">{task.assigned_to}</Avatar>
             </div>
           )}
           
-          {task.dueDate && (
+          {task.due_date && (
             <div className="detail-row">
               <span className="detail-label">Due Date:</span>
-              <Tag color={dayjs().isAfter(task.dueDate) ? 'red' : 'default'}>
-                {task.dueDate.format('MMMM D, YYYY')}
+              <Tag color={dayjs().isAfter(task.due_date) ? 'red' : 'default'}>
+                {task.due_date.format('MMMM D, YYYY')}
               </Tag>
             </div>
           )}
           
-          {task.storyPoints && (
-            <div className="detail-row">
-              <span className="detail-label">Story Points:</span>
-              <Tag>{task.storyPoints}</Tag>
-            </div>
-          )}
+          
           
           <Divider orientation="left">Actions</Divider>
           
@@ -488,58 +530,7 @@ const BackLog = () => {
           </Space>
         }
       >
-        {!isMobile && (
-          <div className="backlog-controls">
-            <Space size="middle" style={{ marginBottom: 16 }}>
-              <Input
-                placeholder="Search tasks..."
-                prefix={<SearchOutlined />}
-                allowClear
-                onChange={e => handleSearch(e.target.value)}
-                style={{ width: isTablet ? 200 : 250 }}
-              />
-              
-              <Select
-                placeholder="Status"
-                allowClear
-                style={{ width: isTablet ? 120 : 150 }}
-                onChange={value => handleFilterChange('status', value)}
-                value={filters.status}
-              >
-                {Object.keys(statusColors).map(status => (
-                  <Option key={status} value={status}>
-                    {status.split('-').map(s => s.charAt(0).toUpperCase() + s.slice(1)).join(' ')}
-                  </Option>
-                ))}
-              </Select>
-              
-              <Select
-                placeholder="Priority"
-                allowClear
-                style={{ width: isTablet ? 120 : 150 }}
-                onChange={value => handleFilterChange('priority', value)}
-                value={filters.priority}
-              >
-                {Object.keys(priorityColors).map(priority => (
-                  <Option key={priority} value={priority}>
-                    {priority.charAt(0).toUpperCase() + priority.slice(1)}
-                  </Option>
-                ))}
-              </Select>
-              
-              <Button
-                icon={<CloseOutlined />}
-                onClick={() => setFilters({
-                  status: null,
-                  priority: null,
-                  assignee: null
-                })}
-              >
-                {!isTablet && 'Clear Filters'}
-              </Button>
-            </Space>
-          </div>
-        )}
+        
 
         {selectedRowKeys.length > 0 && (
           <div className="batch-actions" style={{ marginBottom: 16 }}>
@@ -576,7 +567,7 @@ const BackLog = () => {
           }}
           scroll={{ x: true }}
           rowClassName={record => {
-            if (record.dueDate && dayjs().isAfter(record.dueDate)) {
+            if (record.due_date && dayjs().isAfter(record.due_date)) {
               return 'overdue-task';
             }
             return '';
@@ -600,6 +591,7 @@ const BackLog = () => {
         bodyStyle={{ padding: isMobile ? '16px 8px' : '24px' }}
       >
         <Form form={form} layout="vertical">
+          {contextHolder}
           <Form.Item
             name="title"
             label="Title"
@@ -611,47 +603,15 @@ const BackLog = () => {
           <Form.Item
             name="description"
             label="Description"
+            rules={[{ required: true, message: 'Enter a Description ' }]}
           >
             <TextArea rows={4} placeholder="Task description" />
           </Form.Item>
           
           <Form.Item
-            name="status"
-            label="Status"
-            rules={[{ required: true, message: 'Please select status' }]}
-            initialValue="backlog"
-          >
-            <Select>
-              {Object.keys(statusColors).map(status => (
-                <Option key={status} value={status}>
-                  <Tag color={statusColors[status]}>
-                    {status.split('-').map(s => s.charAt(0).toUpperCase() + s.slice(1)).join(' ')}
-                  </Tag>
-                </Option>
-              ))}
-            </Select>
-          </Form.Item>
-          
-          <Form.Item
-            name="priority"
-            label="Priority"
-            rules={[{ required: true, message: 'Please select priority' }]}
-            initialValue="medium"
-          >
-            <Select>
-              {Object.keys(priorityColors).map(priority => (
-                <Option key={priority} value={priority}>
-                  <Tag color={priorityColors[priority]}>
-                    {priority.charAt(0).toUpperCase() + priority.slice(1)}
-                  </Tag>
-                </Option>
-              ))}
-            </Select>
-          </Form.Item>
-          
-          <Form.Item
-            name="assignee"
-            label="Assignee"
+            name="assigned_to"
+            label="Assigned To"
+            rules={[{ required: true, message: 'Please assign a user' }]}
           >
             <Select allowClear placeholder="Unassigned">
               <Option value="JD">John Doe (JD)</Option>
@@ -661,21 +621,11 @@ const BackLog = () => {
           </Form.Item>
           
           <Form.Item
-            name="dueDate"
+            name="due_date"
             label="Due Date"
+            rules={[{ required: true, message: 'Select due date ' }]}
           >
             <DatePicker style={{ width: '100%' }} />
-          </Form.Item>
-          
-          <Form.Item
-            name="storyPoints"
-            label="Story Points"
-          >
-            <Select allowClear placeholder="Not estimated">
-              {[1, 2, 3, 5, 8, 13, 21].map(points => (
-                <Option key={points} value={points}>{points}</Option>
-              ))}
-            </Select>
           </Form.Item>
         </Form>
       </Modal>

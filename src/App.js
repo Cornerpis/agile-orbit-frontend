@@ -16,6 +16,8 @@ import { ConfigProvider } from 'antd';
 import "./assets/styles/main.css";
 import "./assets/styles/responsive.css";
 import KanbanBoard from "./pages/kansanboard";
+import CreateAssessment from "./pages/createassessment.js";
+
 import ScoreCards from "./pages/score-card";
 
 function App() {
@@ -41,6 +43,7 @@ function App() {
           <Route exact path="/sprint" component={SprintCreation} />
           <Route exact path="/users" component={CreateUsers} />
           <Route exact path="/scorecard" component={ScoreCards} />
+          <Route exact path="/createassessment" component={CreateAssessment} />
         </Main>
         <Redirect from="*" to="/sign-in" /> {/* Moved outside Main */}
       </Switch>

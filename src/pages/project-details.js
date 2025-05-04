@@ -16,6 +16,7 @@ import {
   Modal,
   DatePicker,
   Progress,
+  notification,
   Divider,
   Tooltip,
 } from "antd";
@@ -23,13 +24,18 @@ import { Comment } from "@ant-design/compatible";
 import { PlusOutlined, UserAddOutlined } from "@ant-design/icons";
 import moment from "moment";
 import InviteTeam from "../pages/invite-team";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
+import { assignProjectLeader } from "../redux/action";
+
 
 const { Title, Text, Paragraph } = Typography;
 const { Option } = Select;
 const { TextArea } = Input;
 
-const ProjectDetails = () => {
+const ProjectDetails = (onCancel) => {
+  const dispatch = useDispatch();
+  const [form] = Form.useForm();
+  const [api, contextHolder] = notification.useNotification();
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [isTaskModalVisible, setIsTaskModalVisible] = useState(false);
   const { id } = useParams();
@@ -50,6 +56,55 @@ const ProjectDetails = () => {
     { id: 4, name: "David Brown" },
     { id: 5, name: "Eve Davis" },
   ];
+
+   const handleSubmit = async (values) => {
+      try {
+        const response = await dispatch(assignProjectLeader(values));
+    
+        const successMessage = response?.message?.toLowerCase?.().includes("success");
+  
+  if (
+    response?.statusCode === 201 ||
+    response?.success === true ||
+    response?.success === "true" || // handle string values
+    successMessage // check if message suggests success
+  ) {
+    api.success({
+      message: response?.message || "Project assigned successfully!",
+      description: response.message,
+      duration: 3,
+    });
+    form.resetFields();
+    onCancel();
+  } else if (response?.statusCode === 400) {
+    api.warning({
+      message: "Project assigned Failed",
+      description: response?.message || "Please check your input and try again.",
+      duration: 4,
+    });
+  } else if (response?.statusCode === 409) {
+    api.error({
+      message: "Duplicate Entry",
+      description: response?.message || "User already exists.",
+      duration: 4,
+    });
+  } else {
+    api.error({
+      message: "Unexpected Error",
+      description: response?.message || "Something went wrong. Please try again later.",
+      duration: 4,
+    });
+  }
+  
+      } catch (error) {
+        api.error({
+          message: "Network Error",
+          description: error.message || "Unable to connect to the server.",
+          duration: 4,
+        });
+      }
+    };
+  
 
   const handleCreate = (values) => {
     console.log("Project Created:", values);
@@ -103,14 +158,14 @@ const ProjectDetails = () => {
           </Title>
         </Col>
         <Col>
-          <Button
+          {/* <Button
             type="primary"
             icon={<UserAddOutlined />}
             onClick={() => setIsModalVisible(true)}
             style={{ marginRight: 8 }}
           >
             Invite Team
-          </Button>
+          </Button> */}
           <Button
             type="primary"
             icon={<PlusOutlined />}
@@ -198,14 +253,14 @@ const ProjectDetails = () => {
                       <>
                         <Text>
                           Due:{" "}
-                          {task.end_time
-                            ? moment(task.dueDate).format("YYYY-MM-DD")
+                          {task.due_date
+                            ? moment(task.due_date).format("YYYY-MM-DD")
                             : "N/A"}
                         </Text>
                         <Text>
                           {" "}
                           Assigned:{" "}
-                          {mockUsers.find((user) => user.id === task.assignee)
+                          {mockUsers.find((user) => user.id === task.assigned_to)
                             ?.name || "N/A"}
                         </Text>
                       </>
@@ -290,6 +345,7 @@ const ProjectDetails = () => {
         footer={null}
       >
         <Form onFinish={handleAddTask} layout="vertical" form={taskForm}>
+        {contextHolder}
           <Form.Item
             label="Task Title"
             name="title"
@@ -300,10 +356,10 @@ const ProjectDetails = () => {
           <Form.Item label="Description" name="description">
             <TextArea />
           </Form.Item>
-          <Form.Item label="Due Date" name="dueDate">
+          <Form.Item label="Due Date" name="due_date">
             <DatePicker style={{ width: "100%" }} />
           </Form.Item>
-          <Form.Item label="Assignee" name="assignee">
+          <Form.Item label="Assigned_To" name="assigned_to">
             <Select>
               {mockUsers.map((user) => (
                 <Option key={user.id} value={user.id}>
@@ -313,7 +369,8 @@ const ProjectDetails = () => {
             </Select>
           </Form.Item>
           <Form.Item>
-            <Button type="primary" htmlType="submit">
+            <Button type="primary" htmlType="submit" onClick={() => setIsModalVisible(true)}
+            >
               Add Task
             </Button>
           </Form.Item>

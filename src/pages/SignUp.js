@@ -76,7 +76,9 @@ const SignUp = () => {
           description: "You can now sign in with your credentials.",
           duration: 3,
         });
-        history.push("/sign-in");
+        setTimeout(() => {
+          history("/sign-in"); // or history.push('/sign-in') if using v5
+        }, 3000);
       } else {
         api.error({
           message: "Registration Failed",

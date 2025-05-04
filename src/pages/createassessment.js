@@ -49,7 +49,7 @@ const initialQuestionTypes = [
   { value: 'text', label: 'Text Response' }
 ];
 
-const AdminAssessmentBuilder = () => {
+const CreateAssessment = () => {
   const [form] = Form.useForm();
   const [assessments, setAssessments] = useState(initialAssessmentTypes);
   const [currentAssessment, setCurrentAssessment] = useState(null);
@@ -495,4 +495,4 @@ const AdminAssessmentBuilder = () => {
   );
 };
 
-export default AdminAssessmentBuilder;
+export default CreateAssessment;
