@@ -57,17 +57,29 @@ const UpdateUser = ({ visible, onCancel, userData }) => {
       <Form form={form} layout="vertical">
         <Row gutter={[16, 16]}>
           <Col span={12}>
-            <Form.Item name="first_name" label="First Name" rules={[{ required: true }]}>
+            <Form.Item
+              name="first_name"
+              label="First Name"
+              rules={[{ required: true }]}
+            >
               <Input placeholder="First name" />
             </Form.Item>
           </Col>
           <Col span={12}>
-            <Form.Item name="last_name" label="Last Name" rules={[{ required: true }]}>
+            <Form.Item
+              name="last_name"
+              label="Last Name"
+              rules={[{ required: true }]}
+            >
               <Input placeholder="Last name" />
             </Form.Item>
           </Col>
         </Row>
-        <Form.Item name="email" label="Email" rules={[{ required: true, type: "email" }]}>
+        <Form.Item
+          name="email"
+          label="Email"
+          rules={[{ required: true, type: "email" }]}
+        >
           <Input placeholder="Email" />
         </Form.Item>
         <Row gutter={[16, 16]}>
@@ -77,7 +89,11 @@ const UpdateUser = ({ visible, onCancel, userData }) => {
             </Form.Item>
           </Col>
           <Col span={12}>
-            <Form.Item name="department" label="Department" rules={[{ required: true }]}>
+            <Form.Item
+              name="department"
+              label="Department"
+              rules={[{ required: true }]}
+            >
               <Input placeholder="Department" />
             </Form.Item>
           </Col>
