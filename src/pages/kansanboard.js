@@ -10,6 +10,7 @@ import {
   DeleteOutlined,
 } from '@ant-design/icons';
 import { useDispatch, useSelector } from 'react-redux';
+import { useParams } from 'react-router-dom';
 import { CreateTask, fetchUsers } from '../redux/action';
 import '../assets/styles/KanbanBoard.css';
 
@@ -21,22 +22,22 @@ const KanbanBoard = () => {
   const dispatch = useDispatch();
   const users = useSelector((state) => state.users || []);
   const [loadingUsers, setUsersLoading] = useState(false);
-  const [visible, setVisible] = useState(false);
   const [api, contextHolder] = notification.useNotification();
+  const [form] = Form.useForm();
+  const screens = useBreakpoint();
   const token = localStorage.getItem('token');
 
-  const [projectId] = useState("123456"); // Replace with real project ID
+  const {projectId } = useParams(); // ✅ dynamically fetched from URL
+
   const [columns, setColumns] = useState({
     'todo': { id: 'todo', title: 'To Do', items: [] },
     'in-progress': { id: 'in-progress', title: 'In Progress', items: [] },
     'done': { id: 'done', title: 'Done', items: [] },
   });
 
+  const [mobileView, setMobileView] = useState(false);
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [editingTask, setEditingTask] = useState(null);
-  const [form] = Form.useForm();
-  const screens = useBreakpoint();
-  const [mobileView, setMobileView] = useState(false);
 
   useEffect(() => {
     setMobileView(!screens.md);
@@ -48,7 +49,7 @@ const KanbanBoard = () => {
       try {
         await dispatch(fetchUsers(token));
       } catch {
-        message.error("Failed to fetch users");
+        message.error('Failed to fetch users');
       } finally {
         setUsersLoading(false);
       }
@@ -64,15 +65,20 @@ const KanbanBoard = () => {
     const { source, destination } = result;
     if (!destination || (source.droppableId === destination.droppableId && source.index === destination.index)) return;
 
-    const startItems = [...columns[source.droppableId].items];
+    const sourceColumn = columns[source.droppableId];
+    const destColumn = columns[destination.droppableId];
+    if (!sourceColumn?.items || !destColumn) return;
+
+    const startItems = [...(sourceColumn.items || [])];
     const [movedItem] = startItems.splice(source.index, 1);
-    const finishItems = [...columns[destination.droppableId].items];
+    movedItem.columnId = destination.droppableId;
+    const finishItems = [...(destColumn.items || [])];
     finishItems.splice(destination.index, 0, movedItem);
 
     setColumns({
       ...columns,
-      [source.droppableId]: { ...columns[source.droppableId], items: startItems },
-      [destination.droppableId]: { ...columns[destination.droppableId], items: finishItems },
+      [source.droppableId]: { ...sourceColumn, items: startItems },
+      [destination.droppableId]: { ...destColumn, items: finishItems },
     });
   };
 
@@ -94,17 +100,20 @@ const KanbanBoard = () => {
         description,
         due_date: due_date?.format('YYYY-MM-DD'),
         assigned_to,
-        projectId,
+        projectId, // ✅ use dynamic projectId
+        columnId,
       };
 
-      const response = await dispatch(CreateTask({ ...newTask, projectId }));
+      const response = await dispatch(CreateTask({ ...newTask }));
 
       if (response?.statusCode === 201 || response?.success) {
+        const column = columns[columnId] || { items: [] };
+        const newItems = [...(column.items || []), newTask];
         setColumns({
           ...columns,
           [columnId]: {
-            ...columns[columnId],
-            items: [...columns[columnId].items, newTask],
+            ...column,
+            items: newItems,
           },
         });
         api.success({ message: 'Task created successfully!' });
@@ -114,16 +123,19 @@ const KanbanBoard = () => {
         api.error({ message: response?.message || 'Error creating task' });
       }
     } catch (error) {
-      api.error({ message: 'Form Validation Error', description: error.message });
+      api.error({ message: 'Form Validation Error', description: error?.message || 'Please check the form fields.' });
     }
   };
 
   const deleteTask = (taskId, columnId) => {
+    const column = columns[columnId];
+    if (!column?.items) return;
+    const filteredItems = column.items.filter((item) => item.id !== taskId);
     setColumns({
       ...columns,
       [columnId]: {
-        ...columns[columnId],
-        items: columns[columnId].items.filter(item => item.id !== taskId),
+        ...column,
+        items: filteredItems,
       },
     });
     message.success('Task deleted successfully');
@@ -160,7 +172,7 @@ const KanbanBoard = () => {
               <Droppable droppableId={column.id}>
                 {(provided) => (
                   <div ref={provided.innerRef} {...provided.droppableProps} className="tasks-list">
-                    {column.items.map((task, index) => (
+                    {(column.items || []).map((task, index) => (
                       <Draggable key={task.id} draggableId={task.id} index={index}>
                         {(provided) => (
                           <div

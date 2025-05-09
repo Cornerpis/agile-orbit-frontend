@@ -33,11 +33,7 @@ function App() {
           <Route exact path="/project-management" component={Tables} />
           <Route exact path="/assesment" component={AgileMaturityAssessment} />
           <Route exact path="/profile" component={Profile} />
-          <Route
-            exact
-            path="/project/:id"
-            component={(props) => <ProjectDetails {...props} projects={list} />}
-          />
+          <Route path="/project/:projectId" component={ProjectDetails} />
           <Route exact path="/kansanboard" component={KanbanBoard} />
           <Route exact path="/backlog" component={BackLog} />
           <Route exact path="/sprint" component={SprintCreation} />

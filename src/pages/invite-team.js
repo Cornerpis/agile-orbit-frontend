@@ -6,6 +6,7 @@ import { fetchUsers, inviteTeamMember } from "../redux/action";
 
 const { Option } = Select;
 
+// Form Component for Inviting Users
 const InviteTeamForm = ({ visible, onInvite, onCancel, loading }) => {
   const [form] = Form.useForm();
   const dispatch = useDispatch();
@@ -37,25 +38,19 @@ const InviteTeamForm = ({ visible, onInvite, onCancel, loading }) => {
     } catch (info) {
       const fieldError = info?.errorFields?.[0]?.errors?.[0];
       message.error(fieldError || "Please select a user to invite.");
-      console.error("Validation Failed:", info);
     }
   };
 
   return (
     <Modal
       title="Invite Team Member"
-      visible={visible}
+      open={visible}
       onCancel={onCancel}
       onOk={handleOk}
       confirmLoading={loading}
       destroyOnClose
     >
-      <Form
-        form={form}
-        layout="vertical"
-        name="invite_team_form"
-        preserve={false}
-      >
+      <Form form={form} layout="vertical" name="invite_team_form" preserve={false}>
         <Row gutter={[16, 16]}>
           <Col span={24}>
             <Form.Item
@@ -66,7 +61,7 @@ const InviteTeamForm = ({ visible, onInvite, onCancel, loading }) => {
               {usersLoading ? (
                 <Spin />
               ) : (
-                <Select placeholder="Choose a team member">
+                <Select placeholder="Choose a team member" showSearch optionFilterProp="children">
                   {users.map((user) => (
                     <Option key={user._id} value={user._id}>
                       {user.first_name} {user.last_name}
@@ -82,41 +77,64 @@ const InviteTeamForm = ({ visible, onInvite, onCancel, loading }) => {
   );
 };
 
+// Main Component for Handling Modal Logic and Dispatch
 const InviteTeam = () => {
   const [visible, setVisible] = useState(false);
   const [loading, setLoading] = useState(false);
   const dispatch = useDispatch();
 
-  const projectId = useSelector((state) => state.currentProject?.id);
+  const projectId = useSelector((state) => state.projects[0]?._id);
+  const projects = useSelector((state) => state.projects || []);
+  const project = projects.find((proj) => proj._id === projectId);
+  const token = localStorage.getItem("token");
+  const userId = localStorage.getItem("userId");
+
+  useEffect(() => {
+    if (!projectId) {
+      console.warn("projectId is undefined. Please ensure you have at least one project loaded.");
+    }
+  }, [projectId]);
 
   const handleInvite = async (values) => {
-  setLoading(true);
-  try {
-    
-    const response = await dispatch(inviteTeamMember(projectId, values.userId));
-
-    const success =
-      response?.statusCode === 201 ||
-      response?.success === true ||
-      String(response?.success).toLowerCase() === "true";
-
-    if (success) {
-      message.success(response?.message || "User invited successfully");
-      setVisible(false);
-    } else if (response?.statusCode === 400) {
-      message.warning(response?.message || "Invalid input.");
-    } else if (response?.statusCode === 409) {
-      message.error(response?.message || "User already invited.");
-    } else {
-      message.error(response?.message || "Unknown error.");
+    if (!projectId) {
+      message.error("No project selected to invite users.");
+      return;
     }
-  } catch (error) {
-    console.error("Invite error:", error);
-    message.error("Failed to invite user.");
-  } finally {
-    setLoading(false);
-  }
-};
+  
+    const userId = values.userId; // Get the userId from the form values
+  
+    if (!userId) {
+      message.error("Please select a user to invite.");
+      return;
+    }
+  
+    setLoading(true);
+    try {
+      const response = await dispatch(inviteTeamMember(projectId, userId)); // Pass userId
+  
+      const success =
+        response?.statusCode === 201 ||
+        response?.success === true ||
+        String(response?.message)?.toLowerCase()?.includes("success");
+  
+      if (success) {
+        message.success(response?.message || "Team member added successfully.");
+        setVisible(false);
+      } else if (response?.statusCode === 400) {
+        message.warning(response?.message || "Invalid input.");
+      } else if (response?.statusCode === 409) {
+        message.error(response?.message || "User already invited.");
+      } else {
+        message.error(response?.message || "An unknown error occurred.");
+      }
+    } catch (error) {
+      console.error("Invite error:", error);
+      message.error("Failed to invite user.");
+    } finally {
+      setLoading(false);
+    }
+  };
+  
 
   return (
     <>

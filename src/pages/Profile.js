@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   Form,
   Input,
@@ -7,89 +7,81 @@ import {
   message,
   Typography,
   notification,
+  Spin,
 } from 'antd';
 import { useDispatch } from 'react-redux';
-import { createAssessment } from '../redux/action';
+import { UpdateUserProfile } from '../redux/action'; // Updated action
+import axios from 'axios';
 
 const { Option } = Select;
 const { Title, Paragraph } = Typography;
 
-const Profile = ({ onCancel }) => {
+const Profile = () => {
   const [form] = Form.useForm();
   const dispatch = useDispatch();
-  const [questions, setQuestions] = useState([]);
   const [api, contextHolder] = notification.useNotification();
 
-  const handleFormSubmit = async () => {
+  const [userData, setUserData] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [editMode, setEditMode] = useState(false);
+
+  const token = localStorage.getItem('token');
+
+  useEffect(() => {
+    const fetchProfile = async () => {
+      try {
+        const res = await axios.get('http://localhost:3000/api/v1/users/me', {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+        setUserData(res.data.data);
+        form.setFieldsValue(res.data.data);
+        setLoading(false);
+      } catch (err) {
+        message.error('Failed to load profile. Please try again.');
+        setLoading(false);
+      }
+    };
+
+    fetchProfile();
+  }, [token, form]);
+
+  const handleSave = async () => {
     try {
       const values = await form.validateFields();
-      const { title, question, type, options, correct_answer } = values;
 
-      if (!title || !question || !type || !correct_answer) {
-        message.error('Please fill in all required fields.');
-        return;
-      }
-
-      const optionsArray = options
-        ? options.split(',').map((opt) => opt.trim())
-        : [];
-
-      const newQuestion = {
-        question,
-        type,
-        options: optionsArray,
-        correct_answer,
-      };
-
-      const updatedQuestions = [...questions, newQuestion];
-
-      const token = localStorage.getItem('token');
-      const payload = {
-        title,
-        questions: updatedQuestions,
-      };
-
-      const response = await dispatch(createAssessment(token, payload));
+      const response = await dispatch(UpdateUserProfile(token, values));
 
       if (
-        response?.statusCode === 201 ||
-        response?.success === true ||
-        String(response?.success)?.toLowerCase() === 'true' ||
+        response?.success ||
         response?.message?.toLowerCase?.().includes('success')
       ) {
         api.success({
-          message: 'Assessment created successfully!',
+          message: 'Profile Updated Successfully!',
           description: response.message,
           duration: 3,
         });
-        setQuestions([]);
-        form.resetFields();
-        if (onCancel) onCancel();
-      } else if (response?.statusCode === 400) {
-        api.warning({
-          message: 'Creation Failed',
-          description: response.message || 'Please review your input.',
-          duration: 4,
-        });
-      } else if (response?.statusCode === 409) {
-        api.error({
-          message: 'Duplicate Entry',
-          description: response.message || 'Assessment already exists.',
-          duration: 4,
-        });
+        setEditMode(false);
+        setUserData(values);
       } else {
         api.error({
-          message: 'Unexpected Error',
-          description: response.message || 'Something went wrong.',
-          duration: 4,
+          message: 'Update Failed',
+          description: response.message || 'Please try again.',
         });
       }
-      console.log(response);
-
     } catch (err) {
-      message.error('Please complete all required fields before saving.');
+      message.error('Please fix validation errors before saving.');
     }
   };
+
+  if (loading) {
+    return (
+      <div style={{ padding: 80, textAlign: 'center' }}>
+        <Spin size="large" />
+      </div>
+    );
+  }
 
   return (
     <div
@@ -110,61 +102,87 @@ const Profile = ({ onCancel }) => {
           maxWidth: 600,
           width: '100%',
           boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
+          marginBottom: 100,
+          marginTop: 50,
         }}
       >
         {contextHolder}
-        <Title level={3}>Admin Test Creator</Title>
+        <Title level={3}>Update Profile</Title>
         <Paragraph type="secondary">
-          Please fill in all fields and click Save to submit the test.
+          Click Edit to modify your information.
         </Paragraph>
 
-        <Form layout="vertical" form={form}>
+        <Form layout="vertical" form={form} initialValues={userData}>
           <Form.Item
-            label="Test Title"
-            name="title"
-            rules={[{ required: true, message: 'Title is required' }]}
+            label="First Name"
+            name="first_name"
+            rules={[{ required: true, message: 'First Name is required' }]}
           >
-            <Input placeholder="Enter test title" />
+            <Input disabled={!editMode} />
           </Form.Item>
 
           <Form.Item
-            label="Question"
-            name="question"
-            rules={[{ required: true, message: 'Question is required' }]}
+            label="Last Name"
+            name="last_name"
+            rules={[{ required: true, message: 'Last Name is required' }]}
           >
-            <Input placeholder="Enter the question" />
+            <Input disabled={!editMode} />
           </Form.Item>
 
           <Form.Item
-            label="Type"
-            name="type"
-            rules={[{ required: true, message: 'Type is required' }]}
+            label="Email"
+            name="email"
+            rules={[
+              { required: true, message: 'Email is required' },
+              { type: 'email', message: 'Invalid email format' },
+            ]}
           >
-            <Select placeholder="Select type">
-              <Option value="multiple_choice">Multiple Choice</Option>
-              <Option value="short_answer">Short Answer</Option>
+            <Input disabled={!editMode} />
+          </Form.Item>
+
+          <Form.Item
+            label="Role"
+            name="role"
+            rules={[{ required: true, message: 'Role is required' }]}
+          >
+            <Select disabled={!editMode}>
+              <Option value="project_manager">Project Manager</Option>
+              <Option value="staff">Staff</Option>
             </Select>
           </Form.Item>
 
-          <Form.Item label="Options (comma-separated)" name="options" 
-          rules={[{ required: true, message: 'Correct answer is required' }]}>
-            <Input.TextArea placeholder="e.g. Option A, Option B" />
-          </Form.Item>
-
           <Form.Item
-            label="Correct Answer"
-            name="correct_answer"
-            rules={[{ required: true, message: 'Correct answer is required' }]}
+            label="Department"
+            name="department"
+            rules={[{ required: true, message: 'Department is required' }]}
           >
-            <Input placeholder="Enter correct answer" />
+          <Input disabled={!editMode} />
           </Form.Item>
-          {/* <Button type="dashed" onClick={addQuestion} block>
-            Add Question
-          </Button> */}
+          <Form.Item
+            label="Password"
+            name="password"
+            rules={[
+              { required: true, message: 'Password is required' },
+              { min: 6, message: 'Password must be at least 6 characters' },
+            ]}
+          >
+            <Input.Password disabled={!editMode} />
+          </Form.Item>
 
-          <Button type="primary" onClick={handleFormSubmit} block>
-            Save Test
-          </Button>
+          {!editMode ? (
+            <Button type="primary" onClick={() => setEditMode(true)} block>
+              Edit Profile
+            </Button>
+          ) : (
+            <div style={{ display: 'flex', gap: 10 }}>
+              <Button type="primary" onClick={handleSave} block>
+                Save
+              </Button>
+              <Button onClick={() => setEditMode(false)} block>
+                Cancel
+              </Button>
+            </div>
+          )}
         </Form>
       </div>
     </div>

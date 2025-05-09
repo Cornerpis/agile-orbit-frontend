@@ -5,7 +5,6 @@ import {
   Col,
   Row,
   Typography,
-  Progress,
   Button,
   List,
   notification,
@@ -14,11 +13,10 @@ import {
 } from "antd";
 import { PlusOutlined, ClockCircleOutlined } from "@ant-design/icons";
 import MyModal from "../pages/create-project";
-import { list } from "./data"; // Static list array
-import { getStats } from "../redux/action";
+import { getStats, fetchProjects } from "../redux/action";
 import { useDispatch, useSelector } from "react-redux";
 
-const { Title, Text, Paragraph } = Typography;
+const { Title } = Typography;
 
 function Home() {
   const [isModalVisible, setIsModalVisible] = useState(false);
@@ -27,9 +25,11 @@ function Home() {
   const [api, contextHolder] = notification.useNotification();
 
   const stats = useSelector((state) => state.stats);
+  const projects = useSelector((state) => state.projects); // 👈 Pulling project data from Redux
 
   useEffect(() => {
     dispatch(getStats(localStorage.getItem("token")));
+    dispatch(fetchProjects(localStorage.getItem("token"))); // 👈 Fetch projects on mount
   }, [dispatch]);
 
   const handleCreate = (values) => {
@@ -63,8 +63,8 @@ function Home() {
   const columns = [
     {
       title: "PROJECT NAME",
-      dataIndex: "Title",
-      key: "Title",
+      dataIndex: "name", // Make sure your API returns this key
+      key: "name",
       width: "25%",
     },
     {
@@ -81,30 +81,27 @@ function Home() {
     },
     {
       title: "ASSIGNED TO",
-      dataIndex: "assignedto",
-      key: "assignedto",
+      dataIndex: "assigned_to", // Ensure the API matches this key
+      key: "assigned_to",
     },
     {
       title: "DEADLINE",
-      dataIndex: "deadline",
-      key: "deadline",
+      dataIndex: "end_time",
+      key: "end_time",
+      render: (text) => (text ? new Date(text).toLocaleDateString() : "-"),
     },
     {
-      title: "PRIORITY",
-      dataIndex: "priority",
-      key: "priority",
-      render: (priority) => {
-        let color =
-          priority === "low"
-            ? "green"
-            : priority === "medium"
-            ? "orange"
-            : "red";
-        return (
-          <Tag color={color} style={{ fontWeight: 500 }}>
-            {priority?.toUpperCase()}
-          </Tag>
-        );
+      title: "STATUS",
+      dataIndex: "status",
+      key: "status",
+      render: (status) => {
+        const color =
+          status === "todo"
+            ? "red"
+            : status === "in_progress"
+            ? status ==="on_going"
+            : "green";
+        return <Tag color={color}>{status}</Tag>;
       },
     },
   ];
@@ -175,13 +172,16 @@ function Home() {
               <div className="table-responsive">
                 <Table
                   columns={columns}
-                  dataSource={list.map((item) => ({
-                    ...item,
-                    key: item.id,
-                  }))}
-                  pagination={false}
+                  dataSource={projects
+                    ?.slice()
+                    .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
+                    .map((item) => ({
+                      ...item,
+                      key: item.id,
+                    }))}
+                  pagination={true}
                   onRow={(record) => ({
-                    onClick: () => handleRowClick(record.id),
+                    onClick: () => handleRowClick(record.id || record._id),
                     style: { cursor: "pointer" },
                   })}
                 />

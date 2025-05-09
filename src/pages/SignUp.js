@@ -9,10 +9,15 @@ import {
   Input,
   Checkbox,
   notification,
+  Select,
 } from "antd";
 import { signUp } from "../redux/action";
 import { useDispatch } from "react-redux";
 import { Link, useHistory } from "react-router-dom";
+import { set } from "mobx";
+
+
+const { Option } = Select;
 
 
 const { Title } = Typography;
@@ -65,40 +70,43 @@ const SignUp = () => {
   // Form submission handler
   const onFinish = async (values) => {
     try {
-      // Remove confirmPassword from the payload before sending
-      const { confirmPassword, ...formData } = values;
-
-      const response = await dispatch(signUp(formData));
-
-      if (response?.message === "User registered successfully, proceed to login.") {
+      const response = await dispatch(signUp(values));
+  
+      if (response?.status === "success") {
         api.success({
-          message: response?.message,
+          message: response.message,
           description: "You can now sign in with your credentials.",
           duration: 3,
         });
         setTimeout(() => {
-          history("/sign-in"); // or history.push('/sign-in') if using v5
-        }, 3000);
+        history.push("/sign-in");         
+        }
+        , 1000);
+        
       } else {
         api.error({
           message: "Registration Failed",
-          description: response?.message || 'Please try again',
+          description: response?.message || "An unexpected error occurred",
           duration: 3,
         });
       }
     } catch (error) {
       api.error({
         message: "Registration Error",
-        description: error.response?.data?.message || 'An unexpected error occurred',
+        description: "An unexpected error occurred",
         duration: 3,
       });
-      console.error("Sign-up error:", error);
     }
   };
-
   const onFinishFailed = (errorInfo) => {
-    console.log("Validation Failed:", errorInfo);
+    console.log("Failed:", errorInfo);
+    api.error({
+      message: "Form submission failed",
+      description: "Please check the form fields and try again.",
+      duration: 3,
+    });
   };
+  
 
   const inputStyle = {
     padding: '8px 11px',
@@ -179,12 +187,13 @@ const SignUp = () => {
               name="role"
               rules={[
                 { required: true, message: "Please enter your role" },
-                { min: 4, message: "Role must be at least 4 characters" }
               ]}
             >
-              <Input placeholder="Role" style={inputStyle} />
+            <Select placeholder="Select role" >
+            <Option value="project_manager">Project Manager</Option>
+            <Option value="staff">Staff</Option>
+            </Select>
             </Form.Item>
-
             <Form.Item
               label="Department"
               name="department"

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
 import {
   Card,
@@ -17,160 +17,150 @@ import {
   DatePicker,
   Progress,
   notification,
-  Divider,
   Tooltip,
+  Spin,
+  message,
 } from "antd";
 import { Comment } from "@ant-design/compatible";
-import { PlusOutlined, UserAddOutlined } from "@ant-design/icons";
+import { PlusOutlined } from "@ant-design/icons";
 import moment from "moment";
-import InviteTeam from "../pages/invite-team";
 import { useDispatch, useSelector } from "react-redux";
-import { assignProjectLeader } from "../redux/action";
 
+import InviteTeam from "../pages/invite-team";
+import { assignProjectLeader, CreateTask, fetchUsers } from "../redux/action";
 
 const { Title, Text, Paragraph } = Typography;
 const { Option } = Select;
 const { TextArea } = Input;
 
-const ProjectDetails = (onCancel) => {
+const ProjectDetails = ({ visible, onCancel, loading }) => {
   const dispatch = useDispatch();
   const [form] = Form.useForm();
+  const [taskForm] = Form.useForm();
   const [api, contextHolder] = notification.useNotification();
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [isTaskModalVisible, setIsTaskModalVisible] = useState(false);
-  const { id } = useParams();
-  const projects = useSelector((state) => state.projects);
-  const project = projects.find((p) => p._id === id);
-  const [assignedUsers, setAssignedUsers] = useState(
-    project ? project.assignedUsers || [] : []
-  );
-  const [tasks, setTasks] = useState(project ? project.tasks || [] : []);
-  const [taskForm] = Form.useForm();
   const [comments, setComments] = useState([]);
   const [newComment, setNewComment] = useState("");
+  const [usersLoading, setUsersLoading] = useState(false);
 
-  const mockUsers = [
-    { id: 1, name: "Alice Smith" },
-    { id: 2, name: "Bob Johnson" },
-    { id: 3, name: "Charlie Williams" },
-    { id: 4, name: "David Brown" },
-    { id: 5, name: "Eve Davis" },
-  ];
+  const { projectId } = useParams(); // Get projectId from URL
 
-   const handleSubmit = async (values) => {
+  const token = localStorage.getItem("token");
+  const projects = useSelector((state) => state.projects);
+  const users = useSelector((state) => state.users || []);
+  const loadingUsers = useSelector((state) => state.users?.loading || false);
+  const project = projects.find((p) => p._id === projectId); // Using projectId from useParams
+
+  const [assignedUsers, setAssignedUsers] = useState(project?.assignedUsers || []);
+  const [tasks, setTasks] = useState(project?.tasks || []);
+
+  // Load users when modal is visible
+  useEffect(() => {
+    const loadUsers = async () => {
+      setUsersLoading(true);
       try {
-        const response = await dispatch(assignProjectLeader(values));
-    
-        const successMessage = response?.message?.toLowerCase?.().includes("success");
-  
-  if (
-    response?.statusCode === 201 ||
-    response?.success === true ||
-    response?.success === "true" || // handle string values
-    successMessage // check if message suggests success
-  ) {
-    api.success({
-      message: response?.message || "Project assigned successfully!",
-      description: response.message,
-      duration: 3,
-    });
-    form.resetFields();
-    onCancel();
-  } else if (response?.statusCode === 400) {
-    api.warning({
-      message: "Project assigned Failed",
-      description: response?.message || "Please check your input and try again.",
-      duration: 4,
-    });
-  } else if (response?.statusCode === 409) {
-    api.error({
-      message: "Duplicate Entry",
-      description: response?.message || "User already exists.",
-      duration: 4,
-    });
-  } else {
-    api.error({
-      message: "Unexpected Error",
-      description: response?.message || "Something went wrong. Please try again later.",
-      duration: 4,
-    });
-  }
-  
-      } catch (error) {
-        api.error({
-          message: "Network Error",
-          description: error.message || "Unable to connect to the server.",
-          duration: 4,
-        });
+        await dispatch(fetchUsers(token));
+      } catch {
+        message.error("Failed to fetch users");
+      } finally {
+        setUsersLoading(false);
       }
     };
-  
 
-  const handleCreate = (values) => {
-    console.log("Project Created:", values);
-    setIsModalVisible(false);
+    if (visible) {
+      loadUsers();
+      form.resetFields();
+    }
+  }, [visible, dispatch, form, token]);
+
+  //Assign project leader
+  const handleSubmit = async (values) => {
+    try {
+      const response = await dispatch(assignProjectLeader(values));
+      const successMessage = response?.message?.toLowerCase?.().includes("success");
+
+      if (response?.statusCode === 201 || response?.success || successMessage) {
+        api.success({
+          message: "Success",
+          description: response?.message || "Leader assigned successfully!",
+        });
+        form.resetFields();
+        onCancel?.();
+      } else if (response?.statusCode === 400) {
+        api.warning({ message: "Failed", description: response?.message });
+      } else if (response?.statusCode === 409) {
+        api.error({ message: "Duplicate", description: "User already exists." });
+      } else {
+        api.error({ message: "Unexpected Error", description: response?.message });
+      }
+    } catch (error) {
+      api.error({ message: "Network Error", description: error?.message });
+    }
   };
 
-  const handleAssignUser = (userIds) => {
-    setAssignedUsers(userIds);
+  // Create new task
+  const handleTaskSubmit = async (taskValues) => {
+    try {
+      const response = await dispatch(CreateTask({ ...taskValues, projectId, token })); // Using projectId
+
+      if (response?.statusCode === 201 || response?.successfully) {
+        api.success({ message: "Task added to project successfully." });
+        setTasks([...tasks, taskValues]);
+        setIsTaskModalVisible(false);
+        taskForm.resetFields();
+        console.log('Project ID:', projectId);
+      } else {
+        api.error({ message: response?.message || "Error creating task" });
+      }
+    } catch (error) {
+      api.error({
+        message: "Form Validation Error",
+        description: error?.message || "Check form fields",
+      });
+    }
   };
 
-  const handleAddTask = (taskValues) => {
-    setTasks([...tasks, { id: Date.now(), status: "To Do", ...taskValues }]);
-    setIsTaskModalVisible(false);
-    taskForm.resetFields();
-  };
-
+  // Create new comment
   const handleCommentSubmit = () => {
     if (newComment.trim()) {
-      setComments([
-        ...comments,
-        { text: newComment, author: "You", date: new Date() },
-      ]);
+      setComments([...comments, { text: newComment, author: "You", date: new Date() }]);
       setNewComment("");
     }
+  };
+
+  // Update task status
+  const handleTaskStatusChange = (taskId, status) => {
+    const updatedTasks = tasks.map((task) =>
+      task.id === taskId ? { ...task, status } : task
+    );
+    setTasks(updatedTasks);
   };
 
   if (!project) {
     return <div>Project not found</div>;
   }
 
-  const completedTasks = tasks.filter((task) => task.status === "Done").length;
-  const progress = tasks.length > 0 ? (completedTasks / tasks.length) * 100 : 0;
+  const completedTasks = tasks.filter((t) => t.status === "Done").length;
+  const progress = tasks.length ? (completedTasks / tasks.length) * 100 : 0;
 
   return (
-    <Card
-      style={{
-        margin: 24,
-        border: "1px solid #e8e8e8",
-        boxShadow: "0 2px 8px rgba(0, 0, 0, 0.15)",
-      }}
-    >
+    <Card style={{ margin: 24, border: "1px solid #e8e8e8", boxShadow: "0 2px 8px rgba(0,0,0,0.15)" }}>
+      {contextHolder}
+
       <InviteTeam
         visible={isModalVisible}
-        onCreate={handleCreate}
+        onCreate={() => setIsModalVisible(false)}
         onCancel={() => setIsModalVisible(false)}
+        confirmLoading={loading}
       />
+
       <Row justify="space-between" align="middle" style={{ marginBottom: 24 }}>
         <Col>
-          <Title level={2} style={{ marginBottom: 0 }}>
-            {project.Title}
-          </Title>
+          <Title level={2}>{project.Title}</Title>
         </Col>
         <Col>
-          {/* <Button
-            type="primary"
-            icon={<UserAddOutlined />}
-            onClick={() => setIsModalVisible(true)}
-            style={{ marginRight: 8 }}
-          >
-            Invite Team
-          </Button> */}
-          <Button
-            type="primary"
-            icon={<PlusOutlined />}
-            onClick={() => setIsTaskModalVisible(true)}
-          >
+          <Button type="primary" icon={<PlusOutlined />} onClick={() => setIsTaskModalVisible(true)}>
             Add Task
           </Button>
         </Col>
@@ -179,52 +169,37 @@ const ProjectDetails = (onCancel) => {
       <Row gutter={[24, 24]}>
         <Col span={16}>
           <Card title="Project Details" bordered={false}>
-            <Space
-              direction="vertical"
-              size="middle"
-              style={{ display: "flex", width: "100%" }}
-            >
-              <Row gutter={[16, 16]}>
-                <Col span={12}>
-                  <Text strong>Description:</Text>
-                  <Paragraph>{project.description}</Paragraph>
-                </Col>
-                <Col span={12}>
-                  <Text strong>Budget:</Text>
-                  <Text>{project.budget}</Text>
-                </Col>
-                <Col span={12}>
-                  <Text strong>Priority:</Text>
-                  <Tag
-                    color={
-                      project.priority_level === "High"
-                        ? "red"
-                        : project.priority_level === "Medium"
-                        ? "orange"
-                        : "green"
-                    }
-                  >
-                    {project.priority_level}
-                  </Tag>
-                </Col>
-                <Col span={12}>
-                  <Text strong>Deadline:</Text>
-                  <Text>{project.end_time}</Text>
-                </Col>
-                <Col span={12}>
-                  <Text strong>Start Date:</Text>
-                  <Text>{project.startDate}</Text>
-                </Col>
-                <Col span={12}>
-                  <Text strong>End Date:</Text>
-                  <Text>{project.end_time}</Text>
-                </Col>
-              </Row>
-              <Progress percent={progress} style={{ marginTop: 16 }} />
-            </Space>
+            <Row gutter={[16, 16]}>
+              <Col span={12}>
+                <Text strong>Description:</Text>
+                <Paragraph>{project.description}</Paragraph>
+              </Col>
+              <Col span={12}>
+                <Text strong>Budget:</Text> <Text>{project.budget}</Text>
+              </Col>
+              <Col span={12}>
+                <Text strong>Priority:</Text>
+                <Tag color={
+                  project.priority_level === "High" ? "red" :
+                  project.priority_level === "Medium" ? "orange" : "green"
+                }>
+                  {project.priority_level}
+                </Tag>
+              </Col>
+              <Col span={12}>
+                <Text strong>Deadline:</Text> <Text>{project.end_time}</Text>
+              </Col>
+              <Col span={12}>
+                <Text strong>Start Date:</Text> <Text>{project.startDate}</Text>
+              </Col>
+              <Col span={12}>
+                <Text strong>End Date:</Text> <Text>{project.end_time}</Text>
+              </Col>
+            </Row>
+            <Progress percent={progress} style={{ marginTop: 16 }} />
           </Card>
 
-          <Card title="Tasks" bordered={false} style={{ marginTop: 24 }}>
+          <Card title="Tasks" style={{ marginTop: 24 }}>
             <List
               dataSource={tasks}
               renderItem={(task) => (
@@ -233,36 +208,24 @@ const ProjectDetails = (onCancel) => {
                     <Select
                       defaultValue={task.status}
                       style={{ width: 120 }}
-                      onChange={(value) =>
-                        setTasks(
-                          tasks.map((t) =>
-                            t.id === task.id ? { ...t, status: value } : t
-                          )
-                        )
-                      }
+                      onChange={(value) => handleTaskStatusChange(task.id, value)}
                     >
                       <Option value="To Do">To Do</Option>
                       <Option value="In Progress">In Progress</Option>
                       <Option value="Done">Done</Option>
-                    </Select>,
+                    </Select>
                   ]}
                 >
                   <List.Item.Meta
                     title={task.title}
                     description={
                       <>
-                        <Text>
-                          Due:{" "}
-                          {task.due_date
-                            ? moment(task.due_date).format("YYYY-MM-DD")
-                            : "N/A"}
-                        </Text>
-                        <Text>
-                          {" "}
-                          Assigned:{" "}
-                          {mockUsers.find((user) => user.id === task.assigned_to)
-                            ?.name || "N/A"}
-                        </Text>
+                        <Text>Due: {task.due_date ? moment(task.due_date).format("YYYY-MM-DD") : "N/A"}</Text><br />
+                        <Text>Assigned: {
+                          users.find(u => u._id === task.assigned_to)
+                            ? `${users.find(u => u._id === task.assigned_to).first_name} ${users.find(u => u._id === task.assigned_to).last_name}`
+                            : "N/A"
+                        }</Text>
                       </>
                     }
                   />
@@ -271,17 +234,15 @@ const ProjectDetails = (onCancel) => {
             />
           </Card>
 
-          <Card title="Comments" bordered={false} style={{ marginTop: 24 }}>
-            {comments.map((comment, index) => (
+          <Card title="Comments" style={{ marginTop: 24 }}>
+            {comments.map((c, i) => (
               <Comment
-                key={index}
-                author={comment.author}
-                content={<p>{comment.text}</p>}
+                key={i}
+                author={c.author}
+                content={<p>{c.text}</p>}
                 datetime={
-                  <Tooltip
-                    title={moment(comment.date).format("YYYY-MM-DD HH:mm:ss")}
-                  >
-                    <span>{moment(comment.date).fromNow()}</span>
+                  <Tooltip title={moment(c.date).format("YYYY-MM-DD HH:mm:ss")}>
+                    <span>{moment(c.date).fromNow()}</span>
                   </Tooltip>
                 }
               />
@@ -292,11 +253,7 @@ const ProjectDetails = (onCancel) => {
               placeholder="Add a comment..."
               style={{ marginTop: 16 }}
             />
-            <Button
-              type="primary"
-              onClick={handleCommentSubmit}
-              style={{ marginTop: 8 }}
-            >
+            <Button type="primary" onClick={handleCommentSubmit} style={{ marginTop: 8 }}>
               Post Comment
             </Button>
           </Card>
@@ -306,30 +263,26 @@ const ProjectDetails = (onCancel) => {
           <Card title="Team Members" bordered={false}>
             <Select
               mode="multiple"
-              style={{ width: "100%", marginBottom: 16 }}
               placeholder="Assign team members"
+              style={{ width: "100%", marginBottom: 16 }}
               value={assignedUsers}
-              onChange={handleAssignUser}
+              onChange={setAssignedUsers}
             >
-              {mockUsers.map((user) => (
-                <Option key={user.id} value={user.id}>
-                  {user.name}
+              {users.map((user) => (
+                <Option key={user._id} value={user._id}>
+                  {user.first_name} {user.last_name}
                 </Option>
               ))}
             </Select>
 
             <List
               itemLayout="horizontal"
-              dataSource={mockUsers.filter((user) =>
-                assignedUsers.includes(user.id)
-              )}
+              dataSource={users.filter((u) => assignedUsers.includes(u._id))}
               renderItem={(user) => (
                 <List.Item>
                   <List.Item.Meta
-                    avatar={
-                      <Avatar>{user.name.charAt(0).toUpperCase()}</Avatar>
-                    }
-                    title={user.name}
+                    avatar={<Avatar>{user.first_name.charAt(0).toUpperCase()}</Avatar>}
+                    title={`${user.first_name} ${user.last_name}`}
                   />
                 </List.Item>
               )}
@@ -340,38 +293,36 @@ const ProjectDetails = (onCancel) => {
 
       <Modal
         title="Add Task"
-        visible={isTaskModalVisible}
+        open={isTaskModalVisible}
         onCancel={() => setIsTaskModalVisible(false)}
         footer={null}
       >
-        <Form onFinish={handleAddTask} layout="vertical" form={taskForm}>
-        {contextHolder}
-          <Form.Item
-            label="Task Title"
-            name="title"
-            rules={[{ required: true, message: "Please enter task title" }]}
-          >
+        <Form layout="vertical" onFinish={handleTaskSubmit} form={taskForm}>
+          <Form.Item name="title" label="Task Title" rules={[{ required: true }]}>
             <Input />
           </Form.Item>
-          <Form.Item label="Description" name="description">
+          <Form.Item name="description" label="Description" rules={[{ required: true }]}>
             <TextArea />
           </Form.Item>
-          <Form.Item label="Due Date" name="due_date">
+          <Form.Item name="due_date" label="Due Date" rules={[{ required: true }]}>
             <DatePicker style={{ width: "100%" }} />
           </Form.Item>
-          <Form.Item label="Assigned_To" name="assigned_to">
-            <Select>
-              {mockUsers.map((user) => (
-                <Option key={user.id} value={user.id}>
-                  {user.name}
-                </Option>
-              ))}
-            </Select>
+          <Form.Item name="assigned_to" label="Assigned To" rules={[{ required: true }]}>
+            {usersLoading ? (
+              <Spin />
+            ) : (
+              <Select placeholder="Choose a team member">
+                {users.map((user) => (
+                  <Option key={user._id} value={user._id}>
+                    {user.first_name} {user.last_name}
+                  </Option>
+                ))}
+              </Select>
+            )}
           </Form.Item>
           <Form.Item>
-            <Button type="primary" htmlType="submit" onClick={() => setIsModalVisible(true)}
-            >
-              Add Task
+            <Button type="primary" htmlType="submit" block>
+              Create Task
             </Button>
           </Form.Item>
         </Form>
