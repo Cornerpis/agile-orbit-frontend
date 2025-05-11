@@ -44,6 +44,7 @@ const SignIn = () => {
               localStorage.setItem("token", response.token);
               localStorage.setItem("email", response.user.email);
               localStorage.setItem("role", response.user.role);
+              localStorage.setItem("userId", response.user._id);
               history.push("/dashboard");
             }}
           >

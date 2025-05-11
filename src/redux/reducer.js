@@ -1,4 +1,5 @@
 // src/redux/reducers.js
+
 const initialState = {
   isAuthenticated: false,
   user: null,
@@ -8,8 +9,9 @@ const initialState = {
   projects: [],
   users: [],
   sprint: null,
-  token: localStorage.getItem('token') || null,
+  token: localStorage.getItem("token") || null,
   projectMembers: [], // ✅ new: store members for selected project
+  tasks: [],
 };
 
 const authReducer = (state = initialState, action) => {
@@ -36,8 +38,13 @@ const authReducer = (state = initialState, action) => {
     case "CREATE_SPRINT_SUCCESS":
       return { ...state, sprint: action.payload, loading: false };
 
-    case "FETCH_PROJECT_MEMBERS_SUCCESS":  // ✅ new case
+    case "FETCH_PROJECT_MEMBERS_SUCCESS": // ✅ new case
       return { ...state, projectMembers: action.payload, loading: false };
+    case "FETCH_TASKS_BY_PROJECT":
+      return {
+        ...state,
+        taßsks: action.payload,
+      };
 
     case "GET_STATS_FAILURE":
     case "FETCH_PROJECT_FAILURE":

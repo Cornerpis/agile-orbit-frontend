@@ -328,7 +328,7 @@ function Sidenav({ color }) {
               </NavLink>
             </Menu.Item>
 
-            <Menu.Item key="6">
+            {/* <Menu.Item key="6">
               <NavLink to="/backlog">
                 <span
                   className="icon"
@@ -340,10 +340,10 @@ function Sidenav({ color }) {
                 </span>
                 <span className="label">Project Backlog</span>
               </NavLink>
-            </Menu.Item>
+            </Menu.Item> */}
 
             <Menu.Item key="10">
-              <NavLink to="/assessment/create">
+              <NavLink to="/create-assessment">
                 <span
                   className="icon"
                   style={{
@@ -384,8 +384,8 @@ function Sidenav({ color }) {
           </>
         ) : (
           <>
-            <Menu.Item key="5">
-              <NavLink to="/kansanboard">
+            <Menu.Item key="10">
+              <NavLink to="/my-projects">
                 <span
                   className="icon"
                   style={{
@@ -394,9 +394,10 @@ function Sidenav({ color }) {
                 >
                   {kansanboard}
                 </span>
-                <span className="label">Kanban Board</span>
+                <span className="label">My Projects</span>
               </NavLink>
             </Menu.Item>
+
             <Menu.Item key="4">
               <NavLink to="/assesment">
                 <span

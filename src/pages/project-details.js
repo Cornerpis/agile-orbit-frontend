@@ -27,7 +27,12 @@ import moment from "moment";
 import { useDispatch, useSelector } from "react-redux";
 
 import InviteTeam from "../pages/invite-team";
-import { assignProjectLeader, CreateTask, fetchUsers } from "../redux/action";
+import {
+  assignProjectLeader,
+  CreateTask,
+  fetchUsers,
+  fetchTasks,
+} from "../redux/action";
 
 const { Title, Text, Paragraph } = Typography;
 const { Option } = Select;
@@ -52,7 +57,9 @@ const ProjectDetails = ({ visible, onCancel, loading }) => {
   const loadingUsers = useSelector((state) => state.users?.loading || false);
   const project = projects.find((p) => p._id === projectId); // Using projectId from useParams
 
-  const [assignedUsers, setAssignedUsers] = useState(project?.assignedUsers || []);
+  const [assignedUsers, setAssignedUsers] = useState(
+    project?.assignedUsers || []
+  );
   const [tasks, setTasks] = useState(project?.tasks || []);
 
   // Load users when modal is visible
@@ -68,6 +75,22 @@ const ProjectDetails = ({ visible, onCancel, loading }) => {
       }
     };
 
+    const loadProjectTask = async () => {
+      try {
+        const fetched = await dispatch(fetchTasks(projectId));
+
+        console.log("Fetched taskshhhjj:", fetched);
+
+        setTasks(fetched.data); // update local state
+      } catch (err) {
+        message.error("Failed to load project tasks");
+      }
+    };
+
+    if (projectId && token) {
+      loadProjectTask();
+    }
+
     if (visible) {
       loadUsers();
       form.resetFields();
@@ -78,7 +101,9 @@ const ProjectDetails = ({ visible, onCancel, loading }) => {
   const handleSubmit = async (values) => {
     try {
       const response = await dispatch(assignProjectLeader(values));
-      const successMessage = response?.message?.toLowerCase?.().includes("success");
+      const successMessage = response?.message
+        ?.toLowerCase?.()
+        .includes("success");
 
       if (response?.statusCode === 201 || response?.success || successMessage) {
         api.success({
@@ -90,9 +115,15 @@ const ProjectDetails = ({ visible, onCancel, loading }) => {
       } else if (response?.statusCode === 400) {
         api.warning({ message: "Failed", description: response?.message });
       } else if (response?.statusCode === 409) {
-        api.error({ message: "Duplicate", description: "User already exists." });
+        api.error({
+          message: "Duplicate",
+          description: "User already exists.",
+        });
       } else {
-        api.error({ message: "Unexpected Error", description: response?.message });
+        api.error({
+          message: "Unexpected Error",
+          description: response?.message,
+        });
       }
     } catch (error) {
       api.error({ message: "Network Error", description: error?.message });
@@ -102,14 +133,18 @@ const ProjectDetails = ({ visible, onCancel, loading }) => {
   // Create new task
   const handleTaskSubmit = async (taskValues) => {
     try {
-      const response = await dispatch(CreateTask({ ...taskValues, projectId, token })); // Using projectId
+      const response = await dispatch(
+        CreateTask({ ...taskValues, projectId, token })
+      ); // Using projectId
 
       if (response?.statusCode === 201 || response?.successfully) {
         api.success({ message: "Task added to project successfully." });
-        setTasks([...tasks, taskValues]);
+        const newTask = response?.data || taskValues;
+        setTasks([...tasks, newTask]);
+
         setIsTaskModalVisible(false);
         taskForm.resetFields();
-        console.log('Project ID:', projectId);
+        console.log("Project ID:", projectId);
       } else {
         api.error({ message: response?.message || "Error creating task" });
       }
@@ -124,7 +159,10 @@ const ProjectDetails = ({ visible, onCancel, loading }) => {
   // Create new comment
   const handleCommentSubmit = () => {
     if (newComment.trim()) {
-      setComments([...comments, { text: newComment, author: "You", date: new Date() }]);
+      setComments([
+        ...comments,
+        { text: newComment, author: "You", date: new Date() },
+      ]);
       setNewComment("");
     }
   };
@@ -132,7 +170,7 @@ const ProjectDetails = ({ visible, onCancel, loading }) => {
   // Update task status
   const handleTaskStatusChange = (taskId, status) => {
     const updatedTasks = tasks.map((task) =>
-      task.id === taskId ? { ...task, status } : task
+      (task._id || task.id) === taskId ? { ...task, status } : task
     );
     setTasks(updatedTasks);
   };
@@ -145,7 +183,13 @@ const ProjectDetails = ({ visible, onCancel, loading }) => {
   const progress = tasks.length ? (completedTasks / tasks.length) * 100 : 0;
 
   return (
-    <Card style={{ margin: 24, border: "1px solid #e8e8e8", boxShadow: "0 2px 8px rgba(0,0,0,0.15)" }}>
+    <Card
+      style={{
+        margin: 24,
+        border: "1px solid #e8e8e8",
+        boxShadow: "0 2px 8px rgba(0,0,0,0.15)",
+      }}
+    >
       {contextHolder}
 
       <InviteTeam
@@ -160,15 +204,27 @@ const ProjectDetails = ({ visible, onCancel, loading }) => {
           <Title level={2}>{project.Title}</Title>
         </Col>
         <Col>
-          <Button type="primary" icon={<PlusOutlined />} onClick={() => setIsTaskModalVisible(true)}>
+          <Button
+            type="primary"
+            icon={<PlusOutlined />}
+            onClick={() => setIsTaskModalVisible(true)}
+            style={{ marginRight: 16 }}
+          >
             Add Task
+          </Button>
+          <Button
+            style={{ backgroundColor: "#D3D3D3", color: "black" }}
+            icon={<PlusOutlined />}
+            onClick={() => setIsTaskModalVisible(true)}
+          >
+            Add Project Backlog
           </Button>
         </Col>
       </Row>
 
       <Row gutter={[24, 24]}>
         <Col span={16}>
-          <Card title="Project Details" bordered={false}>
+          <Card title={project.name} bordered={false}>
             <Row gutter={[16, 16]}>
               <Col span={12}>
                 <Text strong>Description:</Text>
@@ -179,21 +235,29 @@ const ProjectDetails = ({ visible, onCancel, loading }) => {
               </Col>
               <Col span={12}>
                 <Text strong>Priority:</Text>
-                <Tag color={
-                  project.priority_level === "High" ? "red" :
-                  project.priority_level === "Medium" ? "orange" : "green"
-                }>
+                <Tag
+                  color={
+                    project.priority_level === "High"
+                      ? "red"
+                      : project.priority_level === "Medium"
+                      ? "orange"
+                      : "green"
+                  }
+                >
                   {project.priority_level}
                 </Tag>
               </Col>
               <Col span={12}>
-                <Text strong>Deadline:</Text> <Text>{project.end_time}</Text>
+                <Text strong>Deadline:</Text>{" "}
+                <Text>{moment(project.end_time).format("YYYY-MM-DD")}</Text>
               </Col>
               <Col span={12}>
-                <Text strong>Start Date:</Text> <Text>{project.startDate}</Text>
+                <Text strong>Start Date:</Text>{" "}
+                <Text>{moment(project.startDate).format("YYYY-MM-DD")}</Text>
               </Col>
               <Col span={12}>
-                <Text strong>End Date:</Text> <Text>{project.end_time}</Text>
+                <Text strong>End Date:</Text>{" "}
+                <Text>{moment(project.end_time).format("YYYY-MM-DD")}</Text>
               </Col>
             </Row>
             <Progress percent={progress} style={{ marginTop: 16 }} />
@@ -208,24 +272,55 @@ const ProjectDetails = ({ visible, onCancel, loading }) => {
                     <Select
                       defaultValue={task.status}
                       style={{ width: 120 }}
-                      onChange={(value) => handleTaskStatusChange(task.id, value)}
+                      onChange={(value) =>
+                        handleTaskStatusChange(task.id, value)
+                      }
+                      disabled={true}
                     >
                       <Option value="To Do">To Do</Option>
                       <Option value="In Progress">In Progress</Option>
                       <Option value="Done">Done</Option>
-                    </Select>
+                    </Select>,
                   ]}
                 >
                   <List.Item.Meta
                     title={task.title}
                     description={
                       <>
-                        <Text>Due: {task.due_date ? moment(task.due_date).format("YYYY-MM-DD") : "N/A"}</Text><br />
-                        <Text>Assigned: {
-                          users.find(u => u._id === task.assigned_to)
-                            ? `${users.find(u => u._id === task.assigned_to).first_name} ${users.find(u => u._id === task.assigned_to).last_name}`
-                            : "N/A"
-                        }</Text>
+                        <Text>
+                          Due:{" "}
+                          {task.due_date
+                            ? moment(task.due_date).format("YYYY-MM-DD")
+                            : "N/A"}
+                        </Text>
+                        <br />
+                        <Text>
+                          Assigned:{" "}
+                          {users.find((u) => u._id === task.assigned_to)
+                            ? `${
+                                users.find((u) => u._id === task.assigned_to)
+                                  .first_name
+                              } ${
+                                users.find((u) => u._id === task.assigned_to)
+                                  .last_name
+                              }`
+                            : "N/A"}
+                        </Text>
+                        <br />
+                        <Text>
+                          Status:{" "}
+                          <Tag
+                            color={
+                              task.status === "Done"
+                                ? "green"
+                                : task.status === "In Progress"
+                                ? "orange"
+                                : "red"
+                            }
+                          >
+                            {task.status}
+                          </Tag>
+                        </Text>
                       </>
                     }
                   />
@@ -253,7 +348,11 @@ const ProjectDetails = ({ visible, onCancel, loading }) => {
               placeholder="Add a comment..."
               style={{ marginTop: 16 }}
             />
-            <Button type="primary" onClick={handleCommentSubmit} style={{ marginTop: 8 }}>
+            <Button
+              type="primary"
+              onClick={handleCommentSubmit}
+              style={{ marginTop: 8 }}
+            >
               Post Comment
             </Button>
           </Card>
@@ -281,7 +380,9 @@ const ProjectDetails = ({ visible, onCancel, loading }) => {
               renderItem={(user) => (
                 <List.Item>
                   <List.Item.Meta
-                    avatar={<Avatar>{user.first_name.charAt(0).toUpperCase()}</Avatar>}
+                    avatar={
+                      <Avatar>{user.first_name.charAt(0).toUpperCase()}</Avatar>
+                    }
                     title={`${user.first_name} ${user.last_name}`}
                   />
                 </List.Item>
@@ -298,16 +399,32 @@ const ProjectDetails = ({ visible, onCancel, loading }) => {
         footer={null}
       >
         <Form layout="vertical" onFinish={handleTaskSubmit} form={taskForm}>
-          <Form.Item name="title" label="Task Title" rules={[{ required: true }]}>
+          <Form.Item
+            name="title"
+            label="Task Title"
+            rules={[{ required: true }]}
+          >
             <Input />
           </Form.Item>
-          <Form.Item name="description" label="Description" rules={[{ required: true }]}>
+          <Form.Item
+            name="description"
+            label="Description"
+            rules={[{ required: true }]}
+          >
             <TextArea />
           </Form.Item>
-          <Form.Item name="due_date" label="Due Date" rules={[{ required: true }]}>
+          <Form.Item
+            name="due_date"
+            label="Due Date"
+            rules={[{ required: true }]}
+          >
             <DatePicker style={{ width: "100%" }} />
           </Form.Item>
-          <Form.Item name="assigned_to" label="Assigned To" rules={[{ required: true }]}>
+          <Form.Item
+            name="assigned_to"
+            label="Assigned To"
+            rules={[{ required: true }]}
+          >
             {usersLoading ? (
               <Spin />
             ) : (

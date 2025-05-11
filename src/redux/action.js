@@ -1,7 +1,7 @@
 // src/redux/actions.js
 import axios from "axios";
 import baseUrl from "../apiConfig";
-import { message } from 'antd';
+import { message } from "antd";
 import { persistor } from "./store";
 
 export const signIn = (credentials) => async (dispatch) => {
@@ -105,10 +105,10 @@ export const getStats = (token) => {
 export const inviteTeamMember = (projectId, userId) => async (dispatch) => {
   try {
     const token = localStorage.getItem("token");
-    const userIdFromLocalStorage = localStorage.getItem("userId");  // Get userId from localStorage
+    const userIdFromLocalStorage = localStorage.getItem("userId"); // Get userId from localStorage
 
-    console.log("Token:", token);  // Check token value
-    console.log("UserId from localStorage:", userIdFromLocalStorage);  // Check userId value
+    console.log("Token:", token); // Check token value
+    console.log("UserId from localStorage:", userIdFromLocalStorage); // Check userId value
 
     if (!token || !userIdFromLocalStorage) {
       throw new Error("User is not authenticated or missing token/userId.");
@@ -120,14 +120,14 @@ export const inviteTeamMember = (projectId, userId) => async (dispatch) => {
       {
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${'token'}`,
+          Authorization: `Bearer ${token}`,
         },
       }
     );
 
-    return response.data;  // Return the response to the component
+    return response.data; // Return the response to the component
   } catch (error) {
-    console.error("API error in invite team member:", error);  // Log full error for debugging
+    console.error("API error in invite team member:", error); // Log full error for debugging
     return {
       success: false,
       statusCode: error.response?.status || 500,
@@ -135,10 +135,6 @@ export const inviteTeamMember = (projectId, userId) => async (dispatch) => {
     };
   }
 };
-
-
-
-
 
 export const fetchProjects = (token) => {
   return async (dispatch) => {
@@ -196,12 +192,15 @@ export const fetchUsers = (token) => {
 export const fetchProjectMembers = (projectId, token) => {
   return async (dispatch) => {
     try {
-      const response = await axios.get(`${baseUrl}/project/${projectId}/members`, {
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-      });
+      const response = await axios.get(
+        `${baseUrl}/project/${projectId}/members`,
+        {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
 
       dispatch({
         type: "FETCH_PROJECT_MEMBERS_SUCCESS",
@@ -216,14 +215,71 @@ export const fetchProjectMembers = (projectId, token) => {
     }
   };
 };
-// This action creator handles user registration
 
+export const fetchUserProjects = (token) => {
+  return async (dispatch) => {
+    try {
+      const response = await axios.get(`${baseUrl}/project/user-projects`, {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      dispatch({
+        type: "FETCH_USER_PROJECTS_SUCCESS",
+        payload: response.data.data, // For the reducer
+      });
+
+      // ✅ Return data here so your component can use it
+      return response.data;
+    } catch (error) {
+      console.error("Error fetching user projects:", error);
+
+      dispatch({
+        type: "FETCH_USER_PROJECTS_FAILURE",
+        payload: error,
+      });
+
+      // ❗Return error response to handle it in the component
+      return { message: "Failed to fetch projects", error };
+    }
+  };
+};
+
+export const fetchTasksByProject =
+  (user_id, projectId, token) => async (dispatch) => {
+    try {
+      const response = await axios.get(
+        `${baseUrl}/user/${user_id}/tasks/${projectId}`,
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
+
+      const tasks = response?.data;
+
+      if (Array.isArray(tasks)) {
+        dispatch({
+          type: "FETCH_TASKS_BY_PROJECT",
+          payload: tasks,
+        });
+      } else {
+      }
+
+      console.log("Fetched tasks:", tasks);
+      return tasks;
+    } catch (error) {
+      console.error("Error fetching tasks:", error);
+      message.error("Error fetching tasks");
+      return [];
+    }
+  };
+
+// This action creator handles user registration
 export const CreateUserModal = (credentials) => async (dispatch) => {
   try {
-    const response = await axios.post(
-      `${baseUrl}/register`,
-      credentials
-    );
+    const response = await axios.post(`${baseUrl}/register`, credentials);
     const userData = response.data;
 
     dispatch({
@@ -256,7 +312,7 @@ export const CreateUserModal = (credentials) => async (dispatch) => {
 export const CreateTask = (credentials) => async (dispatch) => {
   try {
     const { projectId, ...taskData } = credentials;
-    const token = localStorage.getItem('token');
+    const token = localStorage.getItem("token");
 
     if (!token) {
       return {
@@ -267,7 +323,7 @@ export const CreateTask = (credentials) => async (dispatch) => {
 
     const config = {
       headers: {
-        Authorization: `Bearer ${'token'}`,
+        Authorization: `Bearer ${token}`,
       },
     };
 
@@ -287,7 +343,6 @@ export const CreateTask = (credentials) => async (dispatch) => {
       ...userData,
       statusCode: 201, // Explicitly set expected code for the component
     };
-
   } catch (error) {
     if (error.response) {
       return {
@@ -312,10 +367,13 @@ export const CreateTask = (credentials) => async (dispatch) => {
 
 export const fetchTasks = (projectId) => async (dispatch) => {
   try {
-    const token = localStorage.getItem('token');
+    const token = localStorage.getItem("token");
 
     if (!token) {
-      return { status: "failed", message: "Authentication required. Please login." };
+      return {
+        status: "failed",
+        message: "Authentication required. Please login.",
+      };
     }
 
     const config = {
@@ -324,20 +382,26 @@ export const fetchTasks = (projectId) => async (dispatch) => {
       },
     };
 
-    const response = await axios.get(`${baseUrl}/project/${projectId}/tasks`, config);
+    const response = await axios.get(
+      `${baseUrl}/project/${projectId}/tasks`,
+      config
+    );
     const tasks = response.data;
 
     dispatch({
       type: "FETCH_TASKS",
       payload: tasks,
     });
-    console.log('Fetched users:', response.data);
+
     return tasks;
   } catch (error) {
     if (error.response) {
       return error.response.data;
     } else if (error.request) {
-      return { status: "failed", message: "No response received from the server" };
+      return {
+        status: "failed",
+        message: "No response received from the server",
+      };
     } else {
       return { status: "failed", message: "Error setting up the request" };
     }
@@ -358,7 +422,7 @@ export const createAssessment = (token, assessmentData) => async (dispatch) => {
       {
         headers: {
           Authorization: `Bearer ${token}`,
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
       }
     );
@@ -384,24 +448,55 @@ export const createAssessment = (token, assessmentData) => async (dispatch) => {
     }
   }
 };
+
+export const getAssessmentList = (token) => async (dispatch) => {
+  try {
+    const response = await axios.get(`${baseUrl}/assessments`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
+      },
+    });
+
+    const data = response.data.data;
+
+    return data;
+  } catch (error) {
+    if (error.response) {
+      return error.response.data;
+    } else if (error.request) {
+      return {
+        status: "failed",
+        message: "No response received from the server",
+      };
+    } else {
+      return { status: "failed", message: "Error setting up the request" };
+    }
+  }
+};
 //start assessment
 // This action creator starts an assessment by making an API call
-export const startAssessment = (assessmentId, token) => {
+export const startAssessment = (assessmentId) => {
   return async (dispatch) => {
+    const token = localStorage.getItem("token");
     try {
       // Make an API call to start the assessment
-      const response = await axios.get(`${baseUrl}/assessment/:assessmentId/start`, {
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`, // Include the bearer token
-        },
-      });
+      const response = await axios.get(
+        `${baseUrl}/assessment/${assessmentId}/start`,
+        {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`, // Include the bearer token
+          },
+        }
+      );
 
       // Dispatch the fetched data to the store
       dispatch({
         type: "START_ASSESSMENT_SUCCESS",
         payload: response.data,
       });
+      return response.data;
     } catch (error) {
       // Handle errors, dispatch an error action
       console.error("Error starting assessment:", error);
@@ -429,13 +524,11 @@ export const createProject = (token, credentials) => async (dispatch) => {
       `${baseUrl}/create/project`,
       credentials,
       {
-        headers:{
-        "Content-Type": "application/json",
-        Authorization:`Bearer ${token}`
-        
-        }
-       
-      },
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+      }
     );
     const userData = response.data;
 
@@ -443,7 +536,7 @@ export const createProject = (token, credentials) => async (dispatch) => {
       type: "CREATE_PROJECT",
       payload: userData,
     });
-    console.log('API Response:', response.data);
+    console.log("API Response:", response.data);
     // Return the user data upon successful login
     return userData;
   } catch (error) {
@@ -467,42 +560,43 @@ export const createProject = (token, credentials) => async (dispatch) => {
 };
 
 // add team member to a project
-export const addProjectMember = (projectId, formData, token) => async (dispatch) => {
-  try {
-    const response = await axios.post(
-      `${baseUrl}/project/${projectId}/add-member`,
-      formData,
-      {
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
+export const addProjectMember =
+  (projectId, formData, token) => async (dispatch) => {
+    try {
+      const response = await axios.post(
+        `${baseUrl}/project/${projectId}/add-member`,
+        formData,
+        {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      if (response.data.success) {
+        message.success(response.data.message || "Member added successfully");
+        dispatch({
+          type: "ADD_PROJECT_MEMBER_SUCCESS",
+          payload: { projectId, member: response.data.data },
+        });
+      } else {
+        message.error(response.data.message || "Failed to add member");
       }
-    );
 
-    if (response.data.success) {
-      message.success(response.data.message || 'Member added successfully');
-      dispatch({
-        type: "ADD_PROJECT_MEMBER_SUCCESS",
-        payload: { projectId, member: response.data.data },
-      });
-    } else {
-      message.error(response.data.message || 'Failed to add member');
-    }
+      return response.data;
+    } catch (error) {
+      let errorMessage = "An error occurred while adding team member";
 
-    return response.data;
-  } catch (error) {
-    let errorMessage = 'An error occurred while adding team member';
-    
-    if (error.response) {
-      errorMessage = error.response.data.message || errorMessage;
+      if (error.response) {
+        errorMessage = error.response.data.message || errorMessage;
+      }
+
+      message.error(errorMessage);
+      console.error("Add member error:", error);
+      return { success: false, message: errorMessage };
     }
-    
-    message.error(errorMessage);
-    console.error('Add member error:', error);
-    return { success: false, message: errorMessage };
-  }
-};
+  };
 
 export const fetchProjectDetails = (projectId) => async (dispatch) => {
   try {
@@ -522,157 +616,114 @@ export const fetchProjectDetails = (projectId) => async (dispatch) => {
   }
 };
 
-export const addTaskToProject = (token, projectId, taskData) => async (dispatch) => {
-  try {
-    const response = await axios.post(
-      `${baseUrl}/project/${projectId}/task`,
-      taskData,
-      {
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
+export const addTaskToProject =
+  (token, projectId, taskData) => async (dispatch) => {
+    try {
+      const response = await axios.post(
+        `${baseUrl}/project/${projectId}/task`,
+        taskData,
+        {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      dispatch({
+        type: "ADD_TASK_SUCCESS",
+        payload: response.data,
+      });
+
+      return response.data;
+    } catch (error) {
+      if (error.response) {
+        return error.response.data;
       }
-    );
-    
-    dispatch({
-      type: "ADD_TASK_SUCCESS",
-      payload: response.data,
-    });
-    
-    return response.data;
-  } catch (error) {
-    if (error.response) {
-      return error.response.data;
+      throw error;
     }
-    throw error;
-  }
-};
+  };
 // This action creator fetches the assessment data
 // by making an API call to the server
 export const fetchAssessment = (assessmentId, token) => async (dispatch) => {
-  dispatch({ type: 'FETCH_ASSESSMENT_REQUEST' });
+  dispatch({ type: "FETCH_ASSESSMENT_REQUEST" });
   try {
-    const response = await axios.get(`${baseUrl}/assessment/${assessmentId}/start`, {
-      headers: { Authorization: `Bearer ${token}` },
-    });
-    
-    const questions = response.data.questions;
-
-    dispatch({
-      type: 'FETCH_ASSESSMENT_SUCCESS',
-      payload: questions,
-    });
-    console.log('Fetched questions:', response.data);
-  } catch (error) {
-    dispatch({
-      type: 'FETCH_ASSESSMENT_FAILURE',
-      payload: error.message || 'Something went wrong',
-    });
-  }
-};
-
-
-// export const fetchAssessment = (assessmentId, token) => async (dispatch) => {
-//   dispatch({ type: 'ASSESSMENT_FETCH_REQUEST' });
-
-//   try {
-//     const response = await fetch(
-//       `http://localhost:3000/api/v1/assessment/${assessmentId}/start`,
-//       {
-//         method: 'GET',
-//         headers: {
-//           'Authorization': `Bearer ${token}`,
-//           'Content-Type': 'application/json',
-//         },
-//       }
-//     );
-
-//     const data = await response.json();
-//     console.log('Fetched questions:', response.data);
-//     if (data.success) {
-//       message.success(data.message || 'Assessment fetched successfully');
-//     }
-//     if (data.error) {
-//       message.error(data.message || 'Failed to fetch assessment');
-//     }
-//     // Check if the response is ok (status code 200-299)
-
-//     if (!response.ok) {
-//       throw new Error(data.message || 'Failed to fetch assessment');
-//     }
-
-//     dispatch({
-//       type: 'ASSESSMENT_FETCH_SUCCESS',
-//       payload: data.data.questions || [],
-//     });
-//   } catch (error) {
-//     dispatch({
-//       type: 'ASSESSMENT_FETCH_FAIL',
-//       payload: error.message,
-//     });
-//   }
-// };
-//fetch assessment ends
-
-// This action creator submits the assessment answers
-export const submitAssessment = (assessmentId, answers, token) => async (dispatch) => {
-  dispatch({ type: 'ASSESSMENT_SUBMIT_REQUEST' });
-
-  try {
-    const response = await fetch(
-      `http://localhost:3000/api/v1/assessment/${assessmentId}/start`,
+    const response = await axios.get(
+      `${baseUrl}/assessment/${assessmentId}/start`,
       {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ answers }),
+        headers: { Authorization: `Bearer ${token}` },
       }
     );
 
-    const data = await response.json();
+    const questions = response.data.questions;
 
-    if (!response.ok) {
-      throw new Error(data.message || 'Submission failed');
-    }
-
-    message.success('Assessment submitted successfully!');
-    dispatch({ type: 'ASSESSMENT_SUBMIT_SUCCESS', payload: data });
-  } catch (error) {
-    message.error('Submission failed.');
     dispatch({
-      type: 'ASSESSMENT_SUBMIT_FAIL',
-      payload: error.message,
+      type: "FETCH_ASSESSMENT_SUCCESS",
+      payload: questions,
+    });
+    console.log("Fetched questions:", response.data);
+  } catch (error) {
+    dispatch({
+      type: "FETCH_ASSESSMENT_FAILURE",
+      payload: error.message || "Something went wrong",
     });
   }
 };
-//submit assessment ends
 
+// This action creator submits the assessment answers
+export const submitAssessment =
+  (assessmentId, answers, token) => async (dispatch) => {
+    dispatch({ type: "ASSESSMENT_SUBMIT_REQUEST" });
+
+    try {
+      const response = await fetch(
+        `http://localhost:3000/api/v1/assessment/${assessmentId}/start`,
+        {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ answers }),
+        }
+      );
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.message || "Submission failed");
+      }
+
+      message.success("Assessment submitted successfully!");
+      dispatch({ type: "ASSESSMENT_SUBMIT_SUCCESS", payload: data });
+    } catch (error) {
+      message.error("Submission failed.");
+      dispatch({
+        type: "ASSESSMENT_SUBMIT_FAIL",
+        payload: error.message,
+      });
+    }
+  };
+//submit assessment ends
 
 //sprint creation
 // This action creator creates a new sprint by making an API call
-export const CREATE_SPRINT_REQUEST = 'CREATE_SPRINT_REQUEST';
-export const CREATE_SPRINT_SUCCESS = 'CREATE_SPRINT_SUCCESS';
-export const CREATE_SPRINT_FAILURE = 'CREATE_SPRINT_FAILURE';
+export const CREATE_SPRINT_REQUEST = "CREATE_SPRINT_REQUEST";
+export const CREATE_SPRINT_SUCCESS = "CREATE_SPRINT_SUCCESS";
+export const CREATE_SPRINT_FAILURE = "CREATE_SPRINT_FAILURE";
 
 // Create Sprint Action
 export const createSprint = (sprintData) => async (dispatch) => {
   dispatch({ type: CREATE_SPRINT_REQUEST });
 
-  const token = localStorage.getItem('token');
+  const token = localStorage.getItem("token");
 
   try {
-    const response = await axios.post(
-      `${baseUrl}/create/project`,
-      sprintData,
-      {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      }
-    );
+    const response = await axios.post(`${baseUrl}/create/project`, sprintData, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
 
     dispatch({ type: CREATE_SPRINT_SUCCESS, payload: response.data });
 
@@ -687,119 +738,99 @@ export const createSprint = (sprintData) => async (dispatch) => {
     // Return error for the component to handle
     return {
       success: false,
-      message: error?.response?.data?.message || error.message || 'Something went wrong',
+      message:
+        error?.response?.data?.message ||
+        error.message ||
+        "Something went wrong",
     };
   }
 };
-//sprint creation ends
-//update user profile
-// Action Types (optional, if you use Redux state updates)
-export const UPDATE_USER_REQUEST = 'UPDATE_USER_REQUEST';
-export const UPDATE_USER_SUCCESS = 'UPDATE_USER_SUCCESS';
-export const UPDATE_USER_FAILURE = 'UPDATE_USER_FAILURE';
 
-// Update user profile securely using token (without passing userId)
-export const UpdateUserProfile = (token, updatedUserData) => async (dispatch) => {
-  dispatch({ type: UPDATE_USER_REQUEST });
+// Update user profile
 
-  try {
-    const response = await axios.put(
-      'http://localhost:3000/api/v1/users/me',
-      updatedUserData,
-      {
-        headers: {
-          Authorization: `Bearer ${token}`,
-          'Content-Type': 'application/json',
-        },
+export const updateTaskStatus =
+  (token, taskId, statusData) => async (dispatch) => {
+    try {
+      const response = await axios.put(
+        `${baseUrl}/task/${taskId}/status`,
+        statusData,
+        {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      dispatch({
+        type: "UPDATE_TASK_STATUS_SUCCESS",
+        payload: response.data,
+      });
+
+      return response.data;
+    } catch (error) {
+      if (error.response) {
+        return error.response.data;
       }
-    );
+      throw error;
+    }
+  };
+// This action creator assigns a project leader by making an API call
+export const assignProjectLeader =
+  (token, projectId, userId) => async (dispatch) => {
+    try {
+      const response = await axios.put(
+        `${baseUrl}/project/${projectId}/assign-leader`,
+        { userId },
+        {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
 
-    dispatch({
-      type: UPDATE_USER_SUCCESS,
-      payload: response.data,
-    });
+      const assignedData = response.data;
 
-    return response.data; // useful for UI feedback
-  } catch (error) {
-    dispatch({
-      type: UPDATE_USER_FAILURE,
-      payload: error.response?.data || error.message,
+      dispatch({
+        type: "ASSIGN_PROJECT_LEADER",
+        payload: assignedData,
+      });
+
+      return assignedData;
+    } catch (error) {
+      if (error.response) {
+        return error.response.data;
+      } else if (error.request) {
+        console.error("No response received:", error.request);
+        return {
+          status: "failed",
+          message: "No response received from the server",
+        };
+      } else {
+        console.error("Error setting up the request:", error.message);
+        return { status: "failed", message: "Error setting up the request" };
+      }
+    }
+  };
+
+export const UpdateUserProfile = (token, updatedData) => async () => {
+  try {
+    const res = await axios.put(`${baseUrl}/me`, updatedData, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
     });
 
     return {
-      success: false,
-      message:
-        error.response?.data?.message || 'Failed to update profile. Try again.',
+      success: true,
+      message: res.data.message,
+      user: res.data.user,
     };
-  }
-};
-
-// Update user profile 
-
-
-
-
-
-export const updateTaskStatus = (token, projectId, taskId, statusData) => async (dispatch) => {
-  try {
-    const response = await axios.patch(
-      `${baseUrl}/project/${projectId}/task/${taskId}`,
-      statusData,
-      {
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-      }
-    );
-    
-    dispatch({
-      type: "UPDATE_TASK_STATUS_SUCCESS",
-      payload: response.data,
-    });
-    
-    return response.data;
   } catch (error) {
-    if (error.response) {
-      return error.response.data;
-    }
-    throw error;
-  }
-};
-// This action creator assigns a project leader by making an API call
-export const assignProjectLeader = (token, projectId, userId) => async (dispatch) => {
-  try {
-    const response = await axios.put(
-      `${baseUrl}/project/${projectId}/assign-leader`,
-      { userId },
-      {
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-      }
-    );
-
-    const assignedData = response.data;
-
-    dispatch({
-      type: "ASSIGN_PROJECT_LEADER",
-      payload: assignedData,
-    });
-
-    return assignedData;
-  } catch (error) {
-    if (error.response) {
-      return error.response.data;
-    } else if (error.request) {
-      console.error("No response received:", error.request);
-      return {
-        status: "failed",
-        message: "No response received from the server",
-      };
-    } else {
-      console.error("Error setting up the request:", error.message);
-      return { status: "failed", message: "Error setting up the request" };
-    }
+    return {
+      success: false,
+      message: error.response?.data?.message || "Update failed",
+    };
   }
 };
