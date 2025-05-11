@@ -1,14 +1,17 @@
 import React, { useState, useEffect } from 'react';
 import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
-import { Card, Input, Button, Tag, Modal, Form, Dropdown, DatePicker,Select, Menu, message, Grid } from 'antd';
-import { 
-  PlusOutlined, 
-  EditOutlined, 
-  DeleteOutlined, 
+import {
+  Form, Card, Input, Button, Tag, Modal, Dropdown, DatePicker,
+  Select, Menu, message, Grid, notification
+} from 'antd';
+import {
+  PlusOutlined,
   MoreOutlined,
-  CheckOutlined,
-  CloseOutlined
+  DeleteOutlined,
 } from '@ant-design/icons';
+import { useDispatch, useSelector } from 'react-redux';
+import { useParams } from 'react-router-dom';
+import { CreateTask, fetchUsers } from '../redux/action';
 import '../assets/styles/KanbanBoard.css';
 
 const { TextArea } = Input;
@@ -16,121 +19,69 @@ const { useBreakpoint } = Grid;
 const { Option } = Select;
 
 const KanbanBoard = () => {
-  // Initialize with empty columns to prevent undefined errors
-  const [columns, setColumns] = useState({
-    'todo': {
-      id: 'todo',
-      title: 'To Do',
-      items: [],
-    },
-    'in-progress': {
-      id: 'in-progress',
-      title: 'In Progress',
-      items: [],
-    },
-    'done': {
-      id: 'done',
-      title: 'Done',
-      items: [],
-    },
-  });
-
-  const [isModalVisible, setIsModalVisible] = useState(false);
-  const [editingTask, setEditingTask] = useState(null);
-  const [newColumnName, setNewColumnName] = useState('');
-  const [isAddingColumn, setIsAddingColumn] = useState(false);
+  const dispatch = useDispatch();
+  const users = useSelector((state) => state.users || []);
+  const [loadingUsers, setUsersLoading] = useState(false);
+  const [api, contextHolder] = notification.useNotification();
   const [form] = Form.useForm();
   const screens = useBreakpoint();
+  const token = localStorage.getItem('token');
+
+  const {projectId } = useParams(); // ✅ dynamically fetched from URL
+
+  const [columns, setColumns] = useState({
+    'todo': { id: 'todo', title: 'To Do', items: [] },
+    'in-progress': { id: 'in-progress', title: 'In Progress', items: [] },
+    'done': { id: 'done', title: 'Done', items: [] },
+  });
+
   const [mobileView, setMobileView] = useState(false);
+  const [isModalVisible, setIsModalVisible] = useState(false);
+  const [editingTask, setEditingTask] = useState(null);
 
-  // Initialize with sample data after mount
-  useEffect(() => {
-    setColumns({
-      'todo': {
-        id: 'todo',
-        title: 'To Do',
-        items: [
-          { id: 'task-1', title: 'Task 1', description: 'Description for Task 1' },
-          { id: 'task-2', title: 'Task 2', description: 'Description for Task 2' },
-        ],
-      },
-      'in-progress': {
-        id: 'in-progress',
-        title: 'In Progress',
-        items: [
-          { id: 'task-3', title: 'Task 3', description: 'Description for Task 3' },
-        ],
-      },
-      'done': {
-        id: 'done',
-        title: 'Done',
-        items: [
-          { id: 'task-4', title: 'Task 4', description: 'Description for Task 4' },
-        ],
-      },
-    });
-  }, []);
-
-  // Set mobile view based on screen size
   useEffect(() => {
     setMobileView(!screens.md);
   }, [screens]);
 
+  useEffect(() => {
+    const loadUsers = async () => {
+      setUsersLoading(true);
+      try {
+        await dispatch(fetchUsers(token));
+      } catch {
+        message.error('Failed to fetch users');
+      } finally {
+        setUsersLoading(false);
+      }
+    };
+
+    if (isModalVisible) {
+      loadUsers();
+      form.resetFields();
+    }
+  }, [isModalVisible, dispatch, token, form]);
+
   const onDragEnd = (result) => {
     const { source, destination } = result;
+    if (!destination || (source.droppableId === destination.droppableId && source.index === destination.index)) return;
 
-    // Check for invalid destinations
-    if (!destination || 
-        !columns[source.droppableId] || 
-        !columns[destination.droppableId]) {
-      return;
-    }
+    const sourceColumn = columns[source.droppableId];
+    const destColumn = columns[destination.droppableId];
+    if (!sourceColumn?.items || !destColumn) return;
 
-    // No movement
-    if (source.droppableId === destination.droppableId &&
-        source.index === destination.index) {
-      return;
-    }
-
-    const startColumn = columns[source.droppableId];
-    const finishColumn = columns[destination.droppableId];
-
-    // Same column movement
-    if (startColumn.id === finishColumn.id) {
-      const newItems = [...startColumn.items];
-      const [movedItem] = newItems.splice(source.index, 1);
-      newItems.splice(destination.index, 0, movedItem);
-
-      setColumns({
-        ...columns,
-        [startColumn.id]: {
-          ...startColumn,
-          items: newItems,
-        },
-      });
-      return;
-    }
-
-    // Cross-column movement
-    const startItems = [...startColumn.items];
+    const startItems = [...(sourceColumn.items || [])];
     const [movedItem] = startItems.splice(source.index, 1);
-    const finishItems = [...finishColumn.items];
+    movedItem.columnId = destination.droppableId;
+    const finishItems = [...(destColumn.items || [])];
     finishItems.splice(destination.index, 0, movedItem);
 
     setColumns({
       ...columns,
-      [startColumn.id]: {
-        ...startColumn,
-        items: startItems,
-      },
-      [finishColumn.id]: {
-        ...finishColumn,
-        items: finishItems,
-      },
+      [source.droppableId]: { ...sourceColumn, items: startItems },
+      [destination.droppableId]: { ...destColumn, items: finishItems },
     });
   };
 
-  // Task management functions
   const showAddTaskModal = (columnId) => {
     form.resetFields();
     setEditingTask(null);
@@ -138,102 +89,56 @@ const KanbanBoard = () => {
     setIsModalVisible(true);
   };
 
-  const showEditTaskModal = (task, columnId) => {
-    form.resetFields();
-    setEditingTask({ ...task, columnId });
-    form.setFieldsValue({
-      title: task.title,
-      description: task.description,
-      columnId,
-    });
-    setIsModalVisible(true);
-  };
+  const handleTaskSubmit = async () => {
+    try {
+      const values = await form.validateFields();
+      const { title, description, due_date, assigned_to, columnId } = values;
 
-  const handleTaskSubmit = () => {
-    form.validateFields().then(values => {
-      const { title, description, columnId } = values;
-      
-      if (editingTask) {
-        // Update existing task
-        const updatedColumns = {
+      const newTask = {
+        id: `task-${Date.now()}`,
+        title,
+        description,
+        due_date: due_date?.format('YYYY-MM-DD'),
+        assigned_to,
+        projectId, // ✅ use dynamic projectId
+        columnId,
+      };
+
+      const response = await dispatch(CreateTask({ ...newTask }));
+
+      if (response?.statusCode === 201 || response?.success) {
+        const column = columns[columnId] || { items: [] };
+        const newItems = [...(column.items || []), newTask];
+        setColumns({
           ...columns,
           [columnId]: {
-            ...columns[columnId],
-            items: columns[columnId].items.map(item => 
-              item.id === editingTask.id ? { ...item, title, description } : item
-            ),
+            ...column,
+            items: newItems,
           },
-        };
-        setColumns(updatedColumns);
+        });
+        api.success({ message: 'Task created successfully!' });
+        setIsModalVisible(false);
+        form.resetFields();
       } else {
-        // Add new task
-        const newTask = {
-          id: `task-${Date.now()}`,
-          title,
-          description,
-        };
-        
-        const updatedColumns = {
-          ...columns,
-          [columnId]: {
-            ...columns[columnId],
-            items: [...columns[columnId].items, newTask],
-          },
-        };
-        setColumns(updatedColumns);
+        api.error({ message: response?.message || 'Error creating task' });
       }
-      
-      setIsModalVisible(false);
-      form.resetFields();
-    });
+    } catch (error) {
+      api.error({ message: 'Form Validation Error', description: error?.message || 'Please check the form fields.' });
+    }
   };
 
   const deleteTask = (taskId, columnId) => {
-    const updatedColumns = {
-      ...columns,
-      [columnId]: {
-        ...columns[columnId],
-        items: columns[columnId].items.filter(item => item.id !== taskId),
-      },
-    };
-    setColumns(updatedColumns);
-    message.success('Task deleted successfully');
-  };
-
-  // Column management functions
-  const addNewColumn = () => {
-    if (!newColumnName.trim()) {
-      message.warning('Please enter a column name');
-      return;
-    }
-    
-    const newColumnId = `column-${Date.now()}`;
-    const newColumn = {
-      id: newColumnId,
-      title: newColumnName,
-      items: [],
-    };
-    
+    const column = columns[columnId];
+    if (!column?.items) return;
+    const filteredItems = column.items.filter((item) => item.id !== taskId);
     setColumns({
       ...columns,
-      [newColumnId]: newColumn,
+      [columnId]: {
+        ...column,
+        items: filteredItems,
+      },
     });
-    
-    setNewColumnName('');
-    setIsAddingColumn(false);
-    message.success('Column added successfully');
-  };
-
-  const deleteColumn = (columnId) => {
-    if (Object.keys(columns).length <= 1) {
-      message.warning('You must have at least one column');
-      return;
-    }
-    
-    const newColumns = { ...columns };
-    delete newColumns[columnId];
-    setColumns(newColumns);
-    message.success('Column deleted successfully');
+    message.success('Task deleted successfully');
   };
 
   const getColumnColor = (columnId) => {
@@ -245,206 +150,94 @@ const KanbanBoard = () => {
     return colors[columnId] || 'purple';
   };
 
-  const renderColumns = () => {
-    return Object.values(columns).map((column) => (
-      <div key={column.id} className="column">
-        <div className="column-header">
-          <Tag color={getColumnColor(column.id)}>{column.title}</Tag>
-          <div className="column-actions">
-            <Button 
-              type="text" 
-              icon={<PlusOutlined />} 
-              onClick={() => showAddTaskModal(column.id)}
-              className="action-button"
-              aria-label={`Add task to ${column.title}`}
-            />
-            <Dropdown
-              overlay={
-                <Menu>
-                  <Menu.Item 
-                    key="delete" 
-                    icon={<DeleteOutlined />}
-                    onClick={() => deleteColumn(column.id)}
-                  >
-                    Delete Column
-                  </Menu.Item>
-                </Menu>
-              }
-              trigger={['click']}
-            >
-              <Button 
-                type="text" 
-                icon={<MoreOutlined />} 
-                className="action-button"
-                aria-label={`More options for ${column.title}`}
-              />
-            </Dropdown>
-          </div>
-        </div>
-        
-        <Droppable droppableId={column.id} key={column.id}>
-          {(provided) => (
-            <div
-              ref={provided.innerRef}
-              {...provided.droppableProps}
-              className="tasks-list"
-            >
-              {column.items.map((task, index) => (
-                <Draggable 
-                  key={task.id} 
-                  draggableId={task.id} 
-                  index={index}
-                >
-                  {(provided) => (
-                    <div
-                      ref={provided.innerRef}
-                      {...provided.draggableProps}
-                      {...provided.dragHandleProps}
-                      className="task-card"
-                    >
-                      <Card
-                        size="small"
-                        actions={[
-                          <EditOutlined 
-                            key="edit" 
-                            onClick={() => showEditTaskModal(task, column.id)}
-                            className="action-button"
-                            aria-label={`Edit ${task.title}`}
-                          />,
-                          <DeleteOutlined 
-                            key="delete" 
-                            onClick={() => deleteTask(task.id, column.id)}
-                            className="action-button"
-                            aria-label={`Delete ${task.title}`}
-                          />,
-                        ]}
-                      >
-                        <Card.Meta
-                          title={task.title}
-                          description={
-                            mobileView && task.description.length > 30
-                              ? `${task.description.substring(0, 30)}...`
-                              : task.description
-                          }
-                        />
-                      </Card>
-                    </div>
-                  )}
-                </Draggable>
-              ))}
-              {provided.placeholder}
-            </div>
-          )}
-        </Droppable>
-      </div>
-    ));
-  };
+  const getCardMenu = (taskId, columnId) => (
+    <Menu>
+      <Menu.Item key="delete" icon={<DeleteOutlined />} onClick={() => deleteTask(taskId, columnId)}>
+        Delete
+      </Menu.Item>
+    </Menu>
+  );
 
-  const inputStyle = {
-    height: '40px',
-    width: '100%',
-  };
-  
   return (
     <div className="kanban-board">
+      {contextHolder}
       <DragDropContext onDragEnd={onDragEnd}>
-        <div className={`columns-container ${mobileView ? 'mobile-view' : ''}`}>
-          {renderColumns()}
-          
-          <div className="add-column">
-            {isAddingColumn ? (
-              <div className="add-column-form">
-                <Input
-                  placeholder="Column name"
-                  value={newColumnName}
-                  onChange={(e) => setNewColumnName(e.target.value)}
-                  autoFocus
-                  aria-label="New column name"
-                />
-                <div className="add-column-actions">
-                  <Button 
-                    type="primary" 
-                    icon={<CheckOutlined />} 
-                    onClick={addNewColumn}
-                    className="action-button"
-                    aria-label="Confirm new column"
-                  />
-                  <Button 
-                    type="text" 
-                    icon={<CloseOutlined />} 
-                    onClick={() => setIsAddingColumn(false)}
-                    className="action-button"
-                    aria-label="Cancel new column"
-                  />
-                </div>
+        <div className="columns-container">
+          {Object.values(columns).map((column) => (
+            <div key={column.id} className="column">
+              <div className="column-header">
+                <Tag color={getColumnColor(column.id)}>{column.title}</Tag>
+                <Button icon={<PlusOutlined />} onClick={() => showAddTaskModal(column.id)} />
               </div>
-            ) : (
-              <Button 
-                type="dashed" 
-                icon={<PlusOutlined />} 
-                block
-                onClick={() => setIsAddingColumn(true)}
-                className="add-column-button"
-                aria-label="Add new column"
-              >
-                {mobileView ? <PlusOutlined /> : 'Add Column'}
-              </Button>
-            )}
-          </div>
+              <Droppable droppableId={column.id}>
+                {(provided) => (
+                  <div ref={provided.innerRef} {...provided.droppableProps} className="tasks-list">
+                    {(column.items || []).map((task, index) => (
+                      <Draggable key={task.id} draggableId={task.id} index={index}>
+                        {(provided) => (
+                          <div
+                            ref={provided.innerRef}
+                            {...provided.draggableProps}
+                            {...provided.dragHandleProps}
+                          >
+                            <Card
+                              size="small"
+                              title={task.title}
+                              extra={
+                                <Dropdown overlay={getCardMenu(task.id, column.id)} trigger={['click']}>
+                                  <MoreOutlined style={{ cursor: 'pointer' }} />
+                                </Dropdown>
+                              }
+                            >
+                              <p>{task.description}</p>
+                              {task.due_date && <p><strong>Due:</strong> {task.due_date}</p>}
+                              {task.assigned_to && <p><strong>Assigned to:</strong> {task.assigned_to}</p>}
+                            </Card>
+                          </div>
+                        )}
+                      </Draggable>
+                    ))}
+                    {provided.placeholder}
+                  </div>
+                )}
+              </Droppable>
+            </div>
+          ))}
         </div>
       </DragDropContext>
 
       <Modal
         title={editingTask ? 'Edit Task' : 'Add Task'}
-        visible={isModalVisible}
-        onOk={handleTaskSubmit}
-        onCancel={() => {
-          setIsModalVisible(false);
-          form.resetFields();
-        }}
-        width={mobileView ? '90%' : '50%'}
+        open={isModalVisible}
+        onCancel={() => setIsModalVisible(false)}
+        footer={null}
       >
-        <Form form={form} layout="vertical">
-          <Form.Item
-            name="title"
-            label="Task Title"
-            rules={[{ required: true, message: 'Please enter a title' }]}
-          >
-            <Input placeholder="Task title" aria-label="Task title" />
+        <Form form={form} onFinish={handleTaskSubmit} layout="vertical">
+          <Form.Item name="title" label="Title" rules={[{ required: true, message: 'Please enter a title' }]}>
+            <Input />
           </Form.Item>
-          <Form.Item 
-          name="due_date"
-          label="Task Deadline"
-          rules={[{required: true, message: 'Pleae select task deadline'}]}
-          >
-          <DatePicker
-                style={{ ...inputStyle, padding: '4px 11px' }}
-                format="DD/MM/YYYY"
-              /> 
+          <Form.Item name="description" label="Description" rules={[{ required: true, message: 'Please enter a description' }]}>
+            <TextArea rows={4} />
           </Form.Item>
-          <Form.Item
-              name="assigned_to"
-              label="Assigned To"
-              rules={[{ required: true, message: "Please select a priority level!" }]}
-            >
-              <Select placeholder="Select user to assign task" style={inputStyle}>
-                <Option value="user1">Peace Timothy</Option>
-                <Option value="user2">Timothy Agba</Option>
-                <Option value="user3">Daniel Okoro</Option>
-              </Select>
-            </Form.Item>
-          <Form.Item
-            name="description"
-            label="Description"
-          >
-            <TextArea 
-              rows={mobileView ? 3 : 4} 
-              placeholder="Task description" 
-              aria-label="Task description"
-            />
+          <Form.Item name="due_date" label="Due Date" rules={[{ required: true, message: 'Please select a due date' }]}>
+            <DatePicker style={{ width: '100%' }} />
+          </Form.Item>
+          <Form.Item name="assigned_to" label="Assign To" rules={[{ required: true, message: 'Please select an assignee' }]}>
+            <Select placeholder="Choose a team member" loading={loadingUsers}>
+              {users.map((user) => (
+                <Option key={user._id} value={user._id}>
+                  {user.first_name} {user.last_name}
+                </Option>
+              ))}
+            </Select>
           </Form.Item>
           <Form.Item name="columnId" hidden>
             <Input />
+          </Form.Item>
+          <Form.Item>
+            <Button type="primary" htmlType="submit" block>
+              Submit
+            </Button>
           </Form.Item>
         </Form>
       </Modal>

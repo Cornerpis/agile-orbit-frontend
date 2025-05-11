@@ -15,14 +15,14 @@ const CreateProject = ({ visible, onCancel }) => {
     const token = localStorage.getItem('token'); //Gets token
       try {
         const response = await dispatch(createProject(token, values));
-         console.log("API Response:", response);
+        //  console.log("API Response:", response);
     
         const successMessage = response?.message?.toLowerCase?.().includes("success");
   
   if (
     response?.statusCode === 201 ||
     response?.success === true ||
-    response?.success === "true" || // handle string values
+    response?.success === "true" || 
     successMessage // check if message suggests success
   ) {
     api.success({

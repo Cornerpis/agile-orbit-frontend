@@ -1,54 +1,74 @@
-import React, { useState } from 'react';
-import { Form, Input, Button, Modal, Select, Row, Col, message } from 'antd';
-import { useDispatch } from 'react-redux';
-import axios from 'axios';
-import baseUrl from '../apiConfig';
+import React, { useState, useEffect } from 'react';
+import { Form, Select, Button, Modal, Row, Col, message, Spin } from 'antd';
+import { UserAddOutlined } from "@ant-design/icons";
+import { useDispatch, useSelector } from "react-redux";
+import { fetchUsers, inviteTeamMember } from "../redux/action";
 
 const { Option } = Select;
 
+// Form Component for Inviting Users
 const InviteTeamForm = ({ visible, onInvite, onCancel, loading }) => {
   const [form] = Form.useForm();
+  const dispatch = useDispatch();
+  const users = useSelector((state) => state.users || []);
+  const [usersLoading, setUsersLoading] = useState(false);
 
-  const handleOk = () => {
-    form
-      .validateFields()
-      .then(values => onInvite(values))
-      .catch(info => console.error('Validation Failed:', info));
+  useEffect(() => {
+    const loadUsers = async () => {
+      setUsersLoading(true);
+      try {
+        await dispatch(fetchUsers(localStorage.getItem("token")));
+      } catch {
+        message.error("Failed to fetch users");
+      } finally {
+        setUsersLoading(false);
+      }
+    };
+
+    if (visible) {
+      loadUsers();
+      form.resetFields();
+    }
+  }, [visible, dispatch, form]);
+
+  const handleOk = async () => {
+    try {
+      const values = await form.validateFields();
+      onInvite(values);
+    } catch (info) {
+      const fieldError = info?.errorFields?.[0]?.errors?.[0];
+      message.error(fieldError || "Please select a user to invite.");
+    }
   };
 
   return (
     <Modal
-      visible={visible}
       title="Invite Team Member"
-      okText="Invite"
-      cancelText="Cancel"
+      open={visible}
       onCancel={onCancel}
       onOk={handleOk}
       confirmLoading={loading}
+      destroyOnClose
     >
-      <Form form={form} layout="vertical" name="invite_team_form">
+      <Form form={form} layout="vertical" name="invite_team_form" preserve={false}>
         <Row gutter={[16, 16]}>
-          <Col xs={24} sm={24} md={12}>
+          <Col span={24}>
             <Form.Item
-              name="email"
-              label="Email"
-              rules={[{ required: true, type: 'email', message: 'Please enter a valid email!' }]}
+              name="userId"
+              label="Select User"
+              rules={[{ required: true, message: "Please select a user!" }]}
             >
-              <Input placeholder="Enter team member email" />
-            </Form.Item>
-          </Col>
-          <Col xs={24} sm={24} md={12}>
-            <Form.Item
-              name="role"
-              label="Role"
-              rules={[{ required: true, message: 'Please select a role!' }]}
-            >
-              <Select placeholder="Select role">
-                <Option value="developer">Developer</Option>
-                <Option value="designer">Designer</Option>
-                <Option value="project_manager">Project Manager</Option>
-                <Option value="tester">Tester</Option>
-              </Select>
+              {usersLoading ? (
+                <Spin />
+              ) : (
+                <Select placeholder="Choose a team member" showSearch optionFilterProp="children">
+                  {users.map((user) => (
+                    <Option key={user._id} value={user._id}>
+                      {user.first_name} {user.last_name}
+                    </Option>
+                  ))}
+                </Select>
+              )}
             </Form.Item>
           </Col>
         </Row>
@@ -57,58 +77,68 @@ const InviteTeamForm = ({ visible, onInvite, onCancel, loading }) => {
   );
 };
 
-const InviteTeam = ({ projectId }) => {
+// Main Component for Handling Modal Logic and Dispatch
+const InviteTeam = () => {
   const [visible, setVisible] = useState(false);
   const [loading, setLoading] = useState(false);
   const dispatch = useDispatch();
-  const token = localStorage.getItem('token');
+
+  const projectId = useSelector((state) => state.projects[0]?._id);
+  const projects = useSelector((state) => state.projects || []);
+  const project = projects.find((proj) => proj._id === projectId);
+  const token = localStorage.getItem("token");
+  const userId = localStorage.getItem("userId");
+
+  useEffect(() => {
+    if (!projectId) {
+      console.warn("projectId is undefined. Please ensure you have at least one project loaded.");
+    }
+  }, [projectId]);
 
   const handleInvite = async (values) => {
+    if (!projectId) {
+      message.error("No project selected to invite users.");
+      return;
+    }
+  
+    const userId = values.userId; // Get the userId from the form values
+  
+    if (!userId) {
+      message.error("Please select a user to invite.");
+      return;
+    }
+  
+    setLoading(true);
     try {
-      setLoading(true);
-
-      // Step 1: Fetch all users
-      const usersResponse = await axios.get(`${baseUrl}/api/v1/users`, {
-        headers: {
-          Authorization: `Bearer ${token}`
-        }
-      });
-
-      const users = usersResponse.data;
-      const user = users.find(u => u.email === values.email);
-
-      if (!user) throw new Error('User with this email not found');
-
-      // Step 2: Add user to project
-      const addResponse = await axios.put(
-        `${baseUrl}/api/v1/project/${projectId}/add-member`,
-        { userId: user._id },
-        {
-          headers: {
-            Authorization: `Bearer ${token}`
-          }
-        }
-      );
-
-      if (addResponse.data.success) {
-        message.success('Team member added successfully');
+      const response = await dispatch(inviteTeamMember(projectId, userId)); // Pass userId
+  
+      const success =
+        response?.statusCode === 201 ||
+        response?.success === true ||
+        String(response?.message)?.toLowerCase()?.includes("success");
+  
+      if (success) {
+        message.success(response?.message || "Team member added successfully.");
         setVisible(false);
-        // Optionally dispatch refresh
-        // dispatch(fetchProjectDetails(projectId));
+      } else if (response?.statusCode === 400) {
+        message.warning(response?.message || "Invalid input.");
+      } else if (response?.statusCode === 409) {
+        message.error(response?.message || "User already invited.");
       } else {
-        throw new Error(addResponse.data.message || 'Failed to add member');
+        message.error(response?.message || "An unknown error occurred.");
       }
     } catch (error) {
-      console.error('Error:', error);
-      message.error(error.response?.data?.message || error.message || 'Something went wrong');
+      console.error("Invite error:", error);
+      message.error("Failed to invite user.");
     } finally {
       setLoading(false);
     }
   };
+  
 
   return (
     <>
-      <Button type="primary" onClick={() => setVisible(true)}>
+      <Button type="primary" icon={<UserAddOutlined />} onClick={() => setVisible(true)}>
         Invite Team Members
       </Button>
       <InviteTeamForm

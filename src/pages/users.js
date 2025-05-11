@@ -112,10 +112,10 @@ const CreateUsers = () => {
       dataIndex: "status",
       key: "status",
       render: (status) => (
-        <Tag color={status === "active" ? "green" : "red"}>
+        <Tag color={status === "todo" ? "green" : "red"}>
           {status
             ? status.charAt(0).toUpperCase() + status.slice(1)
-            : "Unknown"}
+            : "Inactive"}
         </Tag>
       ),
       filters: [
@@ -163,7 +163,7 @@ const CreateUsers = () => {
                       (word) => word.charAt(0).toUpperCase() + word.slice(1)
                     )
                     .join(" ")
-                : "Unknown"}
+                : "active"}
             </Tag>
             <Tag
               color={record.status === "active" ? "green" : "blue"}
@@ -172,7 +172,7 @@ const CreateUsers = () => {
               {record.status
                 ? record.status.charAt(0).toUpperCase() +
                   record.status.slice(1)
-                : "Unknown"}
+                : "Inactive"}
             </Tag>
           </div>
         </div>

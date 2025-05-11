@@ -9,7 +9,6 @@ import {
   Typography,
   Tag,
 } from "antd";
-
 import {  PlusOutlined } from "@ant-design/icons";
 import MyModal from "../pages/create-project";
 import { fetchProjects } from "../redux/action";
